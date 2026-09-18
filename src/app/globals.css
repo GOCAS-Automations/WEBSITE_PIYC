@@ -1,0 +1,143 @@
+@import "tailwindcss";
+
+/* =====================================================================
+   PIYC — Tokens de diseño (Tailwind CSS v4)
+   ⚠ SE TOCAN JUNTOS con src/lib/tokens.ts (fuente de verdad para JS).
+   Si cambias un valor aquí, cámbialo allá en el mismo commit.
+   La paleta por defecto de Tailwind se anula: solo existen estos colores.
+   ===================================================================== */
+@theme {
+  --color-*: initial;
+  --shadow-*: initial;
+
+  /* Base oscura — grafito azulado */
+  --color-grafito-950: #0b1322;
+  --color-grafito-900: #121c2e;
+  --color-grafito-800: #1b2740;
+  --color-grafito-700: #26334a;
+
+  /* Acento de marca — azul PIYC (700 = color del logo) */
+  --color-azul-50: #eef2fb;
+  --color-azul-100: #dce5f8;
+  --color-azul-300: #93aef0;
+  --color-azul-700: #103a93;
+  --color-azul-800: #0b2b70;
+
+  /* Base clara (50) y neutros medios — acero */
+  --color-acero-50: #f3f5f8;
+  --color-acero-100: #e7ebf0;
+  --color-acero-200: #d3d9e2;
+  --color-acero-400: #9aa5b5;
+  --color-acero-600: #566172;
+
+  /* Estado / señal — naranja de seguridad */
+  --color-naranja-500: #f26a1b;
+  --color-naranja-600: #db5810;
+  --color-naranja-700: #a8430a;
+
+  --color-blanco: #ffffff;
+
+  /* Radios: bordes casi rectos */
+  --radius-fino: 2px;
+  --radius-medio: 4px;
+
+  /* Ancho máximo del contenido */
+  --container-sitio: 80rem;
+
+  /* Animaciones (se apagan con prefers-reduced-motion) */
+  --animate-flujo: flujo 1.6s linear infinite;
+  --animate-parpadeo: parpadeo 2.4s ease-in-out infinite;
+
+  @keyframes flujo {
+    from {
+      stroke-dashoffset: 28;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  @keyframes parpadeo {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.35;
+    }
+  }
+}
+
+/* Tipografías: variables de next/font (definidas en <html>). */
+@theme inline {
+  --font-sans: var(--font-plex), ui-sans-serif, system-ui, sans-serif;
+  --font-titulo: var(--font-barlow), "Arial Narrow", ui-sans-serif, sans-serif;
+}
+
+/* Retícula de plano técnico para fondos claros. */
+@utility fondo-plano {
+  background-color: var(--color-acero-50);
+  background-image:
+    linear-gradient(to right, color-mix(in srgb, var(--color-azul-700) 9%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--color-azul-700) 9%, transparent) 1px, transparent 1px),
+    linear-gradient(to right, color-mix(in srgb, var(--color-azul-700) 4%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--color-azul-700) 4%, transparent) 1px, transparent 1px);
+  background-size:
+    120px 120px,
+    120px 120px,
+    24px 24px,
+    24px 24px;
+  background-position: -1px -1px;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-blanco);
+    color: var(--color-grafito-950);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: clip;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-titulo);
+    text-wrap: balance;
+  }
+
+  ::selection {
+    background-color: var(--color-azul-700);
+    color: var(--color-blanco);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-azul-700);
+    outline-offset: 3px;
+  }
+
+  .sobre-oscuro :focus-visible {
+    outline-color: var(--color-naranja-500);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
