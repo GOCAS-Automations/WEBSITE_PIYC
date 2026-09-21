@@ -25,6 +25,7 @@ import { Galeria } from "@/components/sections/Galeria";
 import { Valores } from "@/components/sections/Valores";
 import {
   Contenedor,
+  EntradaSeccion,
   Parrafos,
   Rotulo,
   TituloSeccion,
@@ -45,7 +46,7 @@ export async function generateMetadata(): Promise<Metadata> {
     titulo: "Quiénes somos",
     descripcion:
       "PIYC — Programación Industrial y Control S.A.S.: ingenieros dedicados a proyectos de ingeniería, montaje y mantenimiento de equipos eléctricos y electrónicos.",
-  });
+  }, seo.ogImage);
   return metadataDePagina({ titulo, descripcion, ruta: "/nosotros", imagen });
 }
 
@@ -173,10 +174,16 @@ export default async function Nosotros() {
             <TituloSeccion id="titulo-galeria" className="mt-5">
               {bloqueGaleria?.title ?? "Nuestro trabajo"}
             </TituloSeccion>
+            {bloqueGaleria?.intro ? (
+              <EntradaSeccion className="mt-5">{bloqueGaleria.intro}</EntradaSeccion>
+            ) : null}
+            {/* Carrusel horizontal: Cesar pidió poder moverse lateralmente
+                entre las fotos en vez de ver un mosaico. El clic sigue
+                abriendo el visor ampliado de siempre. */}
             <Galeria
               imagenes={galeria}
-              titulo="PIYC en obra"
-              columnas={3}
+              titulo={bloqueGaleria?.title ?? "Nuestro trabajo"}
+              vista="carrusel"
               className="mt-8"
             />
           </Contenedor>

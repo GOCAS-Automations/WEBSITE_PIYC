@@ -181,7 +181,10 @@ export const curvas = {
 
 export const layout = {
   anchoMaximo: "80rem",
-  /** Ancho de la cápsula flotante del nav. */
+  /**
+   * @deprecated Desde el sistema v4 la cápsula del nav usa `anchoMaximo`:
+   * llega hasta los mismos márgenes que el contenido de la página.
+   */
   anchoNav: "68.75rem",
   gutterMovil: "16px",
 } as const;

@@ -34,6 +34,7 @@ import { RejillaDeProyectos, RejillaDeServicios } from "@/components/sections/ta
 import {
   Contenedor,
   ListaDeAlcances,
+  NavegacionEntreFichas,
   Parrafos,
   Rotulo,
   TituloSeccion,
@@ -99,6 +100,16 @@ export default async function PaginaDeServicio({
   const parrafos = enParrafos(servicio.description);
   // Línea a la que pertenece el servicio (agrupación propuesta, en el código).
   const linea = lineasDeServicio.find((candidata) => candidata.slugs.includes(servicio.slug));
+  // Títulos de las secciones de la plantilla, editables en «Textos de las
+  // páginas». Se usa `||` y no `??`: un título vacío dejaría la sección sin
+  // nombre accesible, así que ahí vuelve el de fábrica.
+  const plantilla = paginas.servicioDetalle;
+  // Anterior y siguiente dentro del listado: la ficha deja de ser un callejón
+  // sin salida y el rastreador llega a las nueve desde cualquiera.
+  const indiceActual = todos.findIndex((otro) => otro.slug === servicio.slug);
+  const anterior = indiceActual > 0 ? todos[indiceActual - 1] : null;
+  const siguiente =
+    indiceActual >= 0 && indiceActual < todos.length - 1 ? todos[indiceActual + 1] : null;
 
   return (
     <main id="contenido">
@@ -145,7 +156,7 @@ export default async function PaginaDeServicio({
               {/* El h2 no puede repetir el h1: en cuatro servicios `title` y
                   `navTitle` son la misma cadena («Telemetría» / «Telemetría»). */}
               <TituloSeccion id="titulo-alcance" className="mt-5">
-                Alcance y forma de trabajo
+                {plantilla?.tituloAlcance || "Alcance y forma de trabajo"}
               </TituloSeccion>
               <Parrafos textos={parrafos} className="mt-6" />
             </div>
@@ -169,7 +180,7 @@ export default async function PaginaDeServicio({
           {servicio.items.length > 0 ? (
             <div className="mt-12">
               <h3 className="text-[1.375rem] font-semibold leading-tight text-azul-950">
-                Qué incluye
+                {plantilla?.tituloIncluye || "Qué incluye"}
               </h3>
               <ListaDeAlcances items={servicio.items} className="mt-5" />
             </div>
@@ -186,7 +197,7 @@ export default async function PaginaDeServicio({
           <Contenedor className="py-16 lg:py-20">
             <Rotulo>Del trabajo</Rotulo>
             <TituloSeccion id="titulo-galeria-servicio" className="mt-5">
-              Galería
+              {plantilla?.tituloGaleria || "Galería"}
             </TituloSeccion>
             <Galeria
               imagenes={galeria}
@@ -204,7 +215,7 @@ export default async function PaginaDeServicio({
           <Contenedor className="py-16 lg:py-20">
             <Rotulo>Casos de éxito</Rotulo>
             <TituloSeccion id="titulo-relacionados" className="mt-5">
-              Proyectos con este servicio
+              {plantilla?.tituloCasos || "Proyectos con este servicio"}
             </TituloSeccion>
             <div className="mt-8">
               <RejillaDeProyectos proyectos={relacionados} columnas={3} />
@@ -220,7 +231,9 @@ export default async function PaginaDeServicio({
           className="bg-lienzo-alto"
         >
           <Contenedor className="py-16 lg:py-20">
-            <TituloSeccion id="titulo-otros">Otros servicios</TituloSeccion>
+            <TituloSeccion id="titulo-otros">
+              {plantilla?.tituloOtros || "Otros servicios"}
+            </TituloSeccion>
             <div className="mt-8">
               <RejillaDeServicios servicios={otros} columnas={3} />
             </div>
@@ -228,10 +241,18 @@ export default async function PaginaDeServicio({
         </section>
       ) : null}
 
+      {/* Anterior / siguiente entre servicios */}
+      <NavegacionEntreFichas
+        anterior={anterior}
+        siguiente={siguiente}
+        etiqueta="Navegación entre servicios"
+        base="/servicios"
+      />
+
       <FranjaCta
         titulo={`¿Necesita ${servicio.navTitle.toLowerCase()}?`}
         texto={
-          paginas.servicioDetalle?.ctaTexto ??
+          plantilla?.ctaTexto ??
           "Escríbanos con los datos del equipo o del proceso y le decimos qué información hace falta para cotizar."
         }
         hrefWhatsApp={hrefWhatsApp}

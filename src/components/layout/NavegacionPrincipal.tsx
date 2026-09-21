@@ -125,13 +125,16 @@ export function NavegacionPrincipal({
 
   return (
     <header className="pointer-events-none fixed inset-x-0 top-0 z-50">
-      <div className="mx-auto flex w-full max-w-nav flex-col items-stretch px-3 pt-3 sm:px-5 sm:pt-4 lg:items-center">
-        {/* Cápsula: a todo el ancho en móvil, ajustada al contenido en
-            escritorio, que es lo que la hace leerse como una píldora flotante
-            y no como una barra. */}
+      {/* Mismos márgenes laterales y mismo ancho máximo que `Contenedor`: la
+          cápsula llega justo hasta donde llega el contenido de la página, que
+          es lo que pidió Cesar. Antes usaba `max-w-nav` (68.75rem) y se leía
+          pequeña al lado de un contenido de 80rem. */}
+      <div className="mx-auto flex w-full max-w-sitio flex-col items-stretch px-4 pt-3 sm:px-6 sm:pt-4 lg:px-8">
+        {/* Cápsula a todo el ancho del contenedor: logo a la izquierda,
+            enlaces centrados en el espacio sobrante y CTA a la derecha. */}
         <div
           data-compacta={compacta ? "si" : "no"}
-          className="material pointer-events-auto flex h-16 items-center gap-2 rounded-capsula pl-4 pr-2 shadow-flotante ring-1 ring-separador transition-[height,box-shadow] duration-300 ease-ios data-[compacta=si]:h-14 data-[compacta=si]:shadow-elevada sm:pl-5 sm:pr-2.5 lg:gap-5"
+          className="material pointer-events-auto flex h-16 items-center gap-2 rounded-capsula pl-4 pr-2 shadow-flotante ring-1 ring-separador transition-[height,box-shadow] duration-300 ease-ios data-[compacta=si]:h-14 data-[compacta=si]:shadow-elevada sm:pl-5 sm:pr-2.5 lg:gap-6 lg:pl-7 lg:pr-3"
         >
           <Link
             href="/"
@@ -141,8 +144,10 @@ export function NavegacionPrincipal({
             {children}
           </Link>
 
-          <nav aria-label="Principal" className="hidden lg:block">
-            <ul className="flex items-center gap-0.5">
+          {/* `lg:mx-auto` centra el bloque de enlaces en el hueco que dejan el
+              logo y el CTA, sin que ninguno de los dos pierda su sitio. */}
+          <nav aria-label="Principal" className="hidden lg:block lg:mx-auto">
+            <ul className="flex items-center gap-1">
               {navegacionPrincipal.map((enlace) => {
                 const activo = esActivo(pathname, enlace.href);
                 return (
@@ -150,7 +155,7 @@ export function NavegacionPrincipal({
                     <Link
                       href={enlace.href}
                       aria-current={activo ? "page" : undefined}
-                      className="pulsable inline-flex h-9 items-center rounded-capsula px-3.5 text-[15px] font-medium text-acero-600 hover:bg-relleno hover:text-azul-700 aria-[current=page]:bg-relleno-medio aria-[current=page]:text-azul-800"
+                      className="pulsable inline-flex h-11 items-center rounded-capsula px-4 text-[15px] font-medium text-acero-600 hover:bg-relleno hover:text-azul-700 aria-[current=page]:bg-relleno-medio aria-[current=page]:text-azul-800"
                     >
                       {enlace.etiqueta}
                     </Link>

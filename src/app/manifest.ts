@@ -18,7 +18,9 @@ export default function manifest(): MetadataRoute.Manifest {
     start_url: "/",
     display: "standalone",
     background_color: colores.blanco,
-    theme_color: colores.azul[700],
+    // El mismo color que la meta `theme-color` del layout raíz (`colores.lienzo`):
+    // si difieren, la barra del navegador cambia de tono al instalar el sitio.
+    theme_color: colores.lienzo,
     lang: "es-CO",
     icons: [
       { src: "/icon.png", sizes: "any", type: "image/png" },

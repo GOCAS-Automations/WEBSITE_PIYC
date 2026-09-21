@@ -36,6 +36,12 @@ type PropsContentImage = {
   className?: string;
   /** true solo en la imagen más grande de la mitad superior (el LCP). */
   prioritaria?: boolean;
+  /**
+   * Carga inmediata SIN prioridad de red. Para las primeras diapositivas de un
+   * carrusel: se quiere que estén listas al deslizar, pero no compiten con el
+   * LCP de la página. `prioritaria` manda sobre esto.
+   */
+  anticipada?: boolean;
   /** Proporción del recuadro cuando la foto se recorta: `aspect-[4/3]`… */
   proporcion?: string;
   /** `cover` recorta para llenar; `contain` muestra la foto completa. */
@@ -54,6 +60,7 @@ export function ContentImage({
   height,
   className = "",
   prioritaria = false,
+  anticipada = false,
   proporcion,
   ajuste = "cover",
   claseContenedor = "",
@@ -82,7 +89,7 @@ export function ContentImage({
       alt={alt}
       width={anchoFinal}
       height={altoFinal}
-      loading={prioritaria ? "eager" : "lazy"}
+      loading={prioritaria || anticipada ? "eager" : "lazy"}
       decoding={prioritaria ? "sync" : "async"}
       fetchPriority={prioritaria ? "high" : undefined}
       className={clasesImagen}

@@ -8,10 +8,16 @@
 import type { Metadata } from "next";
 import { getContacto, getPaginas, getProyectos, getSeo } from "@/lib/content";
 import { MENSAJES_WHATSAPP, enlaceWhatsAppDe } from "@/lib/contacto";
-import { jsonLdMigas, metadataDePagina, metadatosPagina, type Miga } from "@/lib/seo";
+import {
+  jsonLdListado,
+  jsonLdMigas,
+  metadataDePagina,
+  metadatosPagina,
+  type Miga,
+} from "@/lib/seo";
 import { CabeceraInterna } from "@/components/sections/CabeceraInterna";
 import { FranjaCta } from "@/components/sections/FranjaCta";
-import { RejillaDeProyectos } from "@/components/sections/tarjetas";
+import { RejillaDeProyectos, columnasParaCantidad } from "@/components/sections/tarjetas";
 import { Contenedor, EntradaSeccion } from "@/components/sections/primitivas";
 import { JsonLd } from "@/components/ui/JsonLd";
 
@@ -28,7 +34,7 @@ export async function generateMetadata(): Promise<Metadata> {
     titulo: "Proyectos",
     descripcion:
       "Casos de éxito de PIYC: automatizaciones, sistemas de control e ingeniería eléctrica entregados en plantas de producción del Valle del Cauca.",
-  });
+  }, seo.ogImage);
   return metadataDePagina({ titulo, descripcion, ruta: "/proyectos", imagen });
 }
 
@@ -45,6 +51,20 @@ export default async function ListadoDeProyectos() {
   return (
     <main id="contenido">
       <JsonLd datos={jsonLdMigas(MIGAS)} />
+      <JsonLd
+        datos={jsonLdListado({
+          nombre: ajustes?.title || "Proyectos de PIYC",
+          descripcion:
+            ajustes?.intro ||
+            ajustes?.subtitle ||
+            "Casos de éxito de automatización e ingeniería eléctrica entregados por PIYC.",
+          ruta: "/proyectos",
+          elementos: proyectos.map((proyecto) => ({
+            nombre: proyecto.title,
+            ruta: `/proyectos/${proyecto.slug}`,
+          })),
+        })}
+      />
 
       <CabeceraInterna
         ajustes={ajustes}
@@ -64,7 +84,13 @@ export default async function ListadoDeProyectos() {
           ) : null}
 
           {proyectos.length > 0 ? (
-            <RejillaDeProyectos proyectos={proyectos} columnas={3} prioritariaLaPrimera />
+            /* `columnasParaCantidad`: con 4 casos, tres columnas dejan uno
+               solo en la segunda fila y se lee como un error de maquetación. */
+            <RejillaDeProyectos
+              proyectos={proyectos}
+              columnas={columnasParaCantidad(proyectos.length)}
+              prioritariaLaPrimera
+            />
           ) : (
             <p className="rounded-tarjeta bg-blanco px-5 py-10 text-center text-acero-600 shadow-tarjeta">
               Todavía no hay casos publicados.

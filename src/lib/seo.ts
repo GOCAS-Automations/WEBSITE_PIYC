@@ -27,6 +27,14 @@ import type { AjustesContact, MetadatosPagina } from "@/lib/content-types";
 export const LARGO_MAXIMO_TITULO = 53;
 export const LARGO_MAXIMO_DESCRIPCION = 155;
 
+/**
+ * Imagen OG de respaldo: la que genera `src/app/opengraph-image.tsx`. Next
+ * solo la añade sola cuando la página no declara `openGraph`, y todas las
+ * nuestras lo declaran (para el canonical y el título), así que sin este
+ * respaldo las páginas sin foto propia se compartían **sin imagen**.
+ */
+export const IMAGEN_OG_SITIO = "/opengraph-image";
+
 /** URL base del sitio, sin barra final. */
 export function urlSitio(): string {
   const url = process.env.NEXT_PUBLIC_SITE_URL || "https://piycsas.com";
@@ -73,7 +81,7 @@ export function metadataDePagina({
 }: OpcionesMetadata): Metadata {
   const title = recortar(titulo, LARGO_MAXIMO_TITULO);
   const description = recortar(descripcion, LARGO_MAXIMO_DESCRIPCION);
-  const images = imagen ? [{ url: imagen }] : undefined;
+  const images = [{ url: imagen || IMAGEN_OG_SITIO }];
 
   return {
     title,
@@ -84,13 +92,13 @@ export function metadataDePagina({
       url: ruta,
       title,
       description,
-      ...(images ? { images } : {}),
+      images,
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      ...(images ? { images } : {}),
+      images,
     },
   };
 }
@@ -99,11 +107,13 @@ export function metadataDePagina({
 export function metadatosPagina(
   desdeAjustes: MetadatosPagina | undefined,
   respaldo: { titulo: string; descripcion: string },
+  /** Imagen OG del sitio (`site_settings.seo.ogImage`), si la hay. */
+  imagenDelSitio?: string,
 ): { titulo: string; descripcion: string; imagen?: string } {
   return {
     titulo: desdeAjustes?.title?.trim() || respaldo.titulo,
     descripcion: desdeAjustes?.description?.trim() || respaldo.descripcion,
-    imagen: desdeAjustes?.ogImage?.trim() || undefined,
+    imagen: desdeAjustes?.ogImage?.trim() || imagenDelSitio?.trim() || undefined,
   };
 }
 
@@ -204,7 +214,9 @@ export function jsonLdSitio(contacto: AjustesContact): BloqueJsonLd {
   const sameAs = perfilesSociales(contacto);
   const correo = contacto.emails?.[0]?.address;
   const horarios = horarioEspecificado(contacto);
-  const logo = `${base}/brand/logo-piyc.png`;
+  // JSON-LD: Google no acepta SVG como `logo`, así que aquí va el PNG grande
+  // derivado del SVG (2000 px de ancho).
+  const logo = `${base}/brand/logo-piyc@2000.png`;
 
   const organizacion: BloqueJsonLd = {
     "@type": "Organization",
@@ -313,6 +325,94 @@ export function jsonLdMigas(migas: readonly Miga[]): BloqueJsonLd {
       name: miga.etiqueta,
       item: urlAbsoluta(miga.href),
     })),
+  };
+}
+
+/**
+ * `CollectionPage` + `ItemList` de un hub (`/servicios`, `/proyectos`).
+ *
+ * Le dice al buscador que esa URL es un listado y en qué orden están sus
+ * elementos, que es lo que permite que aparezcan como enlaces de sitio bajo el
+ * resultado principal. Los elementos van solo con `url` y `name`: la ficha
+ * completa de cada uno ya está en su propia página.
+ */
+export function jsonLdListado(opciones: {
+  nombre: string;
+  descripcion: string;
+  ruta: string;
+  elementos: readonly { nombre: string; ruta: string }[];
+}): BloqueJsonLd | null {
+  const { nombre, descripcion, ruta, elementos } = opciones;
+  if (elementos.length === 0) return null;
+  const base = urlSitio();
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "@id": urlAbsoluta(ruta),
+    url: urlAbsoluta(ruta),
+    name: nombre,
+    description: recortar(descripcion, 300),
+    inLanguage: "es-CO",
+    isPartOf: { "@id": `${base}/${ID_SITIO}` },
+    mainEntity: {
+      "@type": "ItemList",
+      numberOfItems: elementos.length,
+      itemListOrder: "https://schema.org/ItemListOrderAscending",
+      itemListElement: elementos.map((elemento, indice) => ({
+        "@type": "ListItem",
+        position: indice + 1,
+        name: elemento.nombre,
+        url: urlAbsoluta(elemento.ruta),
+      })),
+    },
+  };
+}
+
+/**
+ * `Article` de un caso de éxito. Se emite como `Article` y no como `Service`
+ * porque un caso es un relato de un trabajo hecho, no algo que se contrate.
+ * `datePublished`/`dateModified` solo si la base trae la fecha: no se inventa.
+ */
+export function jsonLdCaso(opciones: {
+  titulo: string;
+  descripcion: string;
+  ruta: string;
+  imagen?: string;
+  actualizado?: string | null;
+  contacto: AjustesContact;
+}): BloqueJsonLd {
+  const { titulo, descripcion, ruta, imagen, actualizado, contacto } = opciones;
+  const base = urlSitio();
+  const fecha = actualizado && !Number.isNaN(new Date(actualizado).getTime()) ? actualizado : null;
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "@id": urlAbsoluta(ruta),
+    headline: recortar(titulo, 110),
+    description: recortar(descripcion, 300),
+    url: urlAbsoluta(ruta),
+    inLanguage: "es-CO",
+    isPartOf: { "@id": `${base}/${ID_SITIO}` },
+    author: { "@id": `${base}/${ID_ORGANIZACION}` },
+    publisher: { "@id": `${base}/${ID_ORGANIZACION}` },
+    about: { "@id": `${base}/${ID_ORGANIZACION}` },
+    ...(imagen ? { image: imagen } : {}),
+    ...(fecha ? { datePublished: fecha, dateModified: fecha } : {}),
+    ...(contacto.address?.city
+      ? {
+          contentLocation: {
+            "@type": "Place",
+            address: {
+              "@type": "PostalAddress",
+              addressLocality: contacto.address.city,
+              ...(contacto.address.region ? { addressRegion: contacto.address.region } : {}),
+              addressCountry: "CO",
+            },
+          },
+        }
+      : {}),
   };
 }
 

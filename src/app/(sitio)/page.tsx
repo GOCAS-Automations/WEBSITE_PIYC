@@ -44,7 +44,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const { titulo, descripcion, imagen } = metadatosPagina(seo.paginas?.inicio, {
     titulo: seo.defaultTitle ?? "PIYC",
     descripcion: seo.defaultDescription ?? "",
-  });
+  }, seo.ogImage);
 
   return {
     // El inicio no usa la plantilla «%s | PIYC»: su título ya está completo.

@@ -46,7 +46,7 @@ export async function generateMetadata(): Promise<Metadata> {
     titulo: "Contacto",
     descripcion:
       "Escríbanos por WhatsApp o déjenos los datos de su proyecto de automatización, tableros o ingeniería eléctrica en Cali.",
-  });
+  }, seo.ogImage);
   return metadataDePagina({ titulo, descripcion, ruta: "/contacto", imagen });
 }
 
@@ -94,7 +94,7 @@ export default async function Contacto() {
             <div className="lg:col-span-5">
               <Rotulo>Datos</Rotulo>
               <TituloSeccion className="mt-5 !text-[1.75rem] sm:!text-[2rem]">
-                Dónde encontrarnos
+                {ajustes?.tituloDatos || "Dónde encontrarnos"}
               </TituloSeccion>
 
               <dl className="mt-7 overflow-hidden rounded-tarjeta bg-blanco shadow-tarjeta">
@@ -237,7 +237,7 @@ export default async function Contacto() {
             <div className="lg:col-span-7">
               <Rotulo>Formulario</Rotulo>
               <TituloSeccion className="mt-5 !text-[1.75rem] sm:!text-[2rem]">
-                Cuéntenos qué necesita
+                {ajustes?.tituloFormulario || "Cuéntenos qué necesita"}
               </TituloSeccion>
               {ajustes?.introFormulario !== "" ? (
                 <p className="mt-4 max-w-[60ch] text-[15px] leading-relaxed text-acero-600">
@@ -269,7 +269,7 @@ export default async function Contacto() {
           <Contenedor className="py-16 lg:py-20">
             <Rotulo>Ubicación</Rotulo>
             <TituloSeccion id="titulo-mapa" className="mt-5">
-              Cómo llegar
+              {ajustes?.tituloMapa || "Cómo llegar"}
             </TituloSeccion>
             <p className="mt-4 text-[15px] text-acero-600">{direccion}</p>
 

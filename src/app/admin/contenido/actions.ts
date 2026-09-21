@@ -412,6 +412,8 @@ export async function guardarInicioHero(
         etiqueta: text(formData, "cta2_etiqueta"),
         href: text(formData, "cta2_href"),
       },
+      // Sin imagen (`undefined`) la portada vuelve al diagrama de escalera.
+      image: imagenDeFormulario(formData, "hero_imagen", "hero_imagen_alt"),
     },
   }));
   if (estado.status === "success") revalidarSitio("/");
@@ -662,6 +664,7 @@ export async function guardarNosotrosGaleria(
     bloqueGaleria: {
       eyebrow: text(formData, "galeria_eyebrow"),
       title: text(formData, "galeria_title"),
+      intro: text(formData, "galeria_intro"),
     },
   }));
   if (estado.status === "success") revalidarSitio("/nosotros");
@@ -741,6 +744,9 @@ export async function guardarTextosFormulario(
       ...(p.contacto ?? {}),
       introFormulario: text(formData, "intro_formulario"),
       notaFormulario: text(formData, "nota_formulario"),
+      tituloDatos: text(formData, "titulo_datos"),
+      tituloFormulario: text(formData, "titulo_formulario"),
+      tituloMapa: text(formData, "titulo_mapa"),
     },
   }));
   if (estado.status === "success") revalidarSitio("/contacto");
@@ -794,8 +800,18 @@ export async function guardarPlantillasDeFicha(
         title: text(formData, "proyecto_cta_title"),
         body: text(formData, "proyecto_cta_body"),
       },
+      tituloCuerpo: text(formData, "proyecto_titulo_cuerpo"),
+      tituloGaleria: text(formData, "proyecto_titulo_galeria"),
+      tituloServicios: text(formData, "proyecto_titulo_servicios"),
     },
-    servicioDetalle: { ctaTexto: text(formData, "servicio_cta_body") },
+    servicioDetalle: {
+      ctaTexto: text(formData, "servicio_cta_body"),
+      tituloAlcance: text(formData, "servicio_titulo_alcance"),
+      tituloIncluye: text(formData, "servicio_titulo_incluye"),
+      tituloGaleria: text(formData, "servicio_titulo_galeria"),
+      tituloCasos: text(formData, "servicio_titulo_casos"),
+      tituloOtros: text(formData, "servicio_titulo_otros"),
+    },
   }));
   if (estado.status === "success") {
     revalidatePath("/proyectos/[slug]", "page");

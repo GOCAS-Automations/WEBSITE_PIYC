@@ -208,7 +208,7 @@ export default async function AjustesPage() {
                     etiquetaA="Correo"
                     etiquetaB="De quién es"
                     filasB={1}
-                    placeholderA="jorge.castillo@piycsas.com"
+                    placeholderA="contacto@piycsas.com"
                     placeholderB="Jorge Castillo"
                     textoAgregar="Agregar correo"
                     defaultValue={(contact.emails ?? []).map((c) => ({

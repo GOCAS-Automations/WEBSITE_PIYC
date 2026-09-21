@@ -9,7 +9,13 @@
  */
 
 import type { ReactNode } from "react";
-import { BotonSecundario, BotonWhatsApp, Contenedor, TituloSeccion } from "./primitivas";
+import {
+  BotonSecundario,
+  BotonWhatsApp,
+  Contenedor,
+  GrupoDeBotones,
+  TituloSeccion,
+} from "./primitivas";
 
 export function FranjaCta({
   titulo,
@@ -47,12 +53,16 @@ export function FranjaCta({
               {children}
             </div>
 
-            <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap lg:col-span-5 lg:justify-end">
+            {/* En `lg` esta columna mide cinco de doce: dos cápsulas largas no
+                caben en una línea. Antes se envolvían y quedaban apiladas con
+                anchos distintos; ahora se apilan a propósito, compartiendo
+                ancho y alto (ver `GrupoDeBotones`). */}
+            <GrupoDeBotones direccion="fila-hasta-lg" alinear="fin" className="lg:col-span-5">
               <BotonWhatsApp href={hrefWhatsApp}>{etiquetaWhatsApp}</BotonWhatsApp>
               <BotonSecundario href={hrefSecundario} tono="oscuro">
                 {etiquetaSecundaria}
               </BotonSecundario>
-            </div>
+            </GrupoDeBotones>
           </div>
         </div>
       </Contenedor>

@@ -241,7 +241,21 @@ export default async function NosotrosPage() {
                   defaultValue={nosotros.bloqueGaleria?.title}
                   placeholder="Nuestro trabajo"
                 />
+                <AreaTexto
+                  label="Texto de entrada"
+                  name="galeria_intro"
+                  scope="galeria"
+                  rows={2}
+                  defaultValue={nosotros.bloqueGaleria?.intro}
+                  hint="Una o dos frases sobre lo que se ve en las fotos. Si lo dejas vacío, no se pinta."
+                  className="sm:col-span-2"
+                />
               </div>
+              <p className="rounded-control bg-azul-50 px-3 py-2 text-xs leading-relaxed text-azul-900">
+                En el sitio estas fotos se ven en un carrusel que se desliza de
+                lado. Van todas a la misma altura y recortadas al centro, así
+                que sirven tanto apaisadas como verticales.
+              </p>
               <CampoGaleria
                 label="Fotos de la página Nosotros"
                 folder="nosotros"

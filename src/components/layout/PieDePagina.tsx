@@ -11,7 +11,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { getContacto, getServicios } from "@/lib/content";
+import { getContacto, getProyectos, getServicios } from "@/lib/content";
 import {
   MENSAJES_WHATSAPP,
   correosVisibles,
@@ -31,7 +31,11 @@ import {
 import { IconoCorreo, IconoTelefono } from "@/components/ui/iconos-servicio";
 
 export async function PieDePagina() {
-  const [contacto, servicios] = await Promise.all([getContacto(), getServicios()]);
+  const [contacto, servicios, proyectos] = await Promise.all([
+    getContacto(),
+    getServicios(),
+    getProyectos(),
+  ]);
 
   const telefono = telefonoPrincipal(contacto);
   const hrefWhatsApp = enlaceWhatsAppDe(contacto, MENSAJES_WHATSAPP.general);
@@ -47,14 +51,15 @@ export async function PieDePagina() {
         <div className="overflow-hidden rounded-lienzo fondo-noche px-6 py-12 shadow-elevada sm:px-10 lg:px-12 lg:py-14">
         <div className="grid gap-10 lg:grid-cols-12 lg:gap-8">
           {/* Marca */}
-          <div className="lg:col-span-4">
-            <Link href="/" className="inline-block">
+          <div className="lg:col-span-3">
+            <Link href="/" className="inline-block" prefetch={false}>
               <Image
-                src="/brand/logo-piyc-oscuro.png"
+                src="/brand/logo-piyc-oscuro.svg"
                 alt="PIYC — Programación Industrial y Control S.A.S., ir al inicio"
                 width={452}
                 height={192}
                 loading="lazy"
+                unoptimized
                 className="h-12 w-auto"
               />
             </Link>
@@ -81,32 +86,66 @@ export async function PieDePagina() {
           </div>
 
           {/* Navegación */}
-          <nav aria-labelledby="pie-navegacion" className="lg:col-span-2">
-            <h2 id="pie-navegacion" className="text-[13px] font-semibold text-acero-300">
-              Navegación
-            </h2>
-            <ul className="mt-4 space-y-2.5 text-[15px]">
-              {navegacionPrincipal.map((enlace) => (
-                <li key={enlace.href}>
-                  <Link href={enlace.href} className="transition-colors hover:text-blanco">
-                    {enlace.etiqueta}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
+          {/* Mapa del sitio: páginas, casos y servicios, todo enlazado.
+              `prefetch={false}`: el pie está al final de cada página y, con el
+              prefetch por defecto, apenas asoma dispara una petición por cada
+              uno de sus ~20 enlaces. Aquí la intención de clic es baja. */}
+          <div className="lg:col-span-3">
+            <nav aria-labelledby="pie-navegacion">
+              <h2 id="pie-navegacion" className="text-[13px] font-semibold text-acero-300">
+                Navegación
+              </h2>
+              {/* `py-2.5` en cada enlace: el objetivo de toque pasa de 19 px
+                  a ~40 px sin inflar el pie con márgenes. */}
+              <ul className="mt-3 text-[15px]">
+                {navegacionPrincipal.map((enlace) => (
+                  <li key={enlace.href}>
+                    <Link
+                      href={enlace.href}
+                      prefetch={false}
+                      className="inline-block py-2.5 leading-snug transition-colors hover:text-blanco"
+                    >
+                      {enlace.etiqueta}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+
+            {proyectos.length > 0 ? (
+              <nav aria-labelledby="pie-proyectos" className="mt-8">
+                <h2 id="pie-proyectos" className="text-[13px] font-semibold text-acero-300">
+                  Casos de éxito
+                </h2>
+                <ul className="mt-3 text-[15px]">
+                  {proyectos.map((proyecto) => (
+                    <li key={proyecto.slug}>
+                      <Link
+                        href={`/proyectos/${proyecto.slug}`}
+                        prefetch={false}
+                        className="inline-block py-2.5 leading-snug transition-colors hover:text-blanco"
+                      >
+                        {proyecto.title}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+            ) : null}
+          </div>
 
           {/* Servicios */}
           <nav aria-labelledby="pie-servicios" className="lg:col-span-3">
             <h2 id="pie-servicios" className="text-[13px] font-semibold text-acero-300">
               Servicios
             </h2>
-            <ul className="mt-4 space-y-2.5 text-[15px]">
+            <ul className="mt-3 text-[15px]">
               {servicios.map((servicio) => (
                 <li key={servicio.slug}>
                   <Link
                     href={`/servicios/${servicio.slug}`}
-                    className="transition-colors hover:text-blanco"
+                    prefetch={false}
+                    className="inline-block py-2.5 leading-snug transition-colors hover:text-blanco"
                   >
                     {servicio.navTitle}
                   </Link>

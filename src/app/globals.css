@@ -143,8 +143,11 @@
   --tracking-normal: 0em;
   --tracking-ancho: 0.02em;
 
-  /* Ancho máximo del contenido y de la cápsula del nav */
+  /* Ancho máximo del contenido. La cápsula del nav usa el MISMO
+     (`max-w-sitio`): llega hasta los márgenes del contenido de la página.
+     `--container-nav` queda solo por compatibilidad; no usarlo en nuevo. */
   --container-sitio: 80rem;
+  /* @deprecated el nav usa --container-sitio desde el sistema v4 */
   --container-nav: 68.75rem;
 
   /* Animaciones (se apagan con prefers-reduced-motion) */
@@ -408,7 +411,30 @@
       animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
     }
+
+    /* Los pseudoelementos de la View Transitions API viven fuera del árbol
+       normal: el selector universal de arriba NO los alcanza y la transición
+       entre rutas seguiría animando. */
+    ::view-transition-group(*),
+    ::view-transition-old(*),
+    ::view-transition-new(*) {
+      animation: none !important;
+    }
   }
+}
+
+/* =====================================================================
+   Transición entre rutas (View Transitions API)
+   Un fundido corto y nada más: el objetivo es que el cambio de página no
+   sea un corte seco, no montar una animación. Más de ~200 ms se siente
+   lento justo en lo que queremos que parezca instantáneo.
+   ===================================================================== */
+::view-transition-old(root) {
+  animation: velo 0.16s var(--ease-ios) reverse both;
+}
+
+::view-transition-new(root) {
+  animation: velo 0.2s var(--ease-ios) both;
 }
 
 /* SISTEMA-IOS-V3-LISTO */

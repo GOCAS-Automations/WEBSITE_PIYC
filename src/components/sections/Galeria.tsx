@@ -23,16 +23,26 @@ import { useCallback, useEffect, useId, useRef, useState } from "react";
 import type { ImagenContenido } from "@/lib/content-types";
 import { ContentImage } from "@/components/ui/ContentImage";
 import { IconoCerrar, IconoFlecha } from "@/components/ui/iconos";
+import { CarrilDeFotos } from "./CarrilDeFotos";
 
 export function Galeria({
   imagenes,
   titulo = "Galería",
   columnas = 3,
+  vista = "rejilla",
+  anticipadas = 0,
   className = "",
 }: {
   imagenes: readonly ImagenContenido[];
   titulo?: string;
   columnas?: 2 | 3 | 4;
+  /**
+   * `"rejilla"`: mosaico de miniaturas (el de siempre).
+   * `"carrusel"`: carril horizontal con `scroll-snap`, flechas y contador.
+   */
+  vista?: "rejilla" | "carrusel";
+  /** Diapositivas del carrusel que se cargan de entrada. Ver `CarrilDeFotos`. */
+  anticipadas?: number;
   className?: string;
 }) {
   const [abierta, setAbierta] = useState<number | null>(null);
@@ -115,32 +125,43 @@ export function Galeria({
   const actual = abierta !== null ? imagenes[abierta] : null;
   const hayVarias = imagenes.length > 1;
 
+  const abrir = (indice: number, boton: HTMLButtonElement) => {
+    disparadorRef.current = boton;
+    setAbierta(indice);
+  };
+
   return (
     <div className={className}>
-      <ul className={`grid gap-3 ${clasesColumnas}`}>
-        {imagenes.map((imagen, indice) => (
-          <li key={`${imagen.src}-${indice}`}>
-            <button
-              type="button"
-              onClick={(evento) => {
-                disparadorRef.current = evento.currentTarget;
-                setAbierta(indice);
-              }}
-              className="pulsable group block w-full cursor-zoom-in rounded-tarjeta bg-blanco p-1.5 shadow-tarjeta hover:shadow-elevada"
-            >
-              <ContentImage
-                src={imagen.src}
-                alt={imagen.alt}
-                width={imagen.width}
-                height={imagen.height}
-                proporcion="aspect-[4/3]"
-                claseContenedor="rounded-chip bg-acero-100"
-              />
-              <span className="sr-only">Ampliar: {imagen.alt || `imagen ${indice + 1}`}</span>
-            </button>
-          </li>
-        ))}
-      </ul>
+      {vista === "carrusel" ? (
+        <CarrilDeFotos
+          imagenes={imagenes}
+          titulo={titulo}
+          alAbrir={abrir}
+          anticipadas={anticipadas}
+        />
+      ) : (
+        <ul className={`grid gap-3 ${clasesColumnas}`}>
+          {imagenes.map((imagen, indice) => (
+            <li key={`${imagen.src}-${indice}`}>
+              <button
+                type="button"
+                onClick={(evento) => abrir(indice, evento.currentTarget)}
+                className="pulsable group block w-full cursor-zoom-in rounded-tarjeta bg-blanco p-1.5 shadow-tarjeta hover:shadow-elevada"
+              >
+                <ContentImage
+                  src={imagen.src}
+                  alt={imagen.alt}
+                  width={imagen.width}
+                  height={imagen.height}
+                  proporcion="aspect-[4/3]"
+                  claseContenedor="rounded-chip bg-acero-100"
+                />
+                <span className="sr-only">Ampliar: {imagen.alt || `imagen ${indice + 1}`}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
 
       <dialog
         ref={dialogoRef}
@@ -193,10 +214,12 @@ export function Galeria({
 
           {hayVarias ? (
             <div className="flex items-center justify-between gap-4 border-t border-separador-claro px-4 py-3 lg:px-6">
+              {/* Los dos botones van a los extremos, pero son un grupo: mismo
+                  alto y mismo ancho mínimo para que se lean parejos. */}
               <button
                 type="button"
                 onClick={() => mover(-1)}
-                className="pulsable inline-flex items-center gap-2 rounded-capsula bg-relleno-claro px-5 py-2.5 text-sm font-semibold text-acero-200 hover:bg-azul-800 hover:text-blanco"
+                className="pulsable inline-flex h-11 min-w-[8.5rem] items-center justify-center gap-2 rounded-capsula bg-relleno-claro px-5 text-sm font-semibold text-acero-200 hover:bg-azul-800 hover:text-blanco"
               >
                 <IconoFlecha className="size-4 rotate-180" />
                 Anterior
@@ -204,7 +227,7 @@ export function Galeria({
               <button
                 type="button"
                 onClick={() => mover(1)}
-                className="pulsable inline-flex items-center gap-2 rounded-capsula bg-relleno-claro px-5 py-2.5 text-sm font-semibold text-acero-200 hover:bg-azul-800 hover:text-blanco"
+                className="pulsable inline-flex h-11 min-w-[8.5rem] items-center justify-center gap-2 rounded-capsula bg-relleno-claro px-5 text-sm font-semibold text-acero-200 hover:bg-azul-800 hover:text-blanco"
               >
                 Siguiente
                 <IconoFlecha className="size-4" />

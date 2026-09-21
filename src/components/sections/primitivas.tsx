@@ -186,24 +186,97 @@ export function Tarjeta({
 /* Botones y enlaces de acción                                            */
 /* ===================================================================== */
 
+/**
+ * ARMONÍA DE LOS GRUPOS DE BOTONES
+ * --------------------------------
+ * Un botón suelto se mide por su etiqueta. Dos o más botones juntos son una
+ * **estructura**: tienen que compartir alto siempre y, cuando quedan apilados,
+ * también ancho. Antes esto se resolvía con `flex-col sm:flex-row sm:flex-wrap`
+ * y fallaba justo en el caso más visible: al envolverse, cada línea se
+ * dimensionaba por su contenido y quedaban dos cápsulas apiladas de anchos
+ * distintos (la franja de cierre a 1440 px).
+ *
+ * `GrupoDeBotones` lo resuelve con rejilla en vez de flex:
+ *  - Apilado (una columna): cada celda ocupa el ancho del grupo → mismo ancho.
+ *  - En fila (`grid-flow-col` + `auto-cols-fr` sobre un contenedor `w-fit`):
+ *    todas las columnas valen lo que la etiqueta más larga → mismo ancho, y el
+ *    grupo entero se encoge a su contenido en vez de estirarse.
+ * En ambos casos la altura de la fila la fija el botón más alto y las celdas
+ * se estiran, así que el alto también es común.
+ *
+ * `tamano` mantiene el alto sincronizado entre los botones de un mismo grupo:
+ * mezclar `h-12` y `h-13` a mano era la otra fuente de desalineación.
+ */
+const ALTOS_BOTON = {
+  normal: "h-12 px-6 text-[15px]",
+  grande: "h-13 px-7 text-[15px] sm:text-base",
+} as const;
+
+export type TamanoBoton = keyof typeof ALTOS_BOTON;
+
 /** `whitespace-nowrap`: una cápsula de alto fijo no puede partir su etiqueta. */
 const CLASES_BOTON =
-  "pulsable group inline-flex h-12 shrink-0 items-center justify-center gap-2.5 whitespace-nowrap rounded-capsula px-6 text-center text-[15px] font-semibold";
+  "pulsable group inline-flex shrink-0 items-center justify-center gap-2.5 whitespace-nowrap rounded-capsula text-center font-semibold";
+
+function clasesBoton(tamano: TamanoBoton) {
+  return `${CLASES_BOTON} ${ALTOS_BOTON[tamano]}`;
+}
+
+/**
+ * Grupo de botones. `direccion`:
+ *  - `"fila"` (por defecto): apilado en móvil, en fila desde `sm`.
+ *  - `"apilada"`: siempre apilado (columnas estrechas, como la franja de
+ *    cierre en escritorio, donde dos cápsulas largas no caben en una línea).
+ *  - `"fila-hasta-lg"`: en fila entre `sm` y `lg`, apilado otra vez en `lg`.
+ *
+ * `alinear="fin"` pega el grupo a la derecha sin romper el `w-fit`.
+ */
+export function GrupoDeBotones({
+  children,
+  direccion = "fila",
+  alinear = "inicio",
+  className = "",
+}: {
+  children: ReactNode;
+  direccion?: "fila" | "apilada" | "fila-hasta-lg";
+  alinear?: "inicio" | "fin";
+  className?: string;
+}) {
+  const porDireccion = {
+    fila: "sm:w-fit sm:grid-flow-col sm:auto-cols-fr",
+    apilada: "",
+    "fila-hasta-lg":
+      "sm:w-fit sm:grid-flow-col sm:auto-cols-fr lg:w-full lg:grid-flow-row lg:auto-cols-auto",
+  }[direccion];
+
+  return (
+    <div
+      data-grupo-botones=""
+      className={`grid items-stretch gap-3 ${porDireccion} ${
+        alinear === "fin" ? "sm:ml-auto" : ""
+      } ${className}`}
+    >
+      {children}
+    </div>
+  );
+}
 
 /** Botón primario: azul de marca, cápsula con sombra suave. */
 export function BotonPrimario({
   href,
   children,
+  tamano = "normal",
   className = "",
 }: {
   href: string;
   children: ReactNode;
+  tamano?: TamanoBoton;
   className?: string;
 }) {
   return (
     <Link
       href={href}
-      className={`${CLASES_BOTON} bg-azul-700 text-blanco shadow-tarjeta hover:bg-azul-600 ${className}`}
+      className={`${clasesBoton(tamano)} bg-azul-700 text-blanco shadow-tarjeta hover:bg-azul-600 ${className}`}
     >
       {children}
       <IconoFlecha className="size-4.5 shrink-0 transition-transform duration-300 ease-ios group-hover:translate-x-1" />
@@ -220,11 +293,13 @@ export function BotonSecundario({
   href,
   children,
   tono = "claro",
+  tamano = "normal",
   className = "",
 }: {
   href: string;
   children: ReactNode;
   tono?: "claro" | "oscuro";
+  tamano?: TamanoBoton;
   className?: string;
 }) {
   const clasesTono =
@@ -232,7 +307,7 @@ export function BotonSecundario({
       ? "bg-relleno-claro text-blanco hover:bg-azul-800"
       : "bg-relleno-medio text-azul-700 hover:bg-azul-100";
   return (
-    <Link href={href} className={`${CLASES_BOTON} ${clasesTono} ${className}`}>
+    <Link href={href} className={`${clasesBoton(tamano)} ${clasesTono} ${className}`}>
       {children}
       <IconoFlecha className="size-4.5 shrink-0 transition-transform duration-300 ease-ios group-hover:translate-x-1" />
     </Link>
@@ -246,10 +321,12 @@ export function BotonSecundario({
 export function BotonWhatsApp({
   href,
   children = "Escríbanos por WhatsApp",
+  tamano = "normal",
   className = "",
 }: {
   href: string;
   children?: ReactNode;
+  tamano?: TamanoBoton;
   className?: string;
 }) {
   return (
@@ -257,7 +334,7 @@ export function BotonWhatsApp({
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className={`${CLASES_BOTON} bg-verde-500 text-azul-950 shadow-tarjeta hover:bg-verde-400 ${className}`}
+      className={`${clasesBoton(tamano)} bg-verde-500 text-azul-950 shadow-tarjeta hover:bg-verde-400 ${className}`}
     >
       <IconoWhatsApp className="size-5 shrink-0" />
       {children}
@@ -299,6 +376,86 @@ export function EnlaceConFlecha({
         <IconoFlecha className="size-4 transition-transform duration-300 ease-ios group-hover:translate-x-0.5" />
       </span>
     </Link>
+  );
+}
+
+/* ===================================================================== */
+/* Anterior / siguiente entre fichas                                      */
+/* ===================================================================== */
+
+/**
+ * Par de tarjetas «anterior» y «siguiente» al pie de una ficha. Lo usan las
+ * páginas de caso y de servicio: sin ellas cada ficha es un callejón sin
+ * salida, tanto para el visitante como para el rastreador.
+ *
+ * Las dos celdas existen siempre —aunque una esté vacía— para que la tarjeta
+ * que sí hay conserve su mitad y no se estire a todo el ancho; y comparten
+ * altura (`h-full` dentro de una rejilla de dos columnas).
+ */
+export function NavegacionEntreFichas({
+  anterior,
+  siguiente,
+  etiqueta,
+  base,
+}: {
+  anterior?: { slug: string; title: string } | null;
+  siguiente?: { slug: string; title: string } | null;
+  /** Nombre accesible del `nav`: «Navegación entre servicios». */
+  etiqueta: string;
+  /** Prefijo de la ruta: `/servicios` o `/proyectos`. */
+  base: string;
+}) {
+  if (!anterior && !siguiente) return null;
+
+  return (
+    <nav aria-label={etiqueta} className="bg-lienzo">
+      <Contenedor className="pb-4">
+        <ul className="grid gap-4 sm:grid-cols-2">
+          <li>
+            {anterior ? (
+              <Link
+                href={`${base}/${anterior.slug}`}
+                className="pulsable group flex h-full items-center gap-4 rounded-tarjeta bg-blanco p-5 shadow-tarjeta hover:shadow-elevada"
+              >
+                <span
+                  aria-hidden="true"
+                  className="inline-flex size-9 shrink-0 items-center justify-center rounded-capsula bg-relleno text-azul-700"
+                >
+                  <IconoFlecha className="size-4 rotate-180 transition-transform duration-300 ease-ios group-hover:-translate-x-0.5" />
+                </span>
+                <span>
+                  <span className="block text-[13px] text-acero-600">Anterior</span>
+                  <span className="mt-0.5 block text-[1.0625rem] font-semibold leading-tight text-azul-950">
+                    {anterior.title}
+                  </span>
+                </span>
+              </Link>
+            ) : null}
+          </li>
+          <li>
+            {siguiente ? (
+              <Link
+                href={`${base}/${siguiente.slug}`}
+                className="pulsable group flex h-full items-center justify-end gap-4 rounded-tarjeta bg-blanco p-5 text-right shadow-tarjeta hover:shadow-elevada"
+              >
+                <span>
+                  <span className="block text-[13px] text-acero-600">Siguiente</span>
+                  <span className="mt-0.5 block text-[1.0625rem] font-semibold leading-tight text-azul-950">
+                    {siguiente.title}
+                  </span>
+                </span>
+                <span
+                  aria-hidden="true"
+                  className="inline-flex size-9 shrink-0 items-center justify-center rounded-capsula bg-relleno text-azul-700"
+                >
+                  <IconoFlecha className="size-4 transition-transform duration-300 ease-ios group-hover:translate-x-0.5" />
+                </span>
+              </Link>
+            ) : null}
+          </li>
+        </ul>
+      </Contenedor>
+    </nav>
   );
 }
 

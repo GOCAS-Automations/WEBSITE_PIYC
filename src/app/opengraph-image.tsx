@@ -25,7 +25,11 @@ export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 export default async function Imagen() {
-  const logo = readFileSync(join(process.cwd(), "public", "brand", "logo-piyc-oscuro.png"));
+  // `ImageResponse` no rasteriza SVG con gradientes: aquí va el PNG grande
+  // derivado del SVG, que además llega nítido al tamaño de la tarjeta.
+  const logo = readFileSync(
+    join(process.cwd(), "public", "brand", "logo-piyc-oscuro@2000.png"),
+  );
   const logoDataUri = `data:image/png;base64,${logo.toString("base64")}`;
 
   return new ImageResponse(

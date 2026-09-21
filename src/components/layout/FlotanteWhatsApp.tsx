@@ -94,14 +94,18 @@ export function FlotanteWhatsApp({ href }: { href: string }) {
         rel="noopener noreferrer"
         data-whatsapp-flotante=""
         inert={!visible}
-        className={`fixed bottom-4 right-4 z-30 inline-flex h-14 items-center gap-3 rounded-capsula bg-verde-500 px-4 font-semibold text-azul-950 shadow-flotante transition-[opacity,transform] duration-300 ease-ios hover:bg-verde-400 active:scale-95 sm:bottom-6 sm:right-6 ${
+        aria-label="Escribirle a PIYC por WhatsApp (se abre en una pestaña nueva)"
+        // Solo el ícono, sin etiqueta: el texto «Escríbanos» duplicaba el CTA
+        // verde que ya hay en el encabezado y en cada franja de cierre, y en
+        // móvil tapaba más contenido del que ayudaba. `size-14` = 56 px, muy
+        // por encima del mínimo táctil de 48 px.
+        className={`fixed bottom-4 right-4 z-30 inline-flex size-14 items-center justify-center rounded-capsula bg-verde-500 text-azul-950 shadow-flotante transition-[opacity,transform] duration-300 ease-ios hover:bg-verde-400 active:scale-95 sm:bottom-6 sm:right-6 ${
           visible
             ? "translate-y-0 scale-100 opacity-100"
             : "pointer-events-none translate-y-3 scale-95 opacity-0"
         }`}
       >
         <IconoWhatsApp className="size-7 shrink-0" />
-        <span className="sr-only sm:not-sr-only sm:pr-1">Escríbanos</span>
       </a>
     </aside>
   );

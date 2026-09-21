@@ -16,7 +16,12 @@
 
 import Link from "next/link";
 import type { AjustesHome, LineaServicio } from "@/lib/content-types";
-import { IconoFlecha, IconoWhatsApp } from "@/components/ui/iconos";
+import {
+  BotonPrimario,
+  BotonWhatsApp,
+  GrupoDeBotones,
+} from "@/components/sections/primitivas";
+import { ContentImage } from "@/components/ui/ContentImage";
 import { DiagramaEscalera } from "./DiagramaEscalera";
 
 const cartela = [
@@ -39,6 +44,16 @@ export function HeroInicio({
 }) {
   const ctaPrimario = hero?.ctaPrimario;
   const ctaSecundario = hero?.ctaSecundario;
+  // Imagen principal de la portada. Ausente = se conserva el diagrama.
+  // Una imagen sin `alt` no se pinta: entraría al sitio sin texto alternativo.
+  const imagen = hero?.image?.src && hero.image.alt ? hero.image : null;
+  // El rótulo del marco cuando hay foto sale del propio `alt`, recortado, para
+  // que no haya un texto fijo en código que el panel no pueda cambiar.
+  const rotuloImagen = imagen
+    ? imagen.alt.length > 48
+      ? `${imagen.alt.slice(0, 47).trimEnd()}…`
+      : imagen.alt
+    : "";
 
   return (
     <section aria-labelledby="titulo-inicio" className="fondo-plano">
@@ -71,70 +86,94 @@ export function HeroInicio({
             </p>
           ) : null}
 
-          <div className="mt-9 flex flex-col gap-3 sm:flex-row">
+          {/* Los dos CTA son un grupo: mismo alto siempre y, apilados en
+              móvil, mismo ancho (`GrupoDeBotones`). */}
+          <GrupoDeBotones className="mt-9">
             {ctaPrimario ? (
-              <Link
-                href={ctaPrimario.href}
-                className="pulsable group inline-flex h-13 items-center justify-center gap-2.5 rounded-capsula bg-azul-700 px-7 text-[15px] font-semibold text-blanco shadow-tarjeta hover:bg-azul-600"
-              >
+              <BotonPrimario href={ctaPrimario.href} tamano="grande">
                 {ctaPrimario.etiqueta}
-                <IconoFlecha className="size-4.5 transition-transform duration-300 ease-ios group-hover:translate-x-1" />
-              </Link>
+              </BotonPrimario>
             ) : null}
 
             {/* `href: "whatsapp"` es el convenio del ajuste para «usa el número
                 de contacto», sin que el panel tenga que escribir la URL. */}
             {ctaSecundario && hrefWhatsApp ? (
-              <a
+              <BotonWhatsApp
                 href={ctaSecundario.href === "whatsapp" ? hrefWhatsApp : ctaSecundario.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="pulsable inline-flex h-13 items-center justify-center gap-2.5 rounded-capsula bg-verde-500 px-7 text-[15px] font-semibold text-azul-950 shadow-tarjeta hover:bg-verde-400"
+                tamano="grande"
               >
-                <IconoWhatsApp className="size-5" />
                 {ctaSecundario.etiqueta}
-              </a>
+              </BotonWhatsApp>
             ) : null}
-          </div>
+          </GrupoDeBotones>
         </div>
 
-        {/* Widget con el diagrama */}
+        {/* Widget de la derecha: la foto que el panel haya puesto o, si no hay
+            ninguna, el diagrama de escalera como respaldo. Los dos comparten el
+            mismo marco redondeado azul noche, para que cambiar de uno a otro no
+            altere el ritmo de la portada. */}
         <figure className="animate-aparecer lg:col-span-5 lg:[animation-delay:120ms]">
           <div className="sobre-oscuro overflow-hidden rounded-panel fondo-noche shadow-elevada ring-1 ring-separador-claro">
             <div className="flex items-center justify-between gap-4 px-5 py-4">
-              <span className="text-[13px] font-medium text-acero-300">
-                PLC-01 · Lógica de control
+              {/* Con foto, el rótulo repite el texto alternativo: se oculta a
+                  los lectores de pantalla para no leerlo dos veces. */}
+              <span
+                aria-hidden={imagen ? "true" : undefined}
+                className="truncate text-[13px] font-medium text-acero-300"
+              >
+                {imagen ? rotuloImagen : "PLC-01 · Lógica de control"}
               </span>
-              <span className="inline-flex items-center gap-2 rounded-capsula bg-relleno-claro px-2.5 py-1 text-[12px] font-semibold text-verde-300">
-                <span
-                  aria-hidden="true"
-                  className="size-1.5 rounded-capsula bg-verde-400 animate-parpadeo"
+              {imagen ? null : (
+                <span className="inline-flex shrink-0 items-center gap-2 rounded-capsula bg-relleno-claro px-2.5 py-1 text-[12px] font-semibold text-verde-300">
+                  <span
+                    aria-hidden="true"
+                    className="size-1.5 rounded-capsula bg-verde-400 animate-parpadeo"
+                  />
+                  En marcha
+                </span>
+              )}
+            </div>
+
+            {imagen ? (
+              // Es la imagen LCP de la portada: `prioritaria` le pone
+              // `fetchpriority="high"`, `loading="eager"` y las medidas
+              // explícitas que evitan el salto de layout.
+              <div className="px-3 pb-3">
+                <ContentImage
+                  src={imagen.src}
+                  alt={imagen.alt}
+                  width={imagen.width}
+                  height={imagen.height}
+                  prioritaria
+                  proporcion="aspect-[4/3]"
+                  claseContenedor="rounded-tarjeta bg-azul-950/55 ring-1 ring-separador-claro"
                 />
-                En marcha
-              </span>
-            </div>
-
-            <div className="px-3">
-              <div className="rounded-tarjeta bg-azul-950/55 p-4 ring-1 ring-separador-claro">
-                <DiagramaEscalera className="block h-auto w-full font-sans" />
               </div>
-            </div>
-
-            <figcaption className="px-3 py-3">
-              <dl className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-                {cartela.map((celda) => (
-                  <div
-                    key={celda.dato}
-                    className="rounded-chip bg-relleno-claro px-3 py-2.5"
-                  >
-                    <dt className="text-[11px] font-medium text-acero-300">{celda.dato}</dt>
-                    <dd className="mt-0.5 text-[13px] font-medium text-acero-100">
-                      {celda.valor}
-                    </dd>
+            ) : (
+              <>
+                <div className="px-3">
+                  <div className="rounded-tarjeta bg-azul-950/55 p-4 ring-1 ring-separador-claro">
+                    <DiagramaEscalera className="block h-auto w-full font-sans" />
                   </div>
-                ))}
-              </dl>
-            </figcaption>
+                </div>
+
+                <figcaption className="px-3 py-3">
+                  <dl className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                    {cartela.map((celda) => (
+                      <div
+                        key={celda.dato}
+                        className="rounded-chip bg-relleno-claro px-3 py-2.5"
+                      >
+                        <dt className="text-[11px] font-medium text-acero-300">{celda.dato}</dt>
+                        <dd className="mt-0.5 text-[13px] font-medium text-acero-100">
+                          {celda.valor}
+                        </dd>
+                      </div>
+                    ))}
+                  </dl>
+                </figcaption>
+              </>
+            )}
           </div>
         </figure>
       </div>

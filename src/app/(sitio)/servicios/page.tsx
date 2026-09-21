@@ -14,6 +14,7 @@ import { getContacto, getPaginas, getSeo, getServicios } from "@/lib/content";
 import { MENSAJES_WHATSAPP, enlaceWhatsAppDe } from "@/lib/contacto";
 import {
   jsonLdFaq,
+  jsonLdListado,
   jsonLdMigas,
   metadataDePagina,
   metadatosPagina,
@@ -40,7 +41,7 @@ export async function generateMetadata(): Promise<Metadata> {
     titulo: "Servicios",
     descripcion:
       "Automatización con PLC, tableros de control y potencia, ingeniería eléctrica, telemetría, telecontrol, proyectos llave en mano, refrigeración y climatización.",
-  });
+  }, seo.ogImage);
   return metadataDePagina({ titulo, descripcion, ruta: "/servicios", imagen });
 }
 
@@ -98,6 +99,20 @@ export default async function HubDeServicios() {
     <main id="contenido">
       <JsonLd datos={jsonLdMigas(MIGAS)} />
       <JsonLd datos={jsonLdFaq(faq)} />
+      <JsonLd
+        datos={jsonLdListado({
+          nombre: ajustes?.title || "Servicios de PIYC en Cali",
+          descripcion:
+            ajustes?.intro ||
+            ajustes?.subtitle ||
+            "Los servicios de automatización e ingeniería eléctrica industrial de PIYC.",
+          ruta: "/servicios",
+          elementos: servicios.map((servicio) => ({
+            nombre: servicio.title,
+            ruta: `/servicios/${servicio.slug}`,
+          })),
+        })}
+      />
 
       <CabeceraInterna
         ajustes={ajustes}

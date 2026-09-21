@@ -147,6 +147,18 @@ export default async function InicioPage() {
                 defaultValue={home.hero?.ctaSecundario?.href}
                 placeholder="/servicios"
               />
+              <div className="sm:col-span-2">
+                <CampoImagen
+                  label="Imagen principal de la portada"
+                  name="hero_imagen"
+                  altName="hero_imagen_alt"
+                  folder="inicio"
+                  scope="hero"
+                  defaultValue={home.hero?.image?.src}
+                  defaultAlt={home.hero?.image?.alt}
+                  hint="Es la foto grande del recuadro de la derecha, lo primero que se ve al abrir el sitio. Si la dejas vacía (botón «Quitar»), la portada vuelve a mostrar el esquema eléctrico animado que trae de fábrica. Se recorta a 4:3, así que elige una foto apaisada donde lo importante quede al centro."
+                />
+              </div>
             </div>
           </FormularioAdmin>
         </Tarjeta>

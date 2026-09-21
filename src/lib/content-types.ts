@@ -112,6 +112,12 @@ export type Servicio = {
   metaDescription: string | null;
   sort: number;
   published: boolean;
+  /**
+   * Última modificación en la base (ISO 8601). Ausente en el respaldo
+   * estático — por eso es opcional: `src/data/*` no lo escribe. La usa el
+   * sitemap como `lastModified` real.
+   */
+  updatedAt?: string | null;
 };
 
 /**
@@ -150,6 +156,8 @@ export type Proyecto = {
   images: BloqueImagenes;
   sort: number;
   published: boolean;
+  /** Última modificación en la base (ISO 8601). Ausente en el respaldo. */
+  updatedAt?: string | null;
 };
 
 /* ===================================================================== */
@@ -292,6 +300,13 @@ export type AjustesHome = {
     subtitle?: string;
     ctaPrimario?: EnlaceContenido;
     ctaSecundario?: EnlaceContenido;
+    /**
+     * Imagen principal de la portada, dentro del marco de la derecha.
+     * **Ausente = se pinta el diagrama de escalera** (el respaldo en código).
+     * Es la imagen LCP del sitio: se sirve sin `lazy`, con `fetchpriority` alto
+     * y con medidas explícitas.
+     */
+    image?: ImagenContenido;
   };
   /** Bloque «qué hace PIYC», debajo del hero. */
   intro?: {
@@ -368,8 +383,8 @@ export type AjustesNosotros = {
   valores?: { eyebrow?: string; title?: string; intro?: string };
   /** Galería de la página. Vacía = no se pinta. */
   galeria?: ImagenContenido[];
-  /** Rótulo y título del bloque de galería (las fotos van en `galeria`). */
-  bloqueGaleria?: { eyebrow?: string; title?: string };
+  /** Rótulo, título y entradilla del bloque de galería (las fotos van en `galeria`). */
+  bloqueGaleria?: { eyebrow?: string; title?: string; intro?: string };
   /** Franja de cierre de `/nosotros`. */
   cta?: { title?: string; body?: string };
 };
@@ -407,6 +422,10 @@ export type AjustesPaginas = {
     introFormulario?: string;
     /** Texto bajo el formulario: qué se hace con los datos. */
     notaFormulario?: string;
+    /** Títulos de los tres bloques de la página. Vacío = se usa el de fábrica. */
+    tituloDatos?: string;
+    tituloFormulario?: string;
+    tituloMapa?: string;
     faq?: PreguntaFrecuente[];
   };
   /**
@@ -417,10 +436,25 @@ export type AjustesPaginas = {
     /** Frase bajo la ficha cuando el caso tiene servicios asociados. */
     notaServicios?: string;
     cta?: CierrePagina;
+    /**
+     * Títulos de las secciones de la ficha. Vacío o ausente = el de fábrica;
+     * no se dejan vacíos de verdad porque cada sección necesita un nombre
+     * accesible (`aria-labelledby`).
+     */
+    tituloCuerpo?: string;
+    tituloGaleria?: string;
+    tituloServicios?: string;
   };
-  /** Texto de la franja de cierre de `/servicios/[slug]`. El título lo arma
+  /** Textos de la plantilla `/servicios/[slug]`. El título del cierre lo arma
    *  el sitio con el nombre del servicio. */
-  servicioDetalle?: { ctaTexto?: string };
+  servicioDetalle?: {
+    ctaTexto?: string;
+    tituloAlcance?: string;
+    tituloIncluye?: string;
+    tituloGaleria?: string;
+    tituloCasos?: string;
+    tituloOtros?: string;
+  };
   /** Página 404. */
   noEncontrada?: { title?: string; body?: string };
 };

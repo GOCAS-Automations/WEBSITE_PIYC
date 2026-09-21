@@ -85,11 +85,12 @@ function Ingreso({ configurado }: { configurado: boolean }) {
             {/* `next/image` directo está permitido aquí: el logo es chrome, no
                 contenido editable (regla 14). */}
             <Image
-              src="/brand/logo-piyc.png"
+              src="/brand/logo-piyc.svg"
               alt="PIYC — Programación Industrial y Control S.A.S."
               width={452}
               height={192}
               priority
+              unoptimized
               className="h-12 w-auto"
             />
             <p className="mt-5 text-xs font-semibold uppercase tracking-ancho text-azul-700">

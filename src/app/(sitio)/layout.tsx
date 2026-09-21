@@ -9,6 +9,7 @@
  * también en cada página, porque una página puede revalidar por su cuenta.
  */
 
+import { ViewTransition } from "react";
 import { BotonWhatsAppFlotante } from "@/components/layout/BotonWhatsAppFlotante";
 import { Encabezado } from "@/components/layout/Encabezado";
 import { PieDePagina } from "@/components/layout/PieDePagina";
@@ -34,7 +35,21 @@ export default async function LayoutSitio({ children }: { children: React.ReactN
       </a>
 
       <Encabezado />
-      {children}
+      {/*
+        TRANSICIÓN ENTRE RUTAS
+        ----------------------
+        `<ViewTransition>` de React sobre la View Transitions API del navegador
+        (`node_modules/next/dist/docs/01-app/02-guides/view-transitions.md`:
+        funciona en el App Router sin configuración ni banderas; Next resuelve
+        `react` contra su propia copia, que sí exporta el componente).
+
+        Envuelve solo el contenido: el encabezado y el pie se quedan quietos y
+        lo que se funde es el cuerpo de la página, que es lo que cambia. Donde
+        el navegador no soporta la API, la navegación es la de siempre —no hay
+        respaldo que mantener— y con `prefers-reduced-motion` el bloque de
+        `globals.css` apaga la animación de la transición.
+      */}
+      <ViewTransition>{children}</ViewTransition>
       <PieDePagina />
       <BotonWhatsAppFlotante />
     </>

@@ -35,11 +35,12 @@ export async function Encabezado() {
       correo={correo}
     >
       <Image
-        src="/brand/logo-piyc.png"
+        src="/brand/logo-piyc.svg"
         alt="PIYC — Programación Industrial y Control S.A.S., ir al inicio"
         width={452}
         height={192}
         priority
+        unoptimized
         className="h-9 w-auto sm:h-10"
       />
     </NavegacionPrincipal>

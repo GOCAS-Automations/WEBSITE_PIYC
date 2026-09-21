@@ -157,6 +157,7 @@ type FilaServicio = {
   meta_description: string | null;
   sort: number;
   published: boolean;
+  updated_at: string | null;
 };
 
 function normalizarServicio(fila: FilaServicio): Servicio {
@@ -176,6 +177,7 @@ function normalizarServicio(fila: FilaServicio): Servicio {
     metaDescription: fila.meta_description,
     sort: typeof fila.sort === "number" ? fila.sort : 0,
     published: fila.published !== false,
+    updatedAt: textoODefecto(fila.updated_at) || null,
   };
 }
 
@@ -188,7 +190,7 @@ export const getServicios = cache(async (): Promise<Servicio[]> => {
     const { data, error } = await supabase
       .from("site_services")
       .select(
-        "id, slug, title, nav_title, icon_key, summary, description, items, images, video, meta_title, meta_description, sort, published",
+        "id, slug, title, nav_title, icon_key, summary, description, items, images, video, meta_title, meta_description, sort, published, updated_at",
       )
       .eq("published", true)
       .order("sort", { ascending: true });
@@ -232,6 +234,7 @@ type FilaProyecto = {
   images: unknown;
   sort: number;
   published: boolean;
+  updated_at: string | null;
 };
 
 function normalizarProyecto(fila: FilaProyecto): Proyecto {
@@ -246,6 +249,7 @@ function normalizarProyecto(fila: FilaProyecto): Proyecto {
     images: normalizarImagenes(fila.images),
     sort: typeof fila.sort === "number" ? fila.sort : 0,
     published: fila.published !== false,
+    updatedAt: textoODefecto(fila.updated_at) || null,
   };
 }
 
@@ -261,6 +265,7 @@ function proyectosDeRespaldo(): Proyecto[] {
     images: proyecto.images,
     sort: proyecto.sort,
     published: proyecto.published,
+    updatedAt: null,
   }));
 }
 
@@ -271,7 +276,7 @@ export const getProyectos = cache(async (): Promise<Proyecto[]> => {
   try {
     const { data, error } = await supabase
       .from("site_projects")
-      .select("id, slug, title, client, description, body, images, sort, published")
+      .select("id, slug, title, client, description, body, images, sort, published, updated_at")
       .eq("published", true)
       .order("sort", { ascending: true });
 

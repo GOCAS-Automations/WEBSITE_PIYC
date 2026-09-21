@@ -8,7 +8,7 @@
  */
 
 import type { Metadata } from "next";
-import Link from "next/link";
+
 import { notFound } from "next/navigation";
 import {
   enParrafos,
@@ -21,7 +21,7 @@ import {
   getVecinosDeProyecto,
 } from "@/lib/content";
 import { MENSAJES_WHATSAPP, enlaceWhatsAppDe } from "@/lib/contacto";
-import { jsonLdMigas, metadataDePagina, type Miga } from "@/lib/seo";
+import { jsonLdCaso, jsonLdMigas, metadataDePagina, type Miga } from "@/lib/seo";
 import { proyectosEstaticos } from "@/data/proyectos";
 import { CabeceraInterna, FichaTecnica } from "@/components/sections/CabeceraInterna";
 import { FranjaCta } from "@/components/sections/FranjaCta";
@@ -29,12 +29,12 @@ import { Galeria } from "@/components/sections/Galeria";
 import { RejillaDeServicios, columnasParaCantidad } from "@/components/sections/tarjetas";
 import {
   Contenedor,
+  NavegacionEntreFichas,
   Parrafos,
   Rotulo,
   TituloSeccion,
 } from "@/components/sections/primitivas";
 import { FotoEnmarcada } from "@/components/ui/ContentImage";
-import { IconoFlecha } from "@/components/ui/iconos";
 import { JsonLd } from "@/components/ui/JsonLd";
 
 export const revalidate = 300;
@@ -104,6 +104,16 @@ export default async function PaginaDeProyecto({
   return (
     <main id="contenido">
       <JsonLd datos={jsonLdMigas(migas)} />
+      <JsonLd
+        datos={jsonLdCaso({
+          titulo: proyecto.title,
+          descripcion: proyecto.description || cuerpo[0] || "",
+          ruta: `/proyectos/${proyecto.slug}`,
+          imagen: proyecto.images.cover,
+          actualizado: proyecto.updatedAt,
+          contacto,
+        })}
+      />
 
       <CabeceraInterna
         rotulo="Caso de éxito"
@@ -130,7 +140,7 @@ export default async function PaginaDeProyecto({
             <div className="lg:col-span-7">
               <Rotulo>El proyecto</Rotulo>
               <TituloSeccion id="titulo-caso" className="mt-5">
-                Contexto, solución y resultado
+                {plantilla?.tituloCuerpo || "Contexto, solución y resultado"}
               </TituloSeccion>
               <Parrafos textos={cuerpo} className="mt-6" />
             </div>
@@ -165,7 +175,7 @@ export default async function PaginaDeProyecto({
           <Contenedor className="py-16 lg:py-20">
             <Rotulo>Del proyecto</Rotulo>
             <TituloSeccion id="titulo-galeria-proyecto" className="mt-5">
-              Galería
+              {plantilla?.tituloGaleria || "Galería"}
             </TituloSeccion>
             <Galeria
               imagenes={galeria}
@@ -182,7 +192,7 @@ export default async function PaginaDeProyecto({
         <section aria-labelledby="titulo-servicios-caso" className="bg-lienzo">
           <Contenedor className="py-16 lg:py-20">
             <TituloSeccion id="titulo-servicios-caso">
-              Servicios que intervinieron
+              {plantilla?.tituloServicios || "Servicios que intervinieron"}
             </TituloSeccion>
             <div className="mt-8">
               <RejillaDeServicios
@@ -194,57 +204,13 @@ export default async function PaginaDeProyecto({
         </section>
       ) : null}
 
-      {/* Anterior / siguiente */}
-      {vecinos.anterior || vecinos.siguiente ? (
-        <nav aria-label="Navegación entre proyectos" className="bg-lienzo">
-          <Contenedor className="pb-4">
-            <ul className="grid gap-4 sm:grid-cols-2">
-              <li>
-                {vecinos.anterior ? (
-                  <Link
-                    href={`/proyectos/${vecinos.anterior.slug}`}
-                    className="pulsable group flex h-full items-center gap-4 rounded-tarjeta bg-blanco p-5 shadow-tarjeta hover:shadow-elevada"
-                  >
-                    <span
-                      aria-hidden="true"
-                      className="inline-flex size-9 shrink-0 items-center justify-center rounded-capsula bg-relleno text-azul-700"
-                    >
-                      <IconoFlecha className="size-4 rotate-180 transition-transform duration-300 ease-ios group-hover:-translate-x-0.5" />
-                    </span>
-                    <span>
-                      <span className="block text-[13px] text-acero-600">Anterior</span>
-                      <span className="mt-0.5 block text-[1.0625rem] font-semibold leading-tight text-azul-950">
-                        {vecinos.anterior.title}
-                      </span>
-                    </span>
-                  </Link>
-                ) : null}
-              </li>
-              <li>
-                {vecinos.siguiente ? (
-                  <Link
-                    href={`/proyectos/${vecinos.siguiente.slug}`}
-                    className="pulsable group flex h-full items-center justify-end gap-4 rounded-tarjeta bg-blanco p-5 text-right shadow-tarjeta hover:shadow-elevada"
-                  >
-                    <span>
-                      <span className="block text-[13px] text-acero-600">Siguiente</span>
-                      <span className="mt-0.5 block text-[1.0625rem] font-semibold leading-tight text-azul-950">
-                        {vecinos.siguiente.title}
-                      </span>
-                    </span>
-                    <span
-                      aria-hidden="true"
-                      className="inline-flex size-9 shrink-0 items-center justify-center rounded-capsula bg-relleno text-azul-700"
-                    >
-                      <IconoFlecha className="size-4 transition-transform duration-300 ease-ios group-hover:translate-x-0.5" />
-                    </span>
-                  </Link>
-                ) : null}
-              </li>
-            </ul>
-          </Contenedor>
-        </nav>
-      ) : null}
+      {/* Anterior / siguiente entre casos */}
+      <NavegacionEntreFichas
+        anterior={vecinos.anterior}
+        siguiente={vecinos.siguiente}
+        etiqueta="Navegación entre proyectos"
+        base="/proyectos"
+      />
 
       <FranjaCta
         titulo={plantilla?.cta?.title ?? "¿Quiere un resultado parecido en su planta?"}
