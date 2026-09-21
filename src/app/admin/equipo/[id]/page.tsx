@@ -92,7 +92,7 @@ export default async function FichaCuentaPage({
             <AyudaSeccion tono="aviso" className="mb-5">
               <strong>Desactivar no es eliminar.</strong> Si la persona salió de
               la empresa, lo correcto casi siempre es desactivar su cuenta: deja
-              de poder entrar y su historial se conserva para la nómina y para
+              de poder entrar y su historial de jornadas se conserva para
               cualquier consulta posterior. Elimina solo las cuentas de prueba o
               las creadas por error.
             </AyudaSeccion>

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { requireContentEditor } from "@/lib/supabase/auth";
 import { isManagerRole } from "@/lib/supabase/roles";
 import { getContadores, listMensajes } from "@/lib/admin/lecturas";
+import { contarJornadasPendientes } from "@/lib/jornadas-lecturas";
 import {
   AyudaSeccion,
   EnlaceSiguiente,
@@ -36,9 +37,10 @@ export default async function AdminDashboardPage() {
   const { profile } = await requireContentEditor();
   const esManager = isManagerRole(profile.role);
 
-  const [contadores, mensajes] = await Promise.all([
+  const [contadores, mensajes, jornadasPendientes] = await Promise.all([
     getContadores(),
     esManager ? listMensajes(5) : Promise.resolve([]),
+    esManager ? contarJornadasPendientes() : Promise.resolve(0),
   ]);
 
   const cifras = [
@@ -74,6 +76,14 @@ export default async function AdminDashboardPage() {
           ? `${contadores.cuentasInactivas} desactivadas`
           : null,
       href: "/admin/equipo",
+      soloManager: true,
+    },
+    {
+      valor: jornadasPendientes,
+      etiqueta:
+        jornadasPendientes === 1 ? "jornada por revisar" : "jornadas por revisar",
+      detalle: "registradas por el equipo",
+      href: "/admin/jornadas?estado=pendiente",
       soloManager: true,
     },
   ].filter((c) => c.valor > 0 && (!c.soloManager || esManager));
@@ -150,7 +160,9 @@ export default async function AdminDashboardPage() {
             href="/admin/jornadas"
             label="Jornadas"
             icon={IconoReloj}
-            description="El registro de horas del equipo: revisión, aprobación y exportación. En construcción."
+            count={jornadasPendientes}
+            unit={jornadasPendientes === 1 ? "por revisar" : "por revisar"}
+            description="El registro de horas del equipo: revisar y aprobar lo que registran desde su portal, corregir, exportar a CSV y fijar los horarios de cada mes."
           />
         )}
       </section>

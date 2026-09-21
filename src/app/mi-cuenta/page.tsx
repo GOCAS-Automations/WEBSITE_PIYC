@@ -5,10 +5,14 @@ import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { getSessionProfile, type SessionProfile } from "@/lib/supabase/auth";
 import { isContentEditorRole, ETIQUETA_ROL } from "@/lib/supabase/roles";
 import { signOutAction } from "@/lib/session-actions";
+import { getContextoJornadas, listMisJornadas } from "@/lib/jornadas-lecturas";
+import { hoyEnColombia } from "@/lib/jornada";
+import { FormularioJornada } from "@/components/jornadas/FormularioJornada";
+import { MisJornadas } from "@/components/jornadas/MisJornadas";
 import { FormularioIngreso } from "./FormularioIngreso";
 import { FormularioClave } from "./FormularioClave";
 import { IrAlPanel } from "./IrAlPanel";
-import { cambiarMiPassword } from "./actions";
+import { cambiarMiPassword, eliminarJornada, guardarJornada } from "./actions";
 import {
   IconoCandado,
   IconoFlecha,
@@ -156,13 +160,21 @@ function CuentaDesactivada() {
 /**
  * PORTAL — la pantalla de quien no administra el sitio.
  *
- * Hoy tiene la ficha de la persona y el cambio de contraseña. El **registro de
- * jornada** y el **historial** los monta el agente del módulo de jornadas en
- * los dos huecos marcados más abajo; están dibujados como tarjetas «en
- * preparación» para que la pantalla no se sienta rota mientras tanto.
+ * Ficha de la persona, **registro de jornada**, **historial** y cambio de
+ * contraseña. Está pensado para usarse desde el celular en campo: una sola
+ * columna, campos altos y teclados nativos de fecha y hora.
  */
-function Portal({ profile }: { profile: SessionProfile }) {
+async function Portal({ profile }: { profile: SessionProfile }) {
   const tienePanel = isContentEditorRole(profile.role);
+
+  /* Todo lo que necesita el módulo de jornadas, de una sola vez. La RLS de la
+     migración 0002 ya limita `listMisJornadas` a lo propio; el filtro por
+     `employee_id` se repite igualmente en la consulta. */
+  const [{ config, horarios }, propias] = await Promise.all([
+    getContextoJornadas(),
+    listMisJornadas(profile.id),
+  ]);
+  const jornadas = { config, horarios, propias, hoy: hoyEnColombia() };
 
   return (
     <main id="contenido" className="fondo-plano min-h-[70vh] px-4 py-10 sm:py-12">
@@ -213,16 +225,9 @@ function Portal({ profile }: { profile: SessionProfile }) {
           </div>
         </header>
 
-        {/* ============================================================
-            PUNTO DE MONTAJE 1 — «Registrar jornada»
-            ------------------------------------------------------------
-            El agente de jornadas reemplaza esta tarjeta entera por su
-            <FormularioJornada action={guardarJornada} … />, un Client
-            Component de esta misma carpeta. La acción va en `./actions.ts`
-            (ya tiene el hueco documentado al final del archivo).
-            ============================================================ */}
-        <section className="rounded-fino border border-dashed border-acero-300 bg-blanco p-5 sm:p-6">
-          <div className="flex items-start gap-3">
+        {/* ---------------- Registrar jornada ---------------- */}
+        <section className="rounded-fino border border-acero-200 bg-blanco p-5 sm:p-6">
+          <div className="mb-5 flex items-start gap-3 border-b border-acero-200 pb-4">
             <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-fino border border-acero-200 bg-acero-50 text-azul-700">
               <IconoReloj className="h-5 w-5" />
             </span>
@@ -230,31 +235,43 @@ function Portal({ profile }: { profile: SessionProfile }) {
               <h2 className="font-titulo text-xl font-semibold uppercase tracking-wide text-azul-950">
                 Registrar jornada
               </h2>
-              <p className="mt-1.5 text-sm leading-relaxed text-acero-600">
-                El formulario para registrar tus horas está en preparación.
-                Mientras tanto, dile a tu coordinador las horas trabajadas como
-                lo vienes haciendo.
+              <p className="mt-1 text-sm leading-relaxed text-acero-600">
+                Al terminar el turno, anota la hora en que empezaste y la hora en
+                que saliste. Abajo verás cómo quedan repartidas tus horas antes
+                de guardar; las cifras definitivas las fija tu coordinador al
+                aprobarla.
               </p>
             </div>
           </div>
+          <FormularioJornada
+            action={guardarJornada}
+            config={jornadas.config}
+            horarios={jornadas.horarios}
+            hoy={jornadas.hoy}
+          />
         </section>
 
-        {/* ============================================================
-            PUNTO DE MONTAJE 2 — «Historial de jornadas»
-            ------------------------------------------------------------
-            Igual que el anterior: se reemplaza por <MisJornadas … />, que
-            lista lo propio (la RLS de 0002 ya limita a `employee_id =
-            auth.uid()`) y pagina con `Paginacion` de
-            `components/admin/ui-base.tsx`, 10 filas por página.
-            ============================================================ */}
-        <section className="rounded-fino border border-dashed border-acero-300 bg-blanco p-5 sm:p-6">
-          <h2 className="font-titulo text-xl font-semibold uppercase tracking-wide text-azul-950">
-            Mis jornadas
-          </h2>
-          <p className="mt-1.5 text-sm leading-relaxed text-acero-600">
-            Aquí verás el historial de lo que registres, con el estado de cada
-            jornada (pendiente, aprobada o rechazada).
-          </p>
+        {/* ---------------- Historial ---------------- */}
+        <section className="rounded-fino border border-acero-200 bg-blanco p-5 sm:p-6">
+          <div className="mb-5 border-b border-acero-200 pb-4">
+            <h2 className="font-titulo text-xl font-semibold uppercase tracking-wide text-azul-950">
+              Mis jornadas
+            </h2>
+            <p className="mt-1 text-sm leading-relaxed text-acero-600">
+              Tu historial con el estado de cada jornada. Mientras esté{" "}
+              <strong>pendiente</strong> la puedes corregir o eliminar; una vez
+              revisada, cualquier cambio lo hace tu coordinador. Si te la
+              devolvieron, la nota con el motivo aparece aquí mismo.
+            </p>
+          </div>
+          <MisJornadas
+            jornadas={jornadas.propias}
+            config={jornadas.config}
+            horarios={jornadas.horarios}
+            hoy={jornadas.hoy}
+            guardar={guardarJornada}
+            eliminar={eliminarJornada}
+          />
         </section>
 
         {/* Cambio de contraseña */}

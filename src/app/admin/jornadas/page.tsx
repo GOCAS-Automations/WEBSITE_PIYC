@@ -1,37 +1,82 @@
+import Link from "next/link";
 import { requireManager } from "@/lib/supabase/auth";
-import { AyudaSeccion, CabeceraPanel, EstadoVacio } from "@/components/admin/ui";
+import { leerPagina, paginar } from "@/lib/paginacion";
+import {
+  getContextoJornadas,
+  listJornadasFiltradas,
+  listPersonasParaJornadas,
+  resolverDesgloses,
+  totalesDeJornadas,
+} from "@/lib/jornadas-lecturas";
+import {
+  CLASES_ESTADO,
+  ETIQUETA_ESTADO,
+  OPCIONES_ESTADO_FILTRO,
+  PARAM_FILTRO,
+  hayFiltros,
+  hrefConFiltros,
+  leerFiltros,
+  BOTON_PRIMARIO,
+  BOTON_SECUNDARIO,
+} from "@/lib/jornada-types";
+import { formatearDuracion, formatearFechaCorta, rangoHorario } from "@/lib/jornada";
+import {
+  AyudaSeccion,
+  CabeceraPanel,
+  Campo,
+  EnlacePrimario,
+  EstadoVacio,
+  Insignia,
+  Paginacion,
+  Selector,
+} from "@/components/admin/ui";
+import {
+  IconoCalendario,
+  IconoDocumento,
+  IconoMas,
+} from "@/components/admin/iconos";
+import { TotalesDesglose } from "@/components/jornadas/Desglose";
 
 export const dynamic = "force-dynamic";
 
 /**
- * JORNADAS — MARCADOR
- * ===================
- * Cuarta entrada del menú. Esta pantalla la reemplaza entera el agente del
- * módulo de jornadas; existe ahora para que el menú no tenga un enlace roto y
- * para dejar escrito, en el sitio donde se va a trabajar, qué se espera aquí.
+ * JORNADAS — listado y revisión
+ * =============================
+ * Cuarta entrada del menú. Solo managers (`requireManager`).
  *
- * QUÉ VA A VIVIR EN ESTA RUTA
- * ---------------------------
- *   /admin/jornadas            → listado con filtros (persona, estado, rango de
- *                                fechas), aprobación y rechazo, exportación CSV.
- *   /admin/jornadas/horarios   → horarios mensuales (`horarios_mensuales`), a
- *                                donde ya apunta el enlace de «Equipo».
+ * LOS FILTROS VIVEN EN LA URL, no en estado del cliente: así el enlace se puede
+ * compartir con un compañero, el botón «atrás» del navegador funciona y —lo más
+ * importante— **el CSV exporta exactamente lo que se está viendo**, porque
+ * recibe los mismos parámetros. El formulario es un `<form method="get">`
+ * normal: funciona aunque falle el JavaScript y no necesita un componente de
+ * cliente.
  *
- * LO QUE YA ESTÁ LISTO Y CONVIENE REUTILIZAR
- * ------------------------------------------
- *   · `requireManager()` — la guarda de rol de esta sección.
- *   · `Paginacion` y `paginar()` — 10 filas por página en todo el panel.
- *   · `nombresDeCompaneros()` de `src/lib/admin/lecturas.ts` — nombre y cargo
- *     con la service-role, que es lo que la regla 3 permite mostrar.
- *   · `FormularioAdmin`, `BotonAccion` y `FormularioEliminar` de
- *     `components/admin/FormularioAdmin.tsx`.
- *
- * REGLA 6, QUE SE APLICA AQUÍ MÁS QUE EN NINGÚN LADO: **rechazar ≠ eliminar**.
- * Rechazar devuelve la jornada al empleado con una nota para que la corrija;
- * eliminar borra el registro. Hay que decirlo en la interfaz, cada vez.
+ * REGLA 6, que aquí se aplica más que en ningún lado: **rechazar ≠ eliminar**.
+ * Se dice en esta pantalla y se vuelve a decir en la ficha de cada jornada.
  */
-export default async function JornadasPage() {
+export default async function JornadasPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
   await requireManager();
+
+  const params = await searchParams;
+  const filtros = leerFiltros(params);
+  const conFiltros = hayFiltros(filtros);
+
+  const [{ config, horarios }, jornadas, personas] = await Promise.all([
+    getContextoJornadas(),
+    listJornadasFiltradas(filtros),
+    listPersonasParaJornadas(),
+  ]);
+
+  const desgloses = resolverDesgloses(jornadas, config, horarios);
+  const totales = totalesDeJornadas(jornadas, desgloses);
+  const pagina = paginar(jornadas, leerPagina(params.pagina));
+  const base = hrefConFiltros("/admin/jornadas", filtros);
+
+  const pendientes = jornadas.filter((j) => j.status === "pendiente").length;
 
   return (
     <>
@@ -39,17 +84,227 @@ export default async function JornadasPage() {
         title="Jornadas"
         description="El registro de horas del equipo: revisión, aprobación y exportación."
         breadcrumb={[{ label: "Panel", href: "/admin" }, { label: "Jornadas" }]}
+        action={
+          <EnlacePrimario href="/admin/jornadas/nueva">
+            <IconoMas className="h-4 w-4" />
+            Registrar jornada
+          </EnlacePrimario>
+        }
       />
 
-      <AyudaSeccion tono="aviso" title="Sección en construcción" className="mb-6">
-        El módulo de jornadas se está construyendo. Mientras tanto, el registro
-        de horas sigue como hasta ahora; nada de lo que ya exista se pierde.
+      {params.eliminada !== undefined && (
+        <AyudaSeccion tono="aviso" title="Jornada eliminada" className="mb-5">
+          El registro se borró definitivamente y también desapareció del portal
+          de la persona.
+        </AyudaSeccion>
+      )}
+
+      <AyudaSeccion className="mb-5">
+        <strong>Rechazar no es eliminar.</strong> Rechazar devuelve la jornada a
+        la persona con una nota para que la corrija, y el registro se conserva.
+        Eliminar borra la fila y no se puede deshacer: se usa solo para pruebas o
+        duplicados. Al <strong>aprobar</strong>, el desglose de horas queda
+        congelado y ya no cambia aunque después se corrija el horario del mes.
       </AyudaSeccion>
 
-      <EstadoVacio
-        title="Todavía no hay nada que revisar"
-        description="Aquí aparecerán las jornadas que registre el equipo desde su portal, para aprobarlas o devolverlas con una nota. También se podrán exportar para la nómina."
-      />
+      {/* ---------------- Filtros ---------------- */}
+      <form
+        method="get"
+        action="/admin/jornadas"
+        className="mb-5 rounded-fino border border-acero-200 bg-blanco p-5"
+      >
+        <h2 className="font-titulo text-lg font-semibold uppercase tracking-wide text-azul-950">
+          Filtrar
+        </h2>
+        <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <Selector
+            label="Persona"
+            name={PARAM_FILTRO.empleado}
+            defaultValue={filtros.empleado}
+            options={[
+              { value: "", label: "Todo el equipo" },
+              ...personas.map((p) => ({
+                value: p.id,
+                label: p.activa ? p.nombre : `${p.nombre} (desactivada)`,
+              })),
+            ]}
+          />
+          <Selector
+            label="Estado"
+            name={PARAM_FILTRO.estado}
+            defaultValue={filtros.estado}
+            options={OPCIONES_ESTADO_FILTRO}
+          />
+          <Campo
+            label="Desde"
+            name={PARAM_FILTRO.desde}
+            type="date"
+            defaultValue={filtros.desde}
+          />
+          <Campo
+            label="Hasta"
+            name={PARAM_FILTRO.hasta}
+            type="date"
+            defaultValue={filtros.hasta}
+          />
+          <Campo
+            label="Orden de trabajo"
+            name={PARAM_FILTRO.orden}
+            defaultValue={filtros.orden}
+            placeholder="Ej.: OT-1042"
+            hint="Busca coincidencias parciales, sin distinguir mayúsculas."
+            className="lg:col-span-2"
+          />
+        </div>
+
+        <div className="mt-4 flex flex-wrap items-center gap-3 border-t border-acero-200 pt-4">
+          <button type="submit" className={BOTON_PRIMARIO}>
+            Aplicar filtros
+          </button>
+          {conFiltros && (
+            <Link prefetch={false} href="/admin/jornadas" className={BOTON_SECUNDARIO}>
+              Quitar filtros
+            </Link>
+          )}
+          {jornadas.length > 0 && (
+            <a
+              href={`/admin/jornadas/exportar${
+                base.includes("?") ? base.slice(base.indexOf("?")) : ""
+              }`}
+              className={`${BOTON_SECUNDARIO} ml-auto`}
+            >
+              <IconoDocumento className="h-4 w-4" />
+              Exportar a CSV ({jornadas.length})
+            </a>
+          )}
+        </div>
+      </form>
+
+      {/* ---------------- Totales ---------------- */}
+      <div className="mb-5">
+        <TotalesDesglose
+          totales={totales}
+          titulo={conFiltros ? "Totales del filtro" : "Totales de todo el histórico"}
+          descripcion={`${totales.jornadas} ${
+            totales.jornadas === 1 ? "jornada" : "jornadas"
+          }${pendientes > 0 ? ` · ${pendientes} sin revisar` : ""}. Las aprobadas aportan sus cifras congeladas; las demás, las que se calculan ahora con el horario vigente.`}
+        />
+      </div>
+
+      {/* ---------------- Listado ---------------- */}
+      {jornadas.length === 0 ? (
+        <EstadoVacio
+          title={conFiltros ? "Ninguna jornada coincide con ese filtro" : "Todavía no hay jornadas"}
+          description={
+            conFiltros
+              ? "Prueba con un rango de fechas más amplio o quita alguno de los filtros."
+              : "Aquí aparecerán las jornadas que registre el equipo desde su portal, para revisarlas y exportarlas. También puedes registrar una tú, a nombre de quien no use el celular."
+          }
+          action={
+            conFiltros ? (
+              <Link prefetch={false} href="/admin/jornadas" className={BOTON_SECUNDARIO}>
+                Quitar filtros
+              </Link>
+            ) : (
+              <EnlacePrimario href="/admin/jornadas/nueva">
+                <IconoMas className="h-4 w-4" />
+                Registrar jornada
+              </EnlacePrimario>
+            )
+          }
+        />
+      ) : (
+        <>
+          <ul id="lista-jornadas" className="scroll-mt-8 space-y-3">
+            {pagina.visibles.map((j) => {
+              const resuelto = desgloses.get(j.id);
+              return (
+                <li
+                  key={j.id}
+                  className={`flex flex-wrap items-start gap-4 rounded-fino border bg-blanco p-4 ${
+                    j.status === "pendiente" ? "border-azul-300" : "border-acero-200"
+                  }`}
+                >
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h2 className="font-titulo text-lg font-semibold uppercase tracking-wide text-azul-950">
+                        {j.empleadoNombre}
+                      </h2>
+                      <Insignia className={CLASES_ESTADO[j.status]}>
+                        {ETIQUETA_ESTADO[j.status]}
+                      </Insignia>
+                      {resuelto?.congelado && (
+                        <Insignia>Cálculo congelado</Insignia>
+                      )}
+                    </div>
+
+                    <p className="mt-1 text-sm text-acero-700">
+                      {formatearFechaCorta(j.work_date)} ·{" "}
+                      {rangoHorario(j.start_at, j.end_at)}
+                      {resuelto && (
+                        <>
+                          {" "}
+                          ·{" "}
+                          <strong className="text-azul-950">
+                            {formatearDuracion(resuelto.desglose.minutosTrabajados)}
+                          </strong>
+                          {resuelto.desglose.extras > 0 && (
+                            <>
+                              {" "}
+                              ({formatearDuracion(resuelto.desglose.extras)} extra)
+                            </>
+                          )}
+                        </>
+                      )}
+                      {j.work_order && <> · Orden {j.work_order}</>}
+                    </p>
+
+                    <p className="mt-1 line-clamp-2 text-sm leading-relaxed text-acero-600">
+                      {j.description}
+                    </p>
+                  </div>
+
+                  <Link
+                    prefetch={false}
+                    href={`/admin/jornadas/${j.id}`}
+                    className="inline-flex items-center gap-1.5 rounded-fino bg-azul-700 px-3 py-2 text-xs font-semibold text-blanco transition-colors hover:bg-azul-800"
+                  >
+                    {j.status === "pendiente" ? "Revisar" : "Abrir ficha"}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+
+          <Paginacion
+            pagina={pagina.pagina}
+            total={pagina.total}
+            hrefBase={base}
+            ancla="lista-jornadas"
+            etiqueta="Páginas de jornadas"
+          />
+        </>
+      )}
+
+      {/* ---------------- Horarios mensuales ---------------- */}
+      <div className="mt-8 rounded-fino border border-acero-200 bg-blanco p-5">
+        <h2 className="font-titulo text-xl font-semibold uppercase tracking-wide text-azul-950">
+          Horarios mensuales
+        </h2>
+        <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-acero-600">
+          Qué días son hábiles cada mes y cuál es la jornada esperada. Es lo que
+          permite saber qué parte de un turno es hora extra: sin el horario del
+          mes, el cálculo no tiene contra qué comparar.
+        </p>
+        <Link
+          prefetch={false}
+          href="/admin/jornadas/horarios"
+          className={`${BOTON_SECUNDARIO} mt-4`}
+        >
+          <IconoCalendario className="h-4 w-4" />
+          Administrar horarios
+        </Link>
+      </div>
     </>
   );
 }
