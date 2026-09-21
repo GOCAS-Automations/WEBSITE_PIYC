@@ -187,7 +187,7 @@ export default async function Inicio() {
         titulo={home.cta?.title ?? "¿Hablamos de su proyecto?"}
         texto={home.cta?.body}
         hrefWhatsApp={hrefWhatsApp}
-        etiquetaWhatsApp={home.cta?.ctaPrimario?.etiqueta ?? "Escríbenos por WhatsApp"}
+        etiquetaWhatsApp={home.cta?.ctaPrimario?.etiqueta ?? "Escríbanos por WhatsApp"}
         hrefSecundario={home.cta?.ctaSecundario?.href ?? "/contacto"}
         etiquetaSecundaria={home.cta?.ctaSecundario?.etiqueta ?? "Ir al formulario de contacto"}
       >

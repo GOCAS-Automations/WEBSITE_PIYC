@@ -74,7 +74,7 @@ export const homeEstatico: AjustesHome = {
     subtitle:
       "Somos un equipo de ingenieros especializados en proyectos de ingeniería, montaje y mantenimiento de equipos eléctricos y electrónicos. Automatizamos equipos y ejecutamos obras eléctricas: desde el control de procesos hasta el desarrollo de equipos de óptima calidad.",
     ctaPrimario: { etiqueta: "Ver servicios", href: "/servicios" },
-    ctaSecundario: { etiqueta: "Escríbenos por WhatsApp", href: "whatsapp" },
+    ctaSecundario: { etiqueta: "Escríbanos por WhatsApp", href: "whatsapp" },
   },
   intro: {
     eyebrow: "Qué hacemos",
@@ -134,7 +134,7 @@ export const homeEstatico: AjustesHome = {
   cta: {
     title: "¿Tiene un proceso que automatizar o un tablero que rehacer?",
     body: "Cuéntenos qué necesita y con qué restricciones trabaja su planta. Respondemos por WhatsApp y, si hace falta, vamos a verlo en sitio.",
-    ctaPrimario: { etiqueta: "Escríbenos por WhatsApp", href: "whatsapp" },
+    ctaPrimario: { etiqueta: "Escríbanos por WhatsApp", href: "whatsapp" },
     ctaSecundario: { etiqueta: "Ir al formulario de contacto", href: "/contacto" },
   },
 };
@@ -148,7 +148,7 @@ export const nosotrosEstatico: AjustesNosotros = {
     eyebrow: "Quiénes somos",
     title: "Ingenieros que trabajan dentro de la planta, no sobre el catálogo",
     subtitle:
-      "PROGRAMACIÓN INDUSTRIAL Y CONTROL S.A.S. — PIYC — desarrolla proyectos de ingeniería, montaje y mantenimiento de equipos eléctricos y electrónicos para la industria del Valle del Cauca.",
+      "PROGRAMACIÓN INDUSTRIAL Y CONTROL S.A.S. —PIYC— desarrolla proyectos de ingeniería, montaje y mantenimiento de equipos eléctricos y electrónicos para la industria del Valle del Cauca.",
     image: {
       src: `${BUCKET}/nosotros/planta-proceso-inoxidable.webp`,
       alt: "Línea de proceso en acero inoxidable dentro de una planta de alimentos, con tuberías e instrumentación montadas",
@@ -214,7 +214,7 @@ export const paginasEstatico: AjustesPaginas = {
     subtitle:
       "Ofrecemos servicios de alta calidad para dar soluciones asertivas, reduciendo el riesgo y dando la seguridad de que nuestra propuesta es la mejor, brindando tranquilidad y respaldo a cada cliente en su proceso de producción.",
     intro:
-      "La agrupación en cuatro líneas es una forma de leer el portafolio, no un compartimento: la mayoría de los proyectos toca varias a la vez —un tablero nuevo viene con su diseño eléctrico, y una automatización termina con telemetría—.",
+      "La agrupación en cuatro líneas es una forma de leer el portafolio, no un compartimento: la mayoría de los proyectos toca varias a la vez —un tablero nuevo viene con su diseño eléctrico, y una automatización termina con telemetría.",
     image: {
       src: `${BUCKET}/cabeceras/planta-proceso-inoxidable.webp`,
       alt: "Línea de proceso en acero inoxidable dentro de una planta de alimentos, con tuberías e instrumentación montadas",
@@ -345,7 +345,7 @@ export const seoEstatico: AjustesSeo = {
     contacto: {
       title: "Contacto",
       description:
-        "Escríbale a PIYC por WhatsApp o déjenos los datos de su proyecto. Cl. 33 #5-76, Cali, Valle del Cauca. Automatización industrial e ingeniería eléctrica.",
+        "Escríbanos por WhatsApp o déjenos los datos de su proyecto. Cl. 33 #5-76, Cali, Valle del Cauca. Automatización industrial e ingeniería eléctrica.",
     },
   },
 };

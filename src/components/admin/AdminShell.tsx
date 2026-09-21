@@ -112,9 +112,13 @@ export function AdminShell({
             <p className="font-titulo text-xs font-semibold uppercase tracking-[0.18em] text-azul-700">
               Panel de administración · PIYC
             </p>
-            <p className="truncate text-sm text-acero-600">
-              Sesión de <span className="font-semibold text-azul-950">{nombre}</span>{" "}
-              <span className="text-acero-500">({identificador})</span>{" "}
+            {/* Envuelve en vez de truncar: a 390 px el `truncate` se comía la
+                etiqueta del rol, que es justo el dato que hay que ver. */}
+            <p className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-sm text-acero-600">
+              <span className="min-w-0 break-words">
+                Sesión de <span className="font-semibold text-azul-950">{nombre}</span>{" "}
+                <span className="text-acero-600">({identificador})</span>
+              </span>
               <span className="whitespace-nowrap rounded-fino border border-acero-300 bg-acero-50 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-acero-600">
                 {ETIQUETA_ROL[role]}
               </span>

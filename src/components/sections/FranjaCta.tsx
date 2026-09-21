@@ -15,7 +15,7 @@ export function FranjaCta({
   titulo,
   texto,
   hrefWhatsApp,
-  etiquetaWhatsApp = "Escríbenos por WhatsApp",
+  etiquetaWhatsApp = "Escríbanos por WhatsApp",
   hrefSecundario = "/contacto",
   etiquetaSecundaria = "Ir al formulario de contacto",
   children,

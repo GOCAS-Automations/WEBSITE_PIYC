@@ -136,6 +136,14 @@ export async function aprobarJornada(
       "No encontramos esa jornada. Puede que alguien la haya eliminado: recarga la página.",
     );
 
+  // Nadie aprueba sus propias horas. `is_manager()` en la RLS deja actualizar
+  // cualquier fila, así que un coordinador podía registrarse una jornada y
+  // congelarse el desglose de recargos sin que la viera nadie más.
+  if (String(fila.employee_id ?? "") === session.profile.id)
+    return fail(
+      "No puedes aprobar tu propia jornada. Pídele la revisión a otro coordinador o al administrador.",
+    );
+
   const cruce = await jornadaSolapada(
     session,
     String(fila.employee_id ?? ""),

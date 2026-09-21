@@ -140,8 +140,10 @@ export default async function PaginaDeServicio({
           <div className="grid gap-12 lg:grid-cols-12 lg:gap-12">
             <div className="lg:col-span-7">
               <Rotulo>En qué consiste</Rotulo>
+              {/* El h2 no puede repetir el h1: en cuatro servicios `title` y
+                  `navTitle` son la misma cadena («Telemetría» / «Telemetría»). */}
               <TituloSeccion id="titulo-alcance" className="mt-5">
-                {servicio.navTitle}
+                Alcance y forma de trabajo
               </TituloSeccion>
               <Parrafos textos={parrafos} className="mt-6" />
             </div>

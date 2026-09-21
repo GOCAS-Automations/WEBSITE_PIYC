@@ -114,7 +114,7 @@ export function FormularioContacto({
       setEstado({
         fase: "error",
         mensaje:
-          "No pudimos enviar el mensaje. Revise su conexión o escríbanos directo por WhatsApp.",
+          "No pudimos enviar el mensaje. Revise su conexión o escríbanos directamente por WhatsApp.",
       });
     }
   }
@@ -167,7 +167,7 @@ export function FormularioContacto({
             className="block text-[13px] font-semibold text-azul-950"
           >
             Servicio de interés{" "}
-            <span className="font-normal text-acero-500">(opcional)</span>
+            <span className="font-normal text-acero-600">(opcional)</span>
           </label>
           <select
             id="contacto-servicio"
@@ -333,7 +333,7 @@ function Campo({
         {requerido ? (
           <span aria-hidden="true">*</span>
         ) : (
-          <span className="font-normal text-acero-500">({ayuda ?? "opcional"})</span>
+          <span className="font-normal text-acero-600">({ayuda ?? "opcional"})</span>
         )}
       </label>
       <input

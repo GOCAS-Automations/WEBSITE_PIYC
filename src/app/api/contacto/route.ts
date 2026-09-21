@@ -44,6 +44,9 @@ export const dynamic = "force-dynamic";
 /* Utilidades                                                             */
 /* ===================================================================== */
 
+/** Cuerpo máximo aceptado, en bytes. Los seis campos juntos no llegan a 4 KB. */
+const TAMANO_MAXIMO_CUERPO = 16 * 1024;
+
 function respuesta(cuerpo: RespuestaContacto, estado: number) {
   return NextResponse.json(cuerpo, {
     status: estado,
@@ -57,17 +60,28 @@ function texto(valor: unknown, maximo: number): string {
 }
 
 /**
- * Sal del hash de IP. Con `CONTACT_IP_SALT` propia si existe; si no, la
- * service-role, que es un secreto que ya vive solo en el servidor. Lo que se
- * guarda es el hash, nunca la IP en claro ni la sal.
+ * Sal del hash de IP. Con `CONTACT_IP_SALT` propia si existe; si no, una
+ * constante del código. **No se usa la service-role**: el hash se persiste en
+ * `site_mensajes.ip_hash` y no hay por qué mezclar ahí el secreto más sensible
+ * del proyecto. Lo que se guarda es el hash, nunca la IP en claro ni la sal.
  */
 function salDeIp(): string {
-  return process.env.CONTACT_IP_SALT || process.env.SUPABASE_SERVICE_ROLE_KEY || "piyc";
+  return process.env.CONTACT_IP_SALT || "piyc:contacto:v1";
 }
 
+/**
+ * IP del visitante para el tope por hora.
+ *
+ * `x-forwarded-for` llega como «ip-del-cliente, proxy1, proxy2…» y el primer
+ * elemento lo puede escribir quien llama: rotándolo, el tope nunca dispararía.
+ * Vercel añade la IP real al FINAL y además fija `x-vercel-forwarded-for`, que
+ * el cliente no controla. Por eso se prefiere esa cabecera y, si no está, se
+ * toma el último elemento de la cadena, no el primero.
+ */
 async function hashDeIp(): Promise<string | null> {
   const cabeceras = await headers();
-  const reenviada = cabeceras.get("x-forwarded-for")?.split(",")[0]?.trim();
+  const cadena = cabeceras.get("x-vercel-forwarded-for") ?? cabeceras.get("x-forwarded-for") ?? "";
+  const reenviada = cadena.split(",").pop()?.trim();
   const ip = reenviada || cabeceras.get("x-real-ip")?.trim();
   if (!ip) return null;
   return createHash("sha256").update(`${salDeIp()}:${ip}`).digest("hex").slice(0, 64);
@@ -100,6 +114,14 @@ function mensajeWhatsApp(datos: {
 /* ===================================================================== */
 
 export async function POST(request: Request) {
+  // Tope de tamaño antes de parsear: los seis campos juntos no llegan a 4 KB,
+  // así que un cuerpo grande solo puede ser un intento de hacer trabajar al
+  // servidor. Se corta sin leerlo.
+  const declarado = Number(request.headers.get("content-length") ?? "0");
+  if (Number.isFinite(declarado) && declarado > TAMANO_MAXIMO_CUERPO) {
+    return respuesta({ ok: false, error: "El mensaje es demasiado largo." }, 413);
+  }
+
   let payload: PayloadContacto;
   try {
     payload = (await request.json()) as PayloadContacto;
@@ -197,7 +219,7 @@ export async function POST(request: Request) {
             {
               ok: false,
               error:
-                "Ya recibimos varios mensajes desde esta conexión. Escríbanos directo por WhatsApp y lo atendemos.",
+                "Ya recibimos varios mensajes desde esta conexión. Escríbanos directamente por WhatsApp y lo atendemos.",
             },
             429,
           );

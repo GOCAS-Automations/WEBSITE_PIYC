@@ -155,7 +155,7 @@ export default async function PaginasPage() {
                 scope="404"
                 rows={3}
                 defaultValue={paginas.noEncontrada?.body}
-                placeholder="Puede que el enlace esté mal escrito o que hayamos movido la página. Vuelve al inicio o escríbenos y te ayudamos."
+                placeholder="Puede que el enlace esté mal escrito o que hayamos movido la página. Vuelva al inicio o escríbanos y le ayudamos."
               />
             </div>
           </FormularioAdmin>

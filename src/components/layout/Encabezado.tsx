@@ -32,7 +32,12 @@ export async function Encabezado() {
   return (
     <>
       {/* Barra de datos (solo escritorio) */}
-      <div className="sobre-oscuro hidden bg-azul-950 text-acero-200 md:block">
+      {/* `aside` y no `div`: si no, los enlaces de la barra quedan fuera de
+          todo landmark y un lector de pantalla no puede saltar a ellos. */}
+      <aside
+        aria-label="Datos de contacto de PIYC"
+        className="sobre-oscuro hidden bg-azul-950 text-acero-200 md:block"
+      >
         <div className="mx-auto flex max-w-sitio items-center justify-between gap-6 px-4 py-2 text-[13px] lg:px-8">
           {direccion?.full ? (
             <p className="flex items-center gap-2">
@@ -81,7 +86,7 @@ export async function Encabezado() {
             ) : null}
           </ul>
         </div>
-      </div>
+      </aside>
 
       <header className="sticky top-0 z-40 border-b border-acero-200 bg-blanco">
         <div className="mx-auto flex h-16 max-w-sitio items-center justify-between gap-6 px-4 lg:h-[76px] lg:px-8">

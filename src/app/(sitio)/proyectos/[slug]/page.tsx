@@ -203,7 +203,7 @@ export default async function PaginaDeProyecto({
                   >
                     <IconoFlecha className="size-5 shrink-0 rotate-180 text-azul-700 transition-transform group-hover:-translate-x-1" />
                     <span>
-                      <span className="block text-[11px] font-semibold uppercase tracking-[0.12em] text-acero-500">
+                      <span className="block text-[11px] font-semibold uppercase tracking-[0.12em] text-acero-600">
                         Anterior
                       </span>
                       <span className="mt-1 block font-titulo text-lg font-semibold leading-tight text-azul-950">
@@ -220,7 +220,7 @@ export default async function PaginaDeProyecto({
                     className="group flex h-full items-center justify-end gap-4 p-5 text-right transition-colors hover:bg-blanco"
                   >
                     <span>
-                      <span className="block text-[11px] font-semibold uppercase tracking-[0.12em] text-acero-500">
+                      <span className="block text-[11px] font-semibold uppercase tracking-[0.12em] text-acero-600">
                         Siguiente
                       </span>
                       <span className="mt-1 block font-titulo text-lg font-semibold leading-tight text-azul-950">

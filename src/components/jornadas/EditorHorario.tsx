@@ -300,7 +300,7 @@ export function EditorHorario({
                       className={`inline-flex min-w-[5.5rem] justify-end rounded-fino px-3 py-1.5 text-sm font-semibold tabular-nums ${
                         laboral
                           ? "bg-azul-50 text-azul-800"
-                          : "bg-acero-100 text-acero-500"
+                          : "bg-acero-100 text-acero-700"
                       }`}
                       title={laboral ? formatearDuracion(minutos) : "Día no laboral"}
                     >
@@ -386,7 +386,7 @@ export function EditorHorario({
           {DIAS_ORDEN.map((clave) => (
             <span
               key={clave}
-              className="pb-1 text-[11px] font-semibold uppercase tracking-wider text-acero-500"
+              className="pb-1 text-[11px] font-semibold uppercase tracking-wider text-acero-600"
             >
               {DIA_CORTO[clave]}
             </span>
@@ -412,7 +412,7 @@ export function EditorHorario({
                   ? "border-verde-300 bg-verde-100 text-verde-700"
                   : d.laboral
                     ? "border-azul-300 bg-azul-50 text-azul-800"
-                    : "border-acero-200 bg-acero-50 text-acero-500"
+                    : "border-acero-200 bg-acero-50 text-acero-600"
               }`}
             >
               {d.dia}

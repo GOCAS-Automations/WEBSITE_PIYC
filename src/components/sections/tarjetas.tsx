@@ -47,7 +47,7 @@ export function TarjetaServicio({
         {numero ? (
           <span
             className={`font-titulo text-sm font-semibold tabular-nums ${
-              oscuro ? "text-acero-500" : "text-acero-400"
+              oscuro ? "text-acero-400" : "text-acero-600"
             }`}
           >
             {String(numero).padStart(2, "0")}
@@ -168,7 +168,7 @@ export function TarjetaProyecto({
 
       <div className="flex flex-1 flex-col gap-3 p-5 lg:p-6">
         {proyecto.client ? (
-          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-acero-500">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-acero-600">
             {proyecto.client}
           </p>
         ) : null}

@@ -122,7 +122,12 @@ export default async function EquipoPage({
                     <IconoUsuario className="h-5 w-5" />
                   </span>
 
-                  <div className="min-w-0 flex-1">
+                  {/* `min-w-0` dejaba que esta columna se encogiera por debajo
+                      de lo que miden las insignias: a 390 px se desbordaban por
+                      la derecha y el botón «Desactivar» quedaba encima del chip
+                      del rol. Con un mínimo real, el `flex-wrap` del `li` hace
+                      lo suyo y los botones bajan a su propia línea. */}
+                  <div className="min-w-[12rem] flex-1">
                     <div className="flex flex-wrap items-center gap-2">
                       <h2 className="font-titulo text-lg font-semibold uppercase tracking-wide text-azul-950">
                         {cuenta.full_name}
@@ -179,7 +184,7 @@ export default async function EquipoPage({
                         Abrir ficha
                       </Link>
                     ) : (
-                      <span className="text-xs text-acero-500">
+                      <span className="text-xs text-acero-600">
                         Solo un administrador puede editarla
                       </span>
                     )}

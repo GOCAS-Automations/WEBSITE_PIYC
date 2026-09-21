@@ -85,7 +85,7 @@ export default async function Nosotros() {
 
                 <dl className="mt-8 grid gap-px border border-acero-200 bg-acero-200 sm:grid-cols-2">
                   <div className="bg-blanco px-4 py-3.5">
-                    <dt className="text-[11px] font-semibold uppercase tracking-[0.12em] text-acero-500">
+                    <dt className="text-[11px] font-semibold uppercase tracking-[0.12em] text-acero-600">
                       Razón social
                     </dt>
                     <dd className="mt-1 text-[15px] font-medium text-azul-950">
@@ -94,7 +94,7 @@ export default async function Nosotros() {
                   </div>
                   {contacto.nit ? (
                     <div className="bg-blanco px-4 py-3.5">
-                      <dt className="text-[11px] font-semibold uppercase tracking-[0.12em] text-acero-500">
+                      <dt className="text-[11px] font-semibold uppercase tracking-[0.12em] text-acero-600">
                         NIT
                       </dt>
                       <dd className="mt-1 text-[15px] font-medium text-azul-950">

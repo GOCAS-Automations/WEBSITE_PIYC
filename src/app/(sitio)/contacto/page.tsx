@@ -43,7 +43,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const { titulo, descripcion, imagen } = metadatosPagina(seo.paginas?.contacto, {
     titulo: "Contacto",
     descripcion:
-      "Escríbale a PIYC por WhatsApp o déjenos los datos de su proyecto de automatización, tableros o ingeniería eléctrica en Cali.",
+      "Escríbanos por WhatsApp o déjenos los datos de su proyecto de automatización, tableros o ingeniería eléctrica en Cali.",
   });
   return metadataDePagina({ titulo, descripcion, ruta: "/contacto", imagen });
 }
@@ -67,8 +67,9 @@ export default async function Contacto() {
   const numerosWhatsApp = contacto.whatsapp ?? [];
 
   return (
-    // `data-pagina` apaga el botón flotante de WhatsApp desde el CSS: aquí
-    // tapaba el «Enviar» del formulario (ver globals.css).
+    // `data-pagina` queda como marca de la página para CSS y pruebas. Quien
+    // apaga el botón flotante de WhatsApp aquí —tapaba el «Enviar» del
+    // formulario en móvil— es `FlotanteWhatsApp`, por ruta.
     <main id="contenido" data-pagina="contacto">
       <JsonLd datos={jsonLdMigas(MIGAS)} />
       <JsonLd datos={jsonLdFaq(faq)} />
@@ -96,60 +97,56 @@ export default async function Contacto() {
 
               <dl className="mt-7 space-y-6">
                 {direccion ? (
-                  <div className="flex gap-4">
-                    <IconoUbicacion className="mt-0.5 size-6 shrink-0 text-azul-700" />
-                    <div>
-                      <dt className="text-[11px] font-semibold uppercase tracking-[0.12em] text-acero-500">
-                        Dirección
-                      </dt>
-                      <dd className="mt-1 text-[15px] leading-relaxed text-azul-950">
-                        {direccion}
-                        {mapaExterno ? (
-                          <>
-                            {" · "}
-                            <a
-                              href={mapaExterno}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="font-medium text-azul-700 underline-offset-2 hover:underline"
-                            >
-                              Abrir en Google Maps
-                            </a>
-                          </>
-                        ) : null}
-                      </dd>
-                    </div>
+                  <div className="grid grid-cols-[1.5rem_1fr] items-start gap-x-4">
+                    <IconoUbicacion className="row-span-2 mt-0.5 size-6 shrink-0 text-azul-700" />
+                    <dt className="text-[11px] font-semibold uppercase tracking-[0.12em] text-acero-600">
+                      Dirección
+                    </dt>
+                    <dd className="mt-1 text-[15px] leading-relaxed text-azul-950">
+                      {direccion}
+                      {mapaExterno ? (
+                        <>
+                          {" · "}
+                          <a
+                            href={mapaExterno}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="font-medium text-azul-700 underline-offset-2 hover:underline"
+                          >
+                            Abrir en Google Maps
+                          </a>
+                        </>
+                      ) : null}
+                    </dd>
                   </div>
                 ) : null}
 
                 {numerosWhatsApp.length > 0 ? (
-                  <div className="flex gap-4">
-                    <IconoWhatsApp className="mt-0.5 size-6 shrink-0 text-verde-600" />
-                    <div>
-                      <dt className="text-[11px] font-semibold uppercase tracking-[0.12em] text-acero-500">
-                        WhatsApp
-                      </dt>
-                      <dd className="mt-1 space-y-1.5">
-                        {numerosWhatsApp.map((numero) => {
-                          const href = enlaceWhatsApp(numero.intl, MENSAJES_WHATSAPP.general);
-                          return (
-                            <p key={numero.intl} className="text-[15px] text-azul-950">
-                              <a
-                                href={href}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="font-medium text-azul-700 underline-offset-2 hover:underline"
-                              >
-                                {numero.label}
-                              </a>
-                              {numero.person ? (
-                                <span className="text-acero-600"> · {numero.person}</span>
-                              ) : null}
-                            </p>
-                          );
-                        })}
-                      </dd>
-                    </div>
+                  <div className="grid grid-cols-[1.5rem_1fr] items-start gap-x-4">
+                    <IconoWhatsApp className="row-span-2 mt-0.5 size-6 shrink-0 text-verde-600" />
+                    <dt className="text-[11px] font-semibold uppercase tracking-[0.12em] text-acero-600">
+                      WhatsApp
+                    </dt>
+                    <dd className="mt-1 space-y-1.5">
+                      {numerosWhatsApp.map((numero) => {
+                        const href = enlaceWhatsApp(numero.intl, MENSAJES_WHATSAPP.general);
+                        return (
+                          <p key={numero.intl} className="text-[15px] text-azul-950">
+                            <a
+                              href={href}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="font-medium text-azul-700 underline-offset-2 hover:underline"
+                            >
+                              {numero.label}
+                            </a>
+                            {numero.person ? (
+                              <span className="text-acero-600"> · {numero.person}</span>
+                            ) : null}
+                          </p>
+                        );
+                      })}
+                    </dd>
                   </div>
                 ) : null}
 
@@ -158,78 +155,70 @@ export default async function Contacto() {
                     número y pintarlo dos veces confunde. */}
                 {telefono &&
                 !numerosWhatsApp.some((numero) => numero.intl === telefono.intl) ? (
-                  <div className="flex gap-4">
-                    <IconoTelefono className="mt-0.5 size-6 shrink-0 text-azul-700" />
-                    <div>
-                      <dt className="text-[11px] font-semibold uppercase tracking-[0.12em] text-acero-500">
-                        Teléfono
-                      </dt>
-                      <dd className="mt-1 text-[15px] text-azul-950">
-                        <a
-                          href={hrefTelefono(telefono)}
-                          className="font-medium text-azul-700 underline-offset-2 hover:underline"
-                        >
-                          {telefono.label}
-                        </a>
-                      </dd>
-                    </div>
+                  <div className="grid grid-cols-[1.5rem_1fr] items-start gap-x-4">
+                    <IconoTelefono className="row-span-2 mt-0.5 size-6 shrink-0 text-azul-700" />
+                    <dt className="text-[11px] font-semibold uppercase tracking-[0.12em] text-acero-600">
+                      Teléfono
+                    </dt>
+                    <dd className="mt-1 text-[15px] text-azul-950">
+                      <a
+                        href={hrefTelefono(telefono)}
+                        className="font-medium text-azul-700 underline-offset-2 hover:underline"
+                      >
+                        {telefono.label}
+                      </a>
+                    </dd>
                   </div>
                 ) : null}
 
                 {correos.length > 0 ? (
-                  <div className="flex gap-4">
-                    <IconoCorreo className="mt-0.5 size-6 shrink-0 text-azul-700" />
-                    <div>
-                      <dt className="text-[11px] font-semibold uppercase tracking-[0.12em] text-acero-500">
-                        Correo
-                      </dt>
-                      <dd className="mt-1 space-y-1.5">
-                        {correos.map((correo) => (
-                          <p key={correo.address} className="text-[15px] text-azul-950">
-                            <a
-                              href={`mailto:${correo.address}`}
-                              className="font-medium break-all text-azul-700 underline-offset-2 hover:underline"
-                            >
-                              {correo.address}
-                            </a>
-                          </p>
-                        ))}
-                      </dd>
-                    </div>
+                  <div className="grid grid-cols-[1.5rem_1fr] items-start gap-x-4">
+                    <IconoCorreo className="row-span-2 mt-0.5 size-6 shrink-0 text-azul-700" />
+                    <dt className="text-[11px] font-semibold uppercase tracking-[0.12em] text-acero-600">
+                      Correo
+                    </dt>
+                    <dd className="mt-1 space-y-1.5">
+                      {correos.map((correo) => (
+                        <p key={correo.address} className="text-[15px] text-azul-950">
+                          <a
+                            href={`mailto:${correo.address}`}
+                            className="font-medium break-all text-azul-700 underline-offset-2 hover:underline"
+                          >
+                            {correo.address}
+                          </a>
+                        </p>
+                      ))}
+                    </dd>
                   </div>
                 ) : null}
 
                 {/* Horario: solo si está en los ajustes. Nunca se inventa. */}
                 {horario ? (
-                  <div className="flex gap-4">
-                    <IconoReloj className="mt-0.5 size-6 shrink-0 text-azul-700" />
-                    <div>
-                      <dt className="text-[11px] font-semibold uppercase tracking-[0.12em] text-acero-500">
-                        Horario
-                      </dt>
-                      <dd className="mt-1 text-[15px] text-azul-950">{horario}</dd>
-                    </div>
+                  <div className="grid grid-cols-[1.5rem_1fr] items-start gap-x-4">
+                    <IconoReloj className="row-span-2 mt-0.5 size-6 shrink-0 text-azul-700" />
+                    <dt className="text-[11px] font-semibold uppercase tracking-[0.12em] text-acero-600">
+                      Horario
+                    </dt>
+                    <dd className="mt-1 text-[15px] text-azul-950">{horario}</dd>
                   </div>
                 ) : null}
 
                 {instagram ? (
-                  <div className="flex gap-4">
-                    <IconoInstagram className="mt-0.5 size-6 shrink-0 text-azul-700" />
-                    <div>
-                      <dt className="text-[11px] font-semibold uppercase tracking-[0.12em] text-acero-500">
-                        Instagram
-                      </dt>
-                      <dd className="mt-1 text-[15px]">
-                        <a
-                          href={instagram}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="font-medium text-azul-700 underline-offset-2 hover:underline"
-                        >
-                          {usuarioInstagram(instagram)}
-                        </a>
-                      </dd>
-                    </div>
+                  <div className="grid grid-cols-[1.5rem_1fr] items-start gap-x-4">
+                    <IconoInstagram className="row-span-2 mt-0.5 size-6 shrink-0 text-azul-700" />
+                    <dt className="text-[11px] font-semibold uppercase tracking-[0.12em] text-acero-600">
+                      Instagram
+                    </dt>
+                    <dd className="mt-1 text-[15px]">
+                      <a
+                        href={instagram}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-medium text-azul-700 underline-offset-2 hover:underline"
+                      >
+                        {usuarioInstagram(instagram)}
+                      </a>
+                    </dd>
                   </div>
                 ) : null}
               </dl>

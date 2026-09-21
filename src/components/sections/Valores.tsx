@@ -46,7 +46,7 @@ export function Valores({
             <li key={valor.title} className="bg-azul-950 p-6 lg:p-7">
               <div className="flex items-start justify-between gap-4">
                 <IconoValor clave={valor.iconKey} className="size-9 shrink-0 text-verde-400" />
-                <span className="font-titulo text-sm font-semibold tabular-nums text-acero-500">
+                <span className="font-titulo text-sm font-semibold tabular-nums text-acero-400">
                   {String(indice + 1).padStart(2, "0")}
                 </span>
               </div>

@@ -200,7 +200,7 @@ export function BotonSecundario({
  */
 export function BotonWhatsApp({
   href,
-  children = "Escríbenos por WhatsApp",
+  children = "Escríbanos por WhatsApp",
   className = "",
 }: {
   href: string;
@@ -249,7 +249,14 @@ export function EnlaceConFlecha({
 /* Listas                                                                 */
 /* ===================================================================== */
 
-/** Lista de alcances: filete a la izquierda y marca verde, sin viñeta redonda. */
+/**
+ * Lista de alcances: filete a la izquierda y marca verde, sin viñeta redonda.
+ *
+ * La rejilla se dibuja con `gap-px` sobre un fondo `acero-200`: los filetes son
+ * el fondo asomando entre celdas. Por eso, con un número **impar** de ítems, la
+ * celda sobrante de la última fila quedaba pintada de gris. El último ítem
+ * ocupa las dos columnas cuando la cuenta es impar y el hueco desaparece.
+ */
 export function ListaDeAlcances({
   items,
   tono = "claro",
@@ -260,14 +267,15 @@ export function ListaDeAlcances({
   className?: string;
 }) {
   if (items.length === 0) return null;
+  const impar = items.length % 2 === 1;
   return (
     <ul className={`grid gap-px bg-acero-200 sm:grid-cols-2 ${className}`}>
-      {items.map((item) => (
+      {items.map((item, indice) => (
         <li
           key={item}
           className={`flex gap-3 px-4 py-3.5 text-[15px] leading-snug ${
             tono === "oscuro" ? "bg-azul-950 text-acero-200" : "bg-blanco text-azul-900"
-          }`}
+          } ${impar && indice === items.length - 1 ? "sm:col-span-2" : ""}`}
         >
           <span aria-hidden="true" className="mt-[7px] size-2 shrink-0 bg-verde-500" />
           <span>{item}</span>

@@ -101,14 +101,13 @@
   background-position: -1px -1px;
 }
 
-/* En /contacto el botón flotante tapaba el «Enviar» del formulario en móvil, y
-   los números ya están en la página. Se resuelve aquí para que el layout del
-   sitio siga siendo Server Component (leer la ruta lo volvería de cliente). */
-@layer components {
-  body:has(main[data-pagina="contacto"]) [data-whatsapp-flotante] {
-    display: none;
-  }
-}
+/* NOTA: aquí vivía la regla que ocultaba el botón flotante de WhatsApp en
+   /contacto con `:has()`. No servía de nada: en Tailwind v4 la capa
+   `utilities` se declara después de `components`, así que la utilidad
+   `inline-flex` del propio botón le ganaba siempre al `display:none`, sin
+   importar la especificidad. Ahora lo decide `FlotanteWhatsApp` con
+   `usePathname()`. Si algún día hace falta apagar una utilidad desde aquí,
+   tiene que ser dentro de `@layer utilities` o con `!important`. */
 
 @layer base {
   html {

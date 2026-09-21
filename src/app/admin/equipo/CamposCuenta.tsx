@@ -81,7 +81,7 @@ export function CamposCuenta({
             maxLength={160}
             defaultValue={cuenta?.email_contacto}
             placeholder="juan.perez@gmail.com"
-            hint="Su correo real, si lo tiene. Es informativo: NO sirve para iniciar sesión, y puede quedar vacío."
+            hint="El correo real de la persona, si lo tiene. Es informativo: NO sirve para iniciar sesión, y puede quedar vacío."
             className="sm:col-span-2"
           />
         </div>

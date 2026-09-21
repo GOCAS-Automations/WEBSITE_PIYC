@@ -92,8 +92,8 @@ function Ingreso({ configurado }: { configurado: boolean }) {
               Iniciar sesión
             </h1>
             <p className="mt-2 text-sm leading-relaxed text-acero-600">
-              Este acceso es solo para el personal de PIYC. Si eres cliente y
-              quieres contactarnos, escríbenos desde{" "}
+              Este acceso es solo para el personal de PIYC. Si es cliente y
+              quiere contactarnos, escríbanos desde{" "}
               <Link href="/contacto" className="font-semibold text-azul-700 underline">
                 la página de contacto
               </Link>
@@ -114,7 +114,7 @@ function Ingreso({ configurado }: { configurado: boolean }) {
           </div>
         </div>
 
-        <p className="mt-5 text-center text-xs leading-relaxed text-acero-500">
+        <p className="mt-5 text-center text-xs leading-relaxed text-acero-600">
           PROGRAMACIÓN INDUSTRIAL Y CONTROL S.A.S. · NIT 901.161.923 · Cali,
           Valle del Cauca
         </p>

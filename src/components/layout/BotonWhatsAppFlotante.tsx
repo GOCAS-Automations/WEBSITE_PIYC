@@ -11,32 +11,24 @@
  *    contenido en pantallas de 360 px.
  *  - `z-30`: por debajo del encabezado pegajoso (`z-40`) y del visor de
  *    galería (que es un `<dialog>` modal y vive en la capa superior).
+ *  - **Cuándo se ve** lo decide `FlotanteWhatsApp` (Client Component): no
+ *    aparece hasta que el visitante baja, y se retira al llegar al pie. Aquí
+ *    solo se resuelve el número, que es trabajo de servidor.
+ *  - Va dentro de un `aside`: un elemento suelto colgando de `<body>` queda
+ *    fuera de todo landmark.
  *  - **En `/contacto` no se pinta**: ahí tapaba el botón de enviar del
- *    formulario en móvil, y el visitante ya tiene los números a la vista. Se
- *    resuelve con CSS (`:has()` sobre `main[data-pagina="contacto"]`, ver
- *    `globals.css`) para no convertir el layout en Client Component solo por
- *    leer la ruta.
+ *    formulario en móvil, y el visitante ya tiene los números a la vista. Lo
+ *    decide `FlotanteWhatsApp` con `usePathname()`.
  */
 
 import { getContacto } from "@/lib/content";
 import { MENSAJES_WHATSAPP, enlaceWhatsAppDe } from "@/lib/contacto";
-import { IconoWhatsApp } from "@/components/ui/iconos";
+import { FlotanteWhatsApp } from "./FlotanteWhatsApp";
 
 export async function BotonWhatsAppFlotante() {
   const contacto = await getContacto();
   const href = enlaceWhatsAppDe(contacto, MENSAJES_WHATSAPP.general);
   if (!href) return null;
 
-  return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      data-whatsapp-flotante=""
-      className="fixed bottom-4 right-4 z-30 inline-flex h-14 items-center gap-3 rounded-fino bg-verde-500 px-4 font-semibold text-azul-950 transition-colors hover:bg-verde-400 sm:bottom-6 sm:right-6"
-    >
-      <IconoWhatsApp className="size-7 shrink-0" />
-      <span className="sr-only sm:not-sr-only sm:pr-1">Escríbenos</span>
-    </a>
-  );
+  return <FlotanteWhatsApp href={href} />;
 }
