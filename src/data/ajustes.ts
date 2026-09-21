@@ -44,19 +44,17 @@ export const contactEstatico: AjustesContact = {
     country: "Colombia",
     full: "Cl. 33 #5-76, Comuna 4, Cali, Valle del Cauca",
   },
+  // Un solo número público y un solo correo público (decisión de Cesar,
+  // 21-sep-2026): el celular y el correo personales del fundador no se
+  // publican en el sitio. Si vuelve a hacer falta un segundo canal, se agrega
+  // desde el panel, no aquí.
   phones: [{ label: "+57 321 761 7958", intl: "573217617958" }],
   whatsapp: [
     { label: "+57 321 761 7958", intl: "573217617958", person: null, principal: true },
-    {
-      label: "+57 310 637 3483",
-      intl: "573106373483",
-      person: "Jorge Castillo",
-      principal: false,
-    },
   ],
   primaryWhatsApp: "573217617958",
   whatsappFormulario: "573217617958",
-  emails: [{ address: "jorge.castillo@piycsas.com", person: "Jorge Castillo" }],
+  emails: [{ address: "fabian.gaviria@piycsas.com", person: null }],
   social: { instagram: "https://www.instagram.com/piyc_sas/" },
   siteUrl: "https://piycsas.com",
   // Horario confirmado por Cesar contra la ficha de Google del negocio
@@ -89,10 +87,10 @@ export const homeEstatico: AjustesHome = {
     title: "Ingeniería que se queda funcionando",
     body: "PIYC trabaja sobre plantas en producción: procesos que no pueden parar más de lo planeado y equipos que tienen que seguir operando cuando el proyecto termina. Por eso el trabajo empieza en el sitio —levantando lo que hay, midiendo cargas reales y entendiendo la secuencia— antes de proponer un solo equipo.\n\nCubrimos el ciclo completo: el diseño eléctrico y el P&ID, el tablero armado según ese plano, la programación del PLC y la supervisión HMI/SCADA, el montaje electromecánico y la puesta en marcha con el proceso corriendo. Al cerrar entregamos planos as-built, programas documentados y capacitación, porque un sistema que solo puede mantener quien lo instaló es un problema aplazado.",
     image: {
-      src: `${BUCKET}/inicio/planta-proceso-inoxidable.webp`,
-      alt: "Línea de proceso en acero inoxidable dentro de una planta de alimentos, con tuberías e instrumentación montadas",
-      width: 658,
-      height: 493,
+      src: `${BUCKET}/inicio/skid-proceso-inoxidable.webp`,
+      alt: "Skid de proceso en acero inoxidable con su panel de control, tuberías sanitarias y bomba, instalado en una sala de producción",
+      width: 1440,
+      height: 1920,
     },
     ctaEtiqueta: "Conocer a PIYC",
   },
@@ -184,10 +182,10 @@ export const nosotrosEstatico: AjustesNosotros = {
     subtitle:
       "PROGRAMACIÓN INDUSTRIAL Y CONTROL S.A.S. —PIYC— desarrolla proyectos de ingeniería, montaje y mantenimiento de equipos eléctricos y electrónicos para la industria del Valle del Cauca.",
     image: {
-      src: `${BUCKET}/nosotros/planta-proceso-inoxidable.webp`,
-      alt: "Línea de proceso en acero inoxidable dentro de una planta de alimentos, con tuberías e instrumentación montadas",
-      width: 658,
-      height: 493,
+      src: `${BUCKET}/cabeceras/cuarto-electrico-tableros.webp`,
+      alt: "Cuarto eléctrico con una fila de tableros de control y fuerza montados contra la pared; uno de ellos abierto durante el cableado",
+      width: 1920,
+      height: 943,
     },
   },
   quienesSomos: {
@@ -196,10 +194,10 @@ export const nosotrosEstatico: AjustesNosotros = {
     // Texto de PIYC (documento «4. QUIÉNES SOMOS», versión pulida).
     body: "Somos una empresa integrada por ingenieros altamente calificados, especializados en el desarrollo de proyectos de ingeniería, montaje y mantenimiento de equipos eléctricos y electrónicos. Nos dedicamos a la automatización de equipos, así como a la ejecución de obras eléctricas y electrónicas. Nuestro enfoque abarca desde la automatización y el control hasta el desarrollo de equipos de óptima calidad.\n\nOfrecemos servicios de alta calidad para dar soluciones asertivas, reduciendo el riesgo y dando la seguridad de que nuestra propuesta es la mejor, brindando tranquilidad y respaldo a cada cliente en su proceso de producción.",
     image: {
-      src: `${BUCKET}/nosotros/plano-electrico-tablero.webp`,
-      alt: "Plano eléctrico de un tablero de control elaborado por PIYC",
-      width: 1097,
-      height: 772,
+      src: `${BUCKET}/nosotros/equipo-planta-alimentos.webp`,
+      alt: "Dos técnicos con traje y cofia de planta revisan el programa en un portátil apoyado sobre el tablero, dentro de una sala de producción",
+      width: 1440,
+      height: 1920,
     },
   },
   // ⚠ Textos intercambiados respecto al documento original de PIYC por decisión
@@ -228,24 +226,63 @@ export const nosotrosEstatico: AjustesNosotros = {
     title: "¿Quiere trabajar con nosotros?",
     body: "Cuéntenos qué necesita su planta y con qué restricciones trabaja. Revisamos el alcance antes de proponer cualquier cosa.",
   },
+  // Galería «Nuestro trabajo»: fotos del propio equipo de PIYC en obra
+  // (Drive del cliente, carpeta «9. FOTOS»; catálogo en docs/CONTENIDO.md §2).
+  // El orden cuenta la historia: primero la gente, después el trabajo terminado.
   galeria: [
     {
-      src: `${BUCKET}/nosotros/transmisor-campo-tuberia.webp`,
-      alt: "Transmisor digital de campo instalado sobre la tubería de una línea de proceso",
-      width: 720,
-      height: 1280,
+      src: `${BUCKET}/nosotros/tecnico-cableando-tablero.webp`,
+      alt: "Técnico con overol y cofia trabaja en el cableado interno de un tablero de control dentro de una planta de alimentos",
+      width: 888,
+      height: 1920,
     },
     {
-      src: `${BUCKET}/nosotros/plano-electrico-tablero.webp`,
-      alt: "Plano eléctrico de un tablero de control elaborado por PIYC",
-      width: 1097,
-      height: 772,
+      src: `${BUCKET}/nosotros/tecnico-piyc-tablero-inox.webp`,
+      alt: "Técnico con la chaqueta de PIYC interviene el cableado de un tablero de control en acero inoxidable",
+      width: 447,
+      height: 489,
     },
     {
-      src: `${BUCKET}/nosotros/planta-proceso-inoxidable.webp`,
-      alt: "Línea de proceso en acero inoxidable dentro de una planta de alimentos, con tuberías e instrumentación montadas",
-      width: 658,
-      height: 493,
+      src: `${BUCKET}/nosotros/programacion-tablero-portatil.webp`,
+      alt: "Tablero de control abierto durante la puesta en marcha, con un portátil conectado al PLC para cargar el programa",
+      width: 934,
+      height: 1920,
+    },
+    {
+      src: `${BUCKET}/nosotros/puesta-en-marcha-variadores.webp`,
+      alt: "Puesta en marcha de un tablero en acero inoxidable con tres variadores de velocidad, con el portátil y el terminal de pruebas sobre la mesa",
+      width: 888,
+      height: 1920,
+    },
+    {
+      src: `${BUCKET}/nosotros/tablero-plc-modular-portatil.webp`,
+      alt: "Tablero con PLC modular, protecciones y borneras, con un portátil conectado durante la programación",
+      width: 933,
+      height: 1920,
+    },
+    {
+      src: `${BUCKET}/nosotros/tablero-doble-puerta-armado.webp`,
+      alt: "Tablero de doble puerta recién armado, con contactores, fuentes y borneras ordenadas por nivel",
+      width: 1440,
+      height: 1920,
+    },
+    {
+      src: `${BUCKET}/nosotros/gabinete-fuerza-armado.webp`,
+      alt: "Gabinete de fuerza abierto con seccionador, interruptores de caja moldeada y equipo de respaldo en la base",
+      width: 1041,
+      height: 1920,
+    },
+    {
+      src: `${BUCKET}/nosotros/tablero-inox-plc-siemens.webp`,
+      alt: "Tablero en acero inoxidable con PLC compacto, switch de red y borneras; guantes dieléctricos colgados en la puerta",
+      width: 1080,
+      height: 1920,
+    },
+    {
+      src: `${BUCKET}/nosotros/tablero-fuerza-barraje.webp`,
+      alt: "Tablero de fuerza abierto con barraje de cobre, interruptores automáticos y bloques de borneras",
+      width: 933,
+      height: 1920,
     },
   ],
 };
@@ -263,10 +300,10 @@ export const paginasEstatico: AjustesPaginas = {
     intro:
       "La agrupación en cuatro líneas es una forma de leer el portafolio, no un compartimento: la mayoría de los proyectos toca varias a la vez —un tablero nuevo viene con su diseño eléctrico, y una automatización termina con telemetría.",
     image: {
-      src: `${BUCKET}/cabeceras/planta-proceso-inoxidable.webp`,
-      alt: "Línea de proceso en acero inoxidable dentro de una planta de alimentos, con tuberías e instrumentación montadas",
-      width: 658,
-      height: 493,
+      src: `${BUCKET}/cabeceras/interior-tablero-plc-red.webp`,
+      alt: "Interior de un tablero en acero inoxidable con PLC modular, switches de red industrial, protecciones y borneras cableadas",
+      width: 1920,
+      height: 933,
     },
     // FAQ redactada por el equipo de la web. Sin precios, tiempos ni garantías:
     // nada de eso está confirmado por PIYC (regla: no prometer lo que no se sabe).
@@ -310,10 +347,10 @@ export const paginasEstatico: AjustesPaginas = {
     intro:
       "Cada caso describe la situación de partida, lo que se hizo y cómo quedó el proceso después. Las cifras que aparecen son las que midió el mismo proceso del cliente.",
     image: {
-      src: `${BUCKET}/cabeceras/planta-proceso-inoxidable.webp`,
-      alt: "Línea de proceso en acero inoxidable dentro de una planta de alimentos, con tuberías e instrumentación montadas",
-      width: 658,
-      height: 493,
+      src: `${BUCKET}/cabeceras/montaje-interno-tablero.webp`,
+      alt: "Vista cenital del montaje interno de un tablero: PLC, switch de red, fuente de 24 V, protecciones y borneras numeradas sobre riel",
+      width: 1920,
+      height: 1081,
     },
     cta: {
       title: "¿Tiene un proyecto parecido?",
@@ -350,7 +387,7 @@ export const paginasEstatico: AjustesPaginas = {
       {
         pregunta: "¿Puedo escribirles directamente por WhatsApp?",
         respuesta:
-          "Sí. El botón verde del sitio abre una conversación con el número principal, y en esta página están los dos números disponibles. El formulario existe para que el mensaje llegue con los datos completos desde el primer envío.",
+          "Sí. El botón verde del sitio abre una conversación con nuestro número de WhatsApp, que también aparece en esta página. El formulario existe para que el mensaje llegue con los datos completos desde el primer envío.",
       },
     ],
   },

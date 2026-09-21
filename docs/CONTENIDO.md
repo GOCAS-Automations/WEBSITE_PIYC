@@ -190,15 +190,30 @@ marca, ni un modelo, ni un resultado que no salga del PPTX.
 
 ## 2. Inventario de imágenes
 
-Todas las imágenes salen del PPTX de casos de éxito, procesadas con `sharp`:
-WebP, calidad 82, ancho máximo 1920 px, orientación EXIF corregida. **La más pesada
-pesa 81 KB**, muy por debajo del tope de 250 KB del plan (§9) — las originales del
-PPTX son pequeñas, así que no hubo que bajar calidad en ninguna.
+Dos orígenes distintos, y **no se mezclan**:
+
+1. **Capturas del PPTX de casos de éxito** (HMI, SCADA, planos eléctricos y P&ID).
+   Son el material de cada proyecto y viven **solo** en `site_projects` — §2.1.
+2. **Fotos de obra del Drive del cliente**, carpeta `9. FOTOS` (14 PNG + 25 JPG +
+   1 MP4 que no se usa). Son las fotos reales del equipo de PIYC trabajando y
+   llenan inicio, nosotros, servicios y cabeceras — §2.2 y §2.3.
+
+**Regla de reparto (21-sep-2026, Cesar):** una misma foto aparece en **una sola
+sección**. La única relación permitida es proyecto ↔ tarjeta de ese proyecto. Se
+verifica con una consulta que cruza `site_settings`, `site_services.images` y
+`site_projects.images` buscando URL repetidas; hoy da cero.
+
+Proceso: `sharp` → WebP, orientación EXIF aplicada, lado mayor ≤ 1920 px,
+calidad 80 con reducción automática hasta caber en 250 KB. **La más pesada del
+lote nuevo pesa 238 KB**, bien por debajo del tope de 400 KB de la regla 14.
 
 Bucket: `site-images` · `Cache-Control: 31536000` · `Content-Type: image/webp`.
 Prefijo público: `https://bzrjeduxjkwvtdaohjrh.supabase.co/storage/v1/object/public/site-images/`.
+44 archivos en total: 18 de casos + 26 de obra.
 
-### 2.1 Fotos de los casos
+### 2.1 Capturas de los casos de éxito
+
+No se tocaron: son de los proyectos y se quedan ahí.
 
 | Ruta en el bucket | Dimensiones | Peso |
 |---|---|---|
@@ -221,57 +236,84 @@ Prefijo público: `https://bzrjeduxjkwvtdaohjrh.supabase.co/storage/v1/object/pu
 | `proyectos/migracion-plc-jgb/caso-migracion-plc-jgb-02.webp` | 595×228 | 14 KB |
 | `proyectos/blanqueado-algodon-jgb/caso-blanqueado-algodon-jgb-01.webp` | 629×480 | 59 KB |
 
-### 2.2 Fotos generales
+### 2.2 Catálogo de las fotos del Drive — las 26 que se publican
 
-Diez fotos, subidas a varias carpetas porque una misma imagen sirve en más de un
-sitio (el bucket guarda una copia por carpeta; el peso listado es el de cada copia).
+Las 39 fotos de `9. FOTOS` se miraron una por una. Estas 26 quedaron dentro. El
+`alt` describe **solo lo que se ve**: no hay nombres de clientes ni de plantas,
+porque el Drive no dice de dónde es cada foto.
 
-| Archivo | Dimensiones | Peso | Carpetas | Uso sugerido |
+| Original | Qué muestra | Calidad | Uso asignado | `alt` |
 |---|---|---|---|---|
-| `tablero-control-variador-plc.webp` | 681×828 | 65 KB | `inicio/` `servicios/tableros-de-control/` `servicios/diseno-ingenieria-electrica/` | Hero de inicio y páginas de tableros de control e ingeniería eléctrica. |
-| `gabinete-control-dcs.webp` | 768×1024 | 81 KB | `inicio/` `servicios/tableros-de-control/` | Inicio y página de ensamble de tableros de control y potencia. |
-| `planta-proceso-inoxidable.webp` | 658×493 | 42 KB | `inicio/` `nosotros/` `cabeceras/` | Cabecera ancha, inicio y nosotros. Única foto de planta apaisada disponible. |
-| `plano-electrico-tablero.webp` | 1097×772 | 38 KB | `nosotros/` `servicios/diseno-ingenieria-electrica/` | Nosotros y diseño de ingeniería eléctrica. |
-| `pid-sistema-alcohol.webp` | 1016×629 | 37 KB | `servicios/diseno-ingenieria-electrica/` | Diseño y desarrollo de proyectos de ingeniería eléctrica. |
-| `hmi-pasteurizador.webp` | 584×317 | 28 KB | `servicios/automatizacion-procesos-industriales/` | Automatización de procesos industriales. |
-| `scada-planta-alimentos.webp` | 609×340 | 18 KB | `servicios/automatizacion-procesos-industriales/` `servicios/telecontrol/` | Automatización de procesos industriales y telecontrol. |
-| `hmi-estacion-cargue.webp` | 1109×883 | 61 KB | `servicios/telemetria/` `servicios/telecontrol/` | Telemetría y telecontrol. |
-| `transmisor-campo-tuberia.webp` | 720×1280 | 56 KB | `nosotros/` `servicios/telemetria/` `servicios/aplicaciones-industriales/` | Nosotros, telemetría y aplicaciones industriales. |
-| `valvula-control-posicionador.webp` | 520×694 | 42 KB | `servicios/aplicaciones-industriales/` `servicios/proyectos-llave-en-mano/` | Aplicaciones industriales y proyectos llave en mano. |
+| `20210707_100235.jpg` | Cuarto eléctrico con una fila de tableros montados; uno abierto | Nítida, apaisada 3648×1792, luz pareja. La mejor panorámica del lote | Cabecera de /nosotros → `cabeceras/cuarto-electrico-tableros.webp` (1920×943, 85 KB) | Cuarto eléctrico con una fila de tableros de control y fuerza montados contra la pared; uno de ellos abierto durante el cableado |
+| `20210902_153937.jpg` | Interior de tablero inox: PLC modular, switches Ethernet, protecciones, borneras | Excelente, apaisada 5664×2752, muy nítida | Cabecera de /servicios → `cabeceras/interior-tablero-plc-red.webp` (1920×933, 203 KB) | Interior de un tablero en acero inoxidable con PLC modular, switches de red industrial, protecciones y borneras cableadas |
+| `20221126_175003.jpg` | Vista cenital del montaje interno de un tablero sobre la placa de fondo | Muy nítida, apaisada 4624×2604 | Cabecera de /proyectos → `cabeceras/montaje-interno-tablero.webp` (1920×1081, 151 KB) | Vista cenital del montaje interno de un tablero: PLC, switch de red, fuente de 24 V, protecciones y borneras numeradas sobre riel |
+| `20220316_093100.jpg` | Skid de proceso inox con panel de control, tuberías sanitarias y bomba | Excelente, vertical 3468×4624, buena luz de sala | Inicio · bloque «Qué hacemos» → `inicio/skid-proceso-inoxidable.webp` (1440×1920, 160 KB) | Skid de proceso en acero inoxidable con su panel de control, tuberías sanitarias y bomba, instalado en una sala de producción |
+| `20210609_110056.jpg` | Dos técnicos con traje y cofia revisan el programa en un portátil, en planta | Buena, vertical 4248×5664. La mejor foto de gente del lote | Nosotros · bloque «Quiénes somos» → `nosotros/equipo-planta-alimentos.webp` (1440×1920, 77 KB) | Dos técnicos con traje y cofia de planta revisan el programa en un portátil apoyado sobre el tablero, dentro de una sala de producción |
+| `20220211_111636.jpg` | Técnico con overol y cofia cableando el interior de un tablero | Nítida, vertical 1184×2560. Resolución justa pero suficiente | Nosotros · galería «Nuestro trabajo» (1.ª) → `nosotros/tecnico-cableando-tablero.webp` (888×1920, 198 KB) | Técnico con overol y cofia trabaja en el cableado interno de un tablero de control dentro de una planta de alimentos |
+| `FOTO 10.png` | Técnico con chaqueta de PIYC interviniendo un tablero inox | Baja: 447×489, del PPTX. Se acepta por ser la única con la marca puesta | Nosotros · galería «Nuestro trabajo» (2.ª) → `nosotros/tecnico-piyc-tablero-inox.webp` (447×489, 32 KB) | Técnico con la chaqueta de PIYC interviene el cableado de un tablero de control en acero inoxidable |
+| `20210519_125533.jpg` | Tablero abierto con portátil conectado durante la puesta en marcha | Correcta, vertical 1588×3264, luz mixta | Nosotros · galería «Nuestro trabajo» (3.ª) → `nosotros/programacion-tablero-portatil.webp` (934×1920, 142 KB) | Tablero de control abierto durante la puesta en marcha, con un portátil conectado al PLC para cargar el programa |
+| `20220313_162115.jpg` | Tablero inox con tres variadores; portátil y terminal de pruebas en la mesa | Nítida, vertical 1184×2560 | Nosotros · galería «Nuestro trabajo» (4.ª) → `nosotros/puesta-en-marcha-variadores.webp` (888×1920, 158 KB) | Puesta en marcha de un tablero en acero inoxidable con tres variadores de velocidad, con el portátil y el terminal de pruebas sobre la mesa |
+| `20210708_171743.jpg` | Tablero con PLC modular y portátil conectado para cargar el programa | Buena, vertical 2752×5664 | Nosotros · galería «Nuestro trabajo» (5.ª) → `nosotros/tablero-plc-modular-portatil.webp` (933×1920, 92 KB) | Tablero con PLC modular, protecciones y borneras, con un portátil conectado durante la programación |
+| `20211220_210055.jpg` | Tablero de doble puerta recién armado, con todo ordenado por nivel | Buena, vertical 3000×4000. Foto de taller, nocturna pero pareja | Nosotros · galería «Nuestro trabajo» (6.ª) → `nosotros/tablero-doble-puerta-armado.webp` (1440×1920, 207 KB) | Tablero de doble puerta recién armado, con contactores, fuentes y borneras ordenadas por nivel |
+| `20220920_090936.jpg` | Gabinete de fuerza abierto con seccionador, interruptores y equipo de respaldo | Buena, vertical 2346×4326, luz de taller nuevo | Nosotros · galería «Nuestro trabajo» (7.ª) → `nosotros/gabinete-fuerza-armado.webp` (1041×1920, 91 KB) | Gabinete de fuerza abierto con seccionador, interruptores de caja moldeada y equipo de respaldo en la base |
+| `20221214_133340.jpg` | Tablero inox con PLC compacto, switch y borneras; guantes dieléctricos | Buena, vertical 1836×3264 | Nosotros · galería «Nuestro trabajo» (8.ª) → `nosotros/tablero-inox-plc-siemens.webp` (1080×1920, 143 KB) | Tablero en acero inoxidable con PLC compacto, switch de red y borneras; guantes dieléctricos colgados en la puerta |
+| `20210603_115417.jpg` | Tablero de fuerza abierto con barraje de cobre e interruptores | Buena, vertical 2752×5664 | Nosotros · galería «Nuestro trabajo» (9.ª) → `nosotros/tablero-fuerza-barraje.webp` (933×1920, 147 KB) | Tablero de fuerza abierto con barraje de cobre, interruptores automáticos y bloques de borneras |
+| `20211230_164318.jpg` | Tablero inox con PLC compacto, fuente de 24 V y borneras marcadas una a una | Nítida, vertical 1184×2560 | Servicio `automatizacion-procesos-industriales` (portada) → `servicios/automatizacion-procesos-industriales/tablero-inox-plc-borneras.webp` (888×1920, 182 KB) | Tablero de automatización en acero inoxidable con PLC compacto, fuente de 24 V y borneras identificadas una a una |
+| `20220128_145701.jpg` | Tablero con PLC compacto, switch de red y fuente conmutada | Aceptable, vertical 948×2048. La de menor resolución de los JPG | Servicio `automatizacion-procesos-industriales` → `servicios/automatizacion-procesos-industriales/tablero-plc-compacto-red.webp` (889×1920, 103 KB) | Tablero con PLC compacto, switch de red industrial y fuente conmutada, cableado y marquillado |
+| `20211220_210218.jpg` | Tablero de doble puerta cerrado y terminado, con rejillas y visor | Buena, vertical 3000×4000 | Servicio `tableros-de-control` (portada) → `servicios/tableros-de-control/tablero-doble-puerta-terminado.webp` (1440×1920, 67 KB) | Tablero de doble puerta terminado, con rejillas de ventilación y visor, listo para despacho |
+| `20211022_104107.jpg` | Tablero grande con PLC modular, bancos de relés y los planos abiertos | Buena, vertical 3000×4000 | Servicio `tableros-de-control` → `servicios/tableros-de-control/tablero-plc-modular-reles.webp` (1440×1920, 238 KB) | Tablero de gran formato con PLC modular, bancos de relés de interposición y borneras, con los planos abiertos durante el montaje |
+| `20220822_221050.jpg` | Interior de tablero de potencia: seccionador e interruptores de caja moldeada | Nítida aunque oscura, vertical 2084×4624 | Servicio `diseno-ingenieria-electrica` (portada) → `servicios/diseno-ingenieria-electrica/tablero-potencia-interruptores.webp` (865×1920, 83 KB) | Interior de un tablero de potencia con seccionador de entrada e interruptores de caja moldeada sobre el barraje |
+| `20210603_115506.jpg` | Dos tableros cerrados instalados en un cuarto eléctrico | Correcta, vertical 1588×3264. Encuadre plano, sirve de acompañamiento | Servicio `diseno-ingenieria-electrica` → `servicios/diseno-ingenieria-electrica/tableros-cuarto-electrico.webp` (934×1920, 28 KB) | Dos tableros cerrados instalados en un cuarto eléctrico, con ventilación forzada y panel de medición en la puerta |
+| `20220920_091002.jpg` | Tablero rotulado montado en pared, junto al visor de la sala de proceso | Buena, vertical 2316×3949 | Servicio `telemetria` (portada) → `servicios/telemetria/tablero-pared-sala-proceso.webp` (1126×1920, 47 KB) | Tablero rotulado montado en pared junto al visor de la sala de proceso, con la canalización llevada al equipo |
+| `20211107_095706.jpg` | Interior de tablero con variadores de distintas potencias y PLC modular | Aceptable, vertical 2448×3264. Algo oscura | Servicio `telecontrol` (portada) → `servicios/telecontrol/tablero-variadores-velocidad.webp` (1440×1920, 209 KB) | Interior de un tablero con variadores de velocidad de distintas potencias, PLC modular y protecciones |
+| `20210923_161629.jpg` | Línea de transporte y empaque montada en planta, con el área aislada | Media: apaisada 3264×1588, pero a contraluz y con el plástico de obra | Servicio `proyectos-llave-en-mano` (portada) → `servicios/proyectos-llave-en-mano/linea-empaque-planta.webp` (1920×934, 127 KB) | Línea de transporte y empaque montada dentro de una planta, con el área aislada durante la obra |
+| `20220817_154311.jpg` | Tablero con PLC, arrancadores y servoaccionamientos sobre la placa de fondo | Buena, vertical 1468×3264 | Servicio `aplicaciones-industriales` (portada) → `servicios/aplicaciones-industriales/tablero-servodrives.webp` (864×1920, 118 KB) | Tablero de control con PLC, arrancadores y servoaccionamientos montados sobre la placa de fondo |
+| `20220822_220427.jpg` | Gabinete metálico terminado en el taller, con rejillas y zócalo | Correcta, vertical 2084×4624. Foto de producto, poco contexto | Servicio `aplicaciones-industriales` → `servicios/aplicaciones-industriales/gabinete-terminado-taller.webp` (865×1920, 39 KB) | Gabinete metálico terminado en el taller, con rejillas de ventilación y base de zócalo |
+| `20220326_164241.jpg` | Dos técnicos sobre un andamio instalando en el techo de una sala con paneles aislantes | Media: apaisada 3264×2448, luz pobre. Única del lote compatible con refrigeración | Servicio `refrigeracion-industrial` (portada) → `servicios/refrigeracion-industrial/montaje-techo-sala-paneles.webp` (1920×1440, 167 KB) | Dos técnicos sobre un andamio instalan equipos en el techo de una sala con paneles aislantes y difusores |
 
-**Textos alternativos:**
+### 2.3 Las 13 fotos descartadas, y por qué
 
-- `tablero-control-variador-plc.webp` — Tablero eléctrico de control abierto, con variador de velocidad Schneider, PLC, protecciones y borneras cableadas
-- `gabinete-control-dcs.webp` — Gabinete de control armado y cableado para un sistema de control tipo DCS
-- `planta-proceso-inoxidable.webp` — Línea de proceso en acero inoxidable dentro de una planta de alimentos, con tuberías e instrumentación montadas
-- `plano-electrico-tablero.webp` — Plano eléctrico de un tablero de control elaborado por PIYC
-- `pid-sistema-alcohol.webp` — Plano P&ID de un sistema de preparación y dosificación, con tanques, válvulas e instrumentación
-- `hmi-pasteurizador.webp` — Pantallas HMI de un pasteurizador: operación, datos de proceso y selección de recetas
-- `scada-planta-alimentos.webp` — Pantalla SCADA de una planta de alimentos, con reactor, homogeneizador y línea de empaque
-- `hmi-estacion-cargue.webp` — Pantalla HMI de una estación de cargue, con volumen cargado, caudal y temperatura del producto
-- `transmisor-campo-tuberia.webp` — Transmisor digital de campo instalado sobre la tubería de una línea de proceso
-- `valvula-control-posicionador.webp` — Válvula de control con posicionador neumático instalada en una línea de proceso
+**Nueve son de banco de imágenes**, no de PIYC. Publicarlas contradice todo lo que
+dice el sitio sobre trabajar dentro de la planta, y una de ellas ya venía con el
+logo de PIYC encima, que es peor:
 
-### 2.3 Lo que se descartó
+- `FOTO 1.png`, `FOTO 8.png` — sala de control futurista con monitores azules (_stock_).
+- `FOTO 2.png` — figurines de obreros en miniatura sobre una placa base (_stock_).
+- `FOTO 3.png` — ilustración vectorial isométrica de una línea de producción.
+- `FOTO 4.png` — manos con guante reparando una placa base (_stock_).
+- `FOTO 5.png` — detalle de cableado de servoaccionamientos (_stock_).
+- `FOTO 6.png` — operario de espaldas en una sala de control (_stock_).
+- `FOTO 9.png` — la misma `FOTO 6` con el logo de PIYC superpuesto. Fuera.
+- `FOTO 7.png` — unidades condensadoras en una azotea (_stock_). Es la **única**
+  imagen de aire acondicionado del material, y aun así no se usa: es comprada.
 
-- **Foto de banco de imágenes** (mano con el pulgar arriba, diapositiva 8): es _stock_,
-  no es PIYC, y contradice la regla de no parecerse a nadie. Fuera.
-- **Diagrama de arquitectura «Configuración HDCS mini»** (diapositiva 16): es material
-  de catálogo del fabricante, no obra de PIYC. No se publica.
-- **Tres fotos de planta de calidad baja o repetidas** (tubo desgastado a contraluz,
-  cableado suelto bajo un bastidor, detalle de tanque): aportan poco y varias repiten
-  lo que ya muestra otra foto del mismo caso.
+**Cuatro son fotos reales pero irrecuperables por resolución** (los PNG del PPTX
+se guardaron reducidos; ninguno pasa de 629 px):
 
-### 2.4 Límite conocido
+- `FOTO 11.png` (351×629) y `FOTO 14.png` (375×505) — la misma escena existe en
+  alta resolución (`20211230_164318.jpg` y `20221214_133340.jpg`). Se usan esas.
+- `FOTO 12.png` (281×498) y `FOTO 13.png` (357×497) — HMI en la puerta de un
+  gabinete; 281 px de ancho no dan ni para una tarjeta.
 
-Las imágenes del PPTX **están incrustadas ya reducidas**: la más grande mide 1229 px de
-ancho y la mayoría ronda los 600–1000 px. Sirven para tarjetas y galerías, pero **ninguna
-da para una cabecera ancha a pantalla completa** sin verse blanda. Se subió
-`cabeceras/planta-proceso-inoxidable.webp` (658×493) como recurso provisional.
+Aparte de esas 13, la carpeta trae `20220216_162823.mp4`, que tampoco entra: es
+video, y el sitio no tiene reproductor propio (`site_services.video` solo acepta
+YouTube).
 
-Las **40 fotos originales de la carpeta `9. FOTOS` del Drive** (14 PNG + 25 JPG, varias de
-más de 4 MB) no se tocaron en esta ronda y son la fuente correcta para cabeceras y para
-el hero de inicio. Hay que bajarlas, catalogarlas con Jorge y procesarlas igual que estas.
+`FOTO 10.png` (447×489) **sí entra**, a pesar de su tamaño: es la única donde se
+ve la chaqueta de PIYC puesta. Va en la galería de nosotros, que la pinta chica.
+
+### 2.4 Lo que sigue faltando
+
+- **Aire acondicionado: cero fotos propias.** El servicio queda con
+  `images = '{}'` — la regla 9 de `AGENTS.md` prefiere no pintar nada antes que
+  pintar de relleno. Hay que pedirle a PIYC fotos de un montaje de climatización.
+- **Refrigeración industrial: una sola**, y de montaje general (andamio, techo,
+  paneles aislantes). Faltan fotos de cuartos fríos terminados, evaporadores y
+  unidades condensadoras.
+- **Retratos del equipo:** no hay ni una foto posada del equipo ni del taller de
+  PIYC. Todo lo que hay es obra en sitio.
+- **Fotos apaisadas:** solo cinco de las 39. Las tres mejores se fueron a las
+  cabeceras y ya no queda margen para un hero nuevo sin recortar una vertical.
 
 ---
 
@@ -324,14 +366,20 @@ Refrigeración y climatización**. Viven en `lineasDeServicio` (`src/data/servic
 no en la base: no son contenido editable desde el panel. Si Jorge prefiere otra
 agrupación se cambia solo ahí.
 
-### Los dos servicios sin foto
+### Refrigeración y climatización: el hueco que queda
 
-`refrigeracion-industrial` y `aires-acondicionados` **no tienen ni una imagen**: el PPTX
-de casos de éxito es todo automatización de procesos. No se les puso una foto de tablero
-prestada de otro servicio —engaña al visitante y arruina el `alt`—. Sus páginas usan
-`GraficoServicio`: un panel técnico con el símbolo del servicio y su cajetín, coherente
-con el lenguaje visual del sitio. **En cuanto Jorge entregue fotos de refrigeración y de
-climatización, se cargan desde el panel y el panel gráfico desaparece solo.**
+Tras repartir las fotos del Drive (§2), `refrigeracion-industrial` quedó con **una
+sola** —el montaje en el techo de una sala con paneles aislantes— y
+`aires-acondicionados` **sigue sin ninguna**. Las 39 fotos del cliente son casi
+todas de tableros y automatización; de climatización no hay nada propio, y la
+única imagen de condensadoras del material es de banco de imágenes (§2.3).
+
+A ninguno de los dos se le puso una foto de tablero prestada de otro servicio:
+engaña al visitante y arruina el `alt`. `aires-acondicionados` sigue usando
+`GraficoServicio` —un panel técnico con el símbolo del servicio y su cajetín,
+coherente con el lenguaje visual del sitio—. **En cuanto Jorge entregue fotos de
+cuartos fríos y de climatización, se cargan desde el panel y el panel gráfico
+desaparece solo.**
 
 Lo mismo pasa con los casos: no hay un solo proyecto de refrigeración ni de aire
 acondicionado publicado, y son dos de los nueve servicios que se ofrecen (ver §6.8).
@@ -372,7 +420,9 @@ Contenido en `site_settings.nosotros` (respaldo: `nosotrosEstatico` de
 - **Titular de la cabecera** («Ingenieros que trabajan dentro de la planta, no sobre el
   catálogo»): redactado por la web. Es el texto más opinado de la página; si a Jorge no le
   suena, se cambia desde el panel.
-- **Galería**: las tres fotos de `nosotros/`, con visor ampliado accesible.
+- **Galería «Nuestro trabajo»**: nueve fotos de obra propias (§2.2), en un orden que
+  cuenta la historia —primero la gente trabajando, después el trabajo terminado—.
+  Ninguna se repite en otra sección del sitio.
 
 ---
 
@@ -392,8 +442,9 @@ Contenido en `site_settings.home` (respaldo: `homeEstatico`).
   revisar, después de los servicios.
 - **Destacados**: cuatro servicios y tres casos, elegidos en `home.serviciosDestacados` y
   `home.proyectosDestacados`. Editables desde el panel.
-- **Foto**: `inicio/planta-proceso-inoxidable.webp`, en recuadro. Las otras dos fotos de
-  `inicio/` quedaron sin usar: son verticales y no caben en el ritmo de la página.
+- **Foto**: `inicio/skid-proceso-inoxidable.webp`, en recuadro — un skid de proceso con
+  su panel de control, del Drive del cliente (§2.2). Es la única foto de la portada:
+  `inicio/` no guarda nada más, para que no se acumule material sin usar.
 
 ---
 

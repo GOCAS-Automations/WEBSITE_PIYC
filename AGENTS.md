@@ -52,9 +52,8 @@ Uso: el azul domina y el verde se dosifica (nunca fondo de sección ni de bloque
 - Eslogan: «Tu socio confiable en soluciones industriales» · dominio `piycsas.com`.
 - Ciudad: Cali. Dirección oficial (la de Google): Cl. 33 #5-76, Comuna 4, Cali, Valle del Cauca.
 - Horario de atención: lunes a viernes, 8:00 a. m. – 5:00 p. m.; sábados y domingos, cerrado (`ajustes.contact.horario`: `label` y `schema` dicen lo mismo).
-- WhatsApp principal, destino del formulario de contacto: +57 321 761 7958.
-- WhatsApp secundario: +57 310 637 3483 (Jorge Castillo, fundador).
-- Correo visible en el sitio: jorge.castillo@piycsas.com.
+- WhatsApp y teléfono público, único, destino del formulario de contacto: +57 321 761 7958. El celular personal del fundador **no se publica**: un solo canal, el de la empresa.
+- Correo visible en el sitio: fabian.gaviria@piycsas.com.
 - Instagram: https://www.instagram.com/piyc_sas/
 
 ## Backend / Supabase
