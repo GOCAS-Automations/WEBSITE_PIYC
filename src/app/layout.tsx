@@ -1,8 +1,19 @@
+/**
+ * LAYOUT RAÍZ — lo mínimo que comparten el sitio público, el panel y el portal.
+ *
+ * Aquí solo va lo que TODOS necesitan: el idioma, las tipografías, la metadata
+ * base y el `metadataBase` que resuelve los canonical relativos de cada página.
+ *
+ * El encabezado, el pie, el botón de WhatsApp y el JSON-LD del sitio viven en
+ * `src/app/(sitio)/layout.tsx`: el panel no debe heredar nada de eso.
+ */
+
 import type { Metadata, Viewport } from "next";
 import { Barlow_Condensed, IBM_Plex_Sans } from "next/font/google";
 import "./globals.css";
-import { Encabezado } from "@/components/layout/Encabezado";
 import { colores } from "@/lib/tokens";
+import { seoEstatico } from "@/data/ajustes";
+import { urlSitio } from "@/lib/seo";
 
 // Títulos: condensada de señalética industrial.
 const barlow = Barlow_Condensed({
@@ -20,41 +31,43 @@ const plex = IBM_Plex_Sans({
   variable: "--font-plex",
 });
 
-const urlSitio = process.env.NEXT_PUBLIC_SITE_URL || "https://piycsas.com";
-
+/**
+ * La metadata base es estática a propósito: se evalúa en el build y no puede
+ * depender de una consulta. Los títulos y descripciones por página sí salen de
+ * `site_settings.seo` (ver `src/lib/seo.ts`).
+ */
 export const metadata: Metadata = {
-  metadataBase: new URL(urlSitio),
+  metadataBase: new URL(urlSitio()),
   title: {
-    default: "PIYC — Automatización industrial e ingeniería eléctrica en Cali",
-    template: "%s | PIYC",
+    default: seoEstatico.defaultTitle ?? "PIYC",
+    template: seoEstatico.titleTemplate ?? "%s | PIYC",
   },
-  description:
-    "Automatización de procesos con PLC y HMI/SCADA, tableros de control y potencia, telemetría y proyectos eléctricos llave en mano en Cali, Valle del Cauca.",
+  description: seoEstatico.defaultDescription,
   applicationName: "PIYC",
+  authors: [{ name: "PIYC — Programación Industrial y Control S.A.S." }],
+  creator: "GOCAS",
+  formatDetection: { telephone: false, address: false, email: false },
   openGraph: {
     type: "website",
     locale: "es_CO",
     siteName: "PIYC — Programación Industrial y Control",
   },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, "max-image-preview": "large" },
+  },
 };
 
 export const viewport: Viewport = {
   themeColor: colores.blanco,
+  colorScheme: "light",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="es-CO" className={`${barlow.variable} ${plex.variable}`}>
-      <body className="min-h-dvh">
-        <a
-          href="#contenido"
-          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:bg-grafito-950 focus:px-4 focus:py-2 focus:text-blanco"
-        >
-          Saltar al contenido
-        </a>
-        <Encabezado />
-        {children}
-      </body>
+      <body className="min-h-dvh">{children}</body>
     </html>
   );
 }

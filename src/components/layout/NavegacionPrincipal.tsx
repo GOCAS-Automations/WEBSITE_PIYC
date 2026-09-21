@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { navegacionPrincipal } from "@/data/navegacion";
-import { contacto } from "@/data/contacto";
 import { IconoCerrar, IconoMenu, IconoWhatsApp } from "@/components/ui/iconos";
 
 function esActivo(pathname: string, href: string) {
@@ -12,7 +11,20 @@ function esActivo(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-export function NavegacionPrincipal({ hrefWhatsApp }: { hrefWhatsApp: string }) {
+/**
+ * El teléfono y el correo llegan por props desde el servidor
+ * (`site_settings.contact`): así el panel los edita y la navegación —que es
+ * Client Component— no tiene que importar la capa de contenido.
+ */
+export function NavegacionPrincipal({
+  hrefWhatsApp,
+  telefono,
+  correo,
+}: {
+  hrefWhatsApp: string;
+  telefono?: string;
+  correo?: string;
+}) {
   const pathname = usePathname();
   const [abierto, setAbierto] = useState(false);
   const botonRef = useRef<HTMLButtonElement>(null);
@@ -51,7 +63,7 @@ export function NavegacionPrincipal({ hrefWhatsApp }: { hrefWhatsApp: string }) 
                 <Link
                   href={enlace.href}
                   aria-current={activo ? "page" : undefined}
-                  className="relative flex items-center px-4 text-[15px] font-medium text-grafito-700 transition-colors after:absolute after:inset-x-4 after:bottom-[-1px] after:h-[3px] after:scale-x-0 after:bg-naranja-500 after:transition-transform hover:text-azul-700 aria-[current=page]:text-grafito-950 aria-[current=page]:after:scale-x-100"
+                  className="relative flex items-center px-4 text-[15px] font-medium text-acero-700 transition-colors after:absolute after:inset-x-4 after:bottom-[-1px] after:h-[3px] after:scale-x-0 after:bg-azul-700 after:transition-transform hover:text-azul-700 aria-[current=page]:text-azul-950 aria-[current=page]:after:scale-x-100"
                 >
                   {enlace.etiqueta}
                 </Link>
@@ -66,7 +78,7 @@ export function NavegacionPrincipal({ hrefWhatsApp }: { hrefWhatsApp: string }) 
           href={hrefWhatsApp}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex h-11 items-center gap-2 rounded-fino bg-naranja-500 px-3 text-sm font-semibold text-grafito-950 transition-colors hover:bg-naranja-600 sm:px-4"
+          className="inline-flex h-11 items-center gap-2 rounded-fino border border-verde-600 px-3 text-sm font-semibold text-verde-700 transition-colors hover:bg-verde-100 sm:px-4"
         >
           <IconoWhatsApp className="size-5" />
           <span className="sr-only sm:not-sr-only">WhatsApp</span>
@@ -78,7 +90,7 @@ export function NavegacionPrincipal({ hrefWhatsApp }: { hrefWhatsApp: string }) 
           aria-expanded={abierto}
           aria-controls="menu-movil"
           onClick={() => setAbierto((valor) => !valor)}
-          className="inline-flex size-11 items-center justify-center rounded-fino border border-acero-200 text-grafito-950 transition-colors hover:border-grafito-950 lg:hidden"
+          className="inline-flex size-11 items-center justify-center rounded-fino border border-acero-200 text-azul-950 transition-colors hover:border-azul-950 lg:hidden"
         >
           <span className="sr-only">{abierto ? "Cerrar menú" : "Abrir menú"}</span>
           {abierto ? <IconoCerrar className="size-5" /> : <IconoMenu className="size-5" />}
@@ -100,9 +112,9 @@ export function NavegacionPrincipal({ hrefWhatsApp }: { hrefWhatsApp: string }) 
                     href={enlace.href}
                     aria-current={activo ? "page" : undefined}
                     onClick={() => setAbierto(false)}
-                    className="flex items-baseline gap-4 py-3.5 font-titulo text-2xl font-semibold text-grafito-950 aria-[current=page]:text-azul-700"
+                    className="flex items-baseline gap-4 py-3.5 font-titulo text-2xl font-semibold text-azul-950 aria-[current=page]:text-azul-700"
                   >
-                    <span aria-hidden="true" className="w-7 font-sans text-xs font-semibold tabular-nums text-naranja-700">
+                    <span aria-hidden="true" className="w-7 font-sans text-xs font-semibold tabular-nums text-azul-600">
                       {String(indice + 1).padStart(2, "0")}
                     </span>
                     {enlace.etiqueta}
@@ -111,9 +123,11 @@ export function NavegacionPrincipal({ hrefWhatsApp }: { hrefWhatsApp: string }) 
               );
             })}
           </ul>
-          <p className="mt-5 text-sm text-acero-600">
-            {contacto.telefono.visible} · {contacto.correo}
-          </p>
+          {telefono || correo ? (
+            <p className="mt-5 text-sm text-acero-600">
+              {[telefono, correo].filter(Boolean).join(" · ")}
+            </p>
+          ) : null}
         </nav>
       </div>
     </>

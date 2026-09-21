@@ -1,6 +1,6 @@
 /**
  * Diagrama escalera (ladder, IEC 61131-3) ilustrativo para el hero de inicio.
- * Tramos energizados en naranja de seguridad; el resto en azul claro.
+ * Tramos energizados en verde PIYC; el resto en azul claro a media opacidad.
  * Colores solo por clases de token (fill-… y stroke-…), nada escrito a mano.
  */
 
@@ -17,8 +17,8 @@ const C2 = 188; // segunda columna (renglón 001)
 const J1 = 60; // uniones del enclavamiento
 const J2 = 148;
 
-const activo = "stroke-naranja-500";
-const inactivo = "stroke-azul-300/55";
+const activo = "stroke-verde-500";
+const inactivo = "stroke-azul-300/45";
 
 function Contacto({
   x,
@@ -45,7 +45,7 @@ function Bobina({ y, energizada }: { y: number; energizada: boolean }) {
   const trazo = energizada ? activo : inactivo;
   return (
     <g>
-      {energizada ? <circle cx={BOBINA} cy={y} r={17} className="fill-naranja-500/15" /> : null}
+      {energizada ? <circle cx={BOBINA} cy={y} r={17} className="fill-verde-500/15" /> : null}
       <path
         className={trazo}
         strokeWidth={2.5}
@@ -125,8 +125,8 @@ export function DiagramaEscalera({ className }: { className?: string }) {
         {/* Enclavamiento */}
         <path d={`M${J1} ${Y_A}V${Y_ENCLAVE}H${C1}M${C1 + 16} ${Y_ENCLAVE}H${J2}V${Y_A}`} className={activo} />
       </g>
-      <circle cx={J1} cy={Y_A} r={3.5} className="fill-naranja-500" />
-      <circle cx={J2} cy={Y_A} r={3.5} className="fill-naranja-500" />
+      <circle cx={J1} cy={Y_A} r={3.5} className="fill-verde-500" />
+      <circle cx={J2} cy={Y_A} r={3.5} className="fill-verde-500" />
       <Contacto x={C1} y={Y_A} energizado={false} />
       <Contacto x={C1} y={Y_ENCLAVE} energizado />
       <Contacto x={C2} y={Y_A} energizado cerrado />
@@ -144,7 +144,7 @@ export function DiagramaEscalera({ className }: { className?: string }) {
         <path d={`M${C1 + 16} ${Y_B}H180M272 ${Y_B}H${BOBINA - 10}M${BOBINA + 10} ${Y_B}H${RIEL_DER}`} className={inactivo} />
       </g>
       <Contacto x={C1} y={Y_B} energizado={false} />
-      <rect x={180} y={Y_B - 26} width={92} height={60} className="fill-grafito-900 stroke-azul-300/55" strokeWidth={1.75} />
+      <rect x={180} y={Y_B - 26} width={92} height={60} className="fill-azul-900 stroke-azul-300/45" strokeWidth={1.75} />
       <g textAnchor="middle">
         <text x={226} y={Y_B - 34} className="fill-acero-200 text-[11px] font-semibold">
           T1
@@ -178,7 +178,7 @@ export function DiagramaEscalera({ className }: { className?: string }) {
 
       {/* Flujo de corriente animado (se oculta con movimiento reducido) */}
       <g
-        className="animate-flujo stroke-blanco/80 motion-reduce:hidden"
+        className="animate-flujo stroke-verde-300/70 motion-reduce:hidden"
         strokeWidth={2}
         strokeDasharray="4 24"
         strokeLinecap="round"
