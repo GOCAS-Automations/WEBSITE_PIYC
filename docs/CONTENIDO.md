@@ -19,8 +19,10 @@ Si un texto se cambia aquí, hay que cambiarlo también en `supabase/seed/*.sql`
 Seis casos. El PPTX nunca dice "proyecto X para el cliente Y": rotula cada lámina con
 frases tipo «EMPRESA DE PRODUCTOS CUIDADO PERSONAL JGB». Los nombres de cliente que
 aparecen abajo salen de esos rótulos y de los logotipos visibles en las capturas de HMI
-(Alival, B·Altman). **Ninguno está inventado, pero ninguno está autorizado todavía**:
-publicar el nombre de un cliente industrial necesita su visto bueno — ver §4.
+(Alival, B·Altman). **Cesar confirmó el 21-sep-2026 que los clientes SÍ se nombran**:
+los seis casos se publican con `client` puesto. La regla que sigue en pie es la otra —
+**no se publica nada que no esté en los documentos de PIYC**: ni una cifra, ni una
+marca, ni un modelo, ni un resultado que no salga del PPTX.
 
 ### Automatización de la preparación y dosificación de alcohol
 
@@ -37,7 +39,7 @@ publicar el nombre de un cliente industrial necesita su visto bueno — ver §4.
 
 > JGB necesitaba un sistema de control nuevo para la preparación y dosificación de alcohol en su planta de productos de cuidado personal. El proceso trabajaba por formulación y su rendimiento estaba limitado a 3 baches por día.
 >
-> PIYC diseñó el P&ID del nuevo sistema de control y suministró el tablero eléctrico, el PLC, el sistema neumático y la instrumentación de campo, además de ejecutar la instalación electromecánica del proyecto. Sobre un PLC Micro800 se programó la lógica de preparación y dosificación por formulación, se desarrolló la HMI de operación y se configuró la instrumentación de campo Endress+Hauser: interruptores de nivel y medición de flujo por efecto Coriolis.
+> PIYC diseñó el P&ID del nuevo sistema de control y suministró el tablero eléctrico, el PLC, el sistema neumático y la instrumentación de campo, además de ejecutar la instalación electromecánica del proyecto. Sobre un PLC Micro800 se programó la lógica de preparación y dosificación por formulación, se desarrolló la HMI de operación y se configuró la instrumentación de campo E&H: interruptores de nivel y medición de flujo por efecto Coriolis.
 >
 > El resultado lo midió el mismo proceso: de 3 baches por día antes de la automatización se pasó a 8 baches por día después de ella.
 
@@ -64,7 +66,7 @@ publicar el nombre de un cliente industrial necesita su visto bueno — ver §4.
 
 > Alival contrató el cambio del sistema de control y el suministro de materiales para automatizar su pasteurizador de 10.000 litros. Las fotografías del antes muestran con qué venía operando el equipo: válvulas de control desgastadas y una válvula reguladora de presión de aire en mal estado.
 >
-> PIYC suministró los materiales y ejecutó la automatización del equipo. El control quedó sobre un PLC Schneider M580, con la lógica de pasteurización y termización de los distintos productos programada para trabajar por recetas. Se desarrollaron las pantallas HMI de operación, datos de proceso y selección de receta, y se configuró la instrumentación de campo Endress+Hauser de nivel y presión.
+> PIYC suministró los materiales y ejecutó la automatización del equipo. El control quedó sobre un PLC Schneider M580, con la lógica de pasteurización y termización de los distintos productos programada para trabajar por recetas. Se desarrollaron las pantallas HMI de operación, datos de proceso y selección de receta, y se configuró la instrumentación de campo E&H de nivel y presión.
 >
 > El pasteurizador quedó operando con instrumentación nueva y con un sistema de control en el que cada producto se selecciona como una receta del sistema.
 
@@ -94,7 +96,7 @@ publicar el nombre de un cliente industrial necesita su visto bueno — ver §4.
 
 > El despacho de producto en la estación de cargue de Alival necesitaba quedar controlado y con registro de cada operación.
 >
-> PIYC diseñó el P&ID del proceso de cargue y la estrategia de control, suministró los equipos y el tablero eléctrico con PLC, y ejecutó la instalación electromecánica del proyecto. El control quedó sobre un PLC Schneider M241, con programación de despacho por baches y conectividad con la base de datos de la planta de Caloto. Se configuró instrumentación de campo Endress+Hauser: interruptores de nivel, transmisor de temperatura y transmisor de flujo electromagnético.
+> PIYC diseñó el P&ID del proceso de cargue y la estrategia de control, suministró los equipos y el tablero eléctrico con PLC, y ejecutó la instalación electromecánica del proyecto. El control quedó sobre un PLC Schneider M241, con programación de despacho por baches y conectividad con la base de datos de la planta de Caloto. Se configuró instrumentación de campo E&H: interruptores de nivel, transmisor de temperatura y transmisor de flujo electromagnético.
 >
 > El despacho quedó controlado por medidor y cada operación genera un tiquete en línea con la placa del vehículo, la cantidad cargada, la temperatura y la fecha y hora.
 
@@ -174,7 +176,7 @@ publicar el nombre de un cliente industrial necesita su visto bueno — ver §4.
 
 > Antes de la intervención, la preparación del blanqueado de algodón en JGB rendía 4 baches por día.
 >
-> PIYC configuró un PLC Siemens S1200 y programó el sistema de control de la preparación de blanqueado de algodón para que trabajara por recetas. Se desarrolló la HMI de operación y se configuró la instrumentación de campo Endress+Hauser: nivel por radar guiado, temperatura y presión.
+> PIYC configuró un PLC Siemens S1200 y programó el sistema de control de la preparación de blanqueado de algodón para que trabajara por recetas. Se desarrolló la HMI de operación y se configuró la instrumentación de campo E&H: nivel por radar guiado, temperatura y presión.
 >
 > Con el proceso automatizado, la planta pasó de 4 a 7 baches por día.
 
@@ -305,8 +307,8 @@ Lo que deliberadamente **no** se escribió, porque PIYC no lo ha confirmado:
 - Ningún cliente fuera de los seis casos del PPTX.
 - Ninguna certificación ni sistema de gestión.
 - Ninguna marca representada ni distribuida. Las que se nombran en los **casos**
-  (Schneider, Endress+Hauser…) salen del PPTX; en las páginas de **servicio** no se
-  nombra ninguna.
+  (Schneider, Siemens, E&H…) salen del PPTX y se escriben como él las escribe; en las
+  páginas de **servicio** no se nombra ninguna.
 - Ningún precio, plazo ni garantía, tampoco en la FAQ.
 
 Lo que sí se nombra son normas y protocolos de uso común en el sector —IEC 61131-3,
@@ -349,12 +351,22 @@ Contenido en `site_settings.nosotros` (respaldo: `nosotrosEstatico` de
 
 - **Quiénes somos**: texto de PIYC (documento «4. QUIÉNES SOMOS», versión pulida), más el
   párrafo introductorio del portafolio como segundo párrafo. No se inventó nada.
-- **Misión y visión**: los textos de PIYC, pasados a primera persona del plural y **con el
-  rótulo que ellos les pusieron**.
-  ⚠ En el documento original **parecen intercambiados** (plan §4.3): lo rotulado «visión»
-  describe lo que la empresa hace hoy y lo rotulado «misión» describe a dónde quiere
-  llegar. **No se corrigió.** Hay que preguntárselo a Jorge: es la decisión más rápida
-  de todas y la única que cambia un texto institucional.
+- **Misión y visión**: los textos de PIYC, pasados a primera persona del plural.
+  ⚠ **Intercambiadas respecto al documento original de PIYC por decisión de Cesar
+  (21-sep-2026):** lo que el documento rotulaba «Visión» describe lo que la empresa hace
+  hoy —proveer soluciones innovadoras en desarrollo, mantenimiento y control de
+  proyectos de ingeniería— y por eso quedó como **Misión**; lo rotulado «Misión»
+  describe a dónde quiere llegar —posicionarse como el proveedor líder del sector
+  industrial— y por eso quedó como **Visión**. Se movieron los cuerpos, no los rótulos,
+  y no se reescribió el contenido.
+  - **Misión** (sitio y base): «Proveer soluciones innovadoras en el desarrollo, el
+    mantenimiento y el control de proyectos de ingeniería, adaptándonos a las
+    necesidades específicas de cada cliente, con estándares de alta calidad y una
+    cultura de mejora continua.»
+  - **Visión** (sitio y base): «Posicionarnos como el proveedor líder de servicios para
+    el sector industrial, reafirmando nuestro profesionalismo al transformar cada idea
+    en soluciones efectivas, con equilibrio entre las necesidades del cliente, el
+    compromiso, los altos estándares de calidad y los resultados.»
 - **Valores**: los cuatro de PIYC con su idea central del documento; **el párrafo de cada
   uno lo redactó el equipo de la web** y hay que aprobarlo.
 - **Titular de la cabecera** («Ingenieros que trabajan dentro de la planta, no sobre el
@@ -390,19 +402,21 @@ Contenido en `site_settings.home` (respaldo: `homeEstatico`).
 Todo lo de abajo salió del PPTX tal cual; nada se completó a ojo. Son las decisiones
 que no puede tomar quien redacta.
 
-1. **¿Se pueden nombrar los clientes?** Los seis casos identifican a JGB, Alival y
-   B. Altman. El PPTX es un documento interno; un sitio público es otra cosa. Si no hay
-   autorización, los casos se publican anónimos («una empresa de productos de cuidado
-   personal…») — el texto ya está escrito de forma que aguanta el cambio.
+1. ~~**¿Se pueden nombrar los clientes?**~~ **RESUELTO (Cesar, 21-sep-2026):** sí. Los
+   seis casos se publican con el nombre del cliente —JGB, Alival y B. Altman— tal como
+   los rotula el PPTX. Lo que no se publica es nada que no esté en los documentos de
+   PIYC.
 2. **¿Y las capturas de HMI?** Varias muestran el logotipo del cliente (Alival, B·Altman,
-   JGB) y nombres de planta («Estación Cargue Cumbal»). Misma pregunta que la anterior.
+   JGB) y nombres de planta («Estación Cargue Cumbal»). Con los clientes ya nombrados
+   (punto 1), lo único abierto aquí es el nombre de planta del punto 3.
 3. **«Planta Caloto» vs. «Cumbal».** El texto del caso de cargue habla de conectividad
    con la base de datos «en planta caloto»; la HMI de la misma lámina dice «ESTACIÓN
    CARGUE CUMBAL». Se dejó Caloto porque es lo que dice el texto. ¿Cuál es?
 4. **«PLC Siemens S1200».** Así está escrito en la fuente; casi con seguridad es un
    **S7-1200**. Se dejó tal cual para no inventar referencias. Confirmar.
-5. **«E&H» se escribió como «Endress+Hauser»** en los cuerpos de los casos. Es la
-   lectura obvia de la abreviatura, pero es una interpretación. Confirmar.
+5. ~~**«E&H» se escribió como «Endress+Hauser»**~~ **CORREGIDO (21-sep-2026):** la
+   expansión no aparece en el PPTX, así que los cuerpos vuelven a decir **«E&H»**, tal
+   como lo trae la fuente. Si Jorge confirma la marca, se escribe completa.
 6. **Baches por día.** Dos casos traen cifras (3→8 y 4→7 baches/día). Son los únicos
    números duros del PPTX y se publicaron tal cual. ¿Siguen vigentes? ¿Se pueden decir?
 7. **Fechas.** El PPTX no fecha ningún proyecto. Los planos traen «2020» en el cajetín,

@@ -114,6 +114,28 @@ test("turno corto en día laboral: menos de 6 horas no descuenta almuerzo", () =
   assert.equal(d.extras, 0);
 });
 
+test("el umbral del almuerzo son 6 horas exactas de presencia", () => {
+  // La regla es la misma que usa GPI: el almuerzo se descuenta cuando el turno
+  // PASA de 6 horas. Justo en 6 h no se descuenta; un minuto más, sí.
+  const justo = turno("2026-09-21", "08:00", "14:00"); // 6 h clavadas
+  assert.equal(justo.totalMinutos, 360);
+  assert.equal(justo.almuerzoMinutos, 0);
+  assert.equal(justo.minutosTrabajados, 360);
+
+  const unMinutoMas = turno("2026-09-21", "08:00", "14:01");
+  assert.equal(unMinutoMas.totalMinutos, 361);
+  assert.equal(unMinutoMas.almuerzoMinutos, 60);
+  assert.equal(unMinutoMas.minutosTrabajados, 301);
+});
+
+test("en día no laboral no se descuenta almuerzo aunque el turno sea largo", () => {
+  // 2026-09-26 es sábado y el horario por defecto no abre los sábados.
+  const d = turno("2026-09-26", "08:00", "17:30");
+  assert.equal(d.diaLaboral, false);
+  assert.equal(d.almuerzoMinutos, 0);
+  assert.equal(d.minutosTrabajados, 570);
+});
+
 /* ==================================================================== */
 /* 3. Horas extra                                                        */
 /* ==================================================================== */

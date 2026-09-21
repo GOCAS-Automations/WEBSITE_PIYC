@@ -10,9 +10,10 @@
  * (documentos del Drive de PIYC). Lo que redactó el equipo de la web está
  * marcado como tal y **pendiente de aprobación de Jorge**.
  *
- * ⚠ `mision` y `vision` se guardan **con el rótulo que les puso PIYC**. En el
- * documento original parecen intercambiados (plan §4.3); no se corrigen por
- * cuenta propia — hay que preguntarle a Jorge.
+ * ⚠ `mision` y `vision` van **intercambiadas respecto al documento original de
+ * PIYC**, por decisión de Cesar (21-sep-2026): en ese documento los dos textos
+ * estaban bajo el rótulo contrario. Los rótulos («Misión», «Visión») no se
+ * tocaron; lo que se movió fue el cuerpo de cada uno.
  */
 
 import type {
@@ -58,9 +59,16 @@ export const contactEstatico: AjustesContact = {
   emails: [{ address: "jorge.castillo@piycsas.com", person: "Jorge Castillo" }],
   social: { instagram: "https://www.instagram.com/piyc_sas/" },
   siteUrl: "https://piycsas.com",
-  // Sin `horario` ni `geo`: PIYC no los ha confirmado y no se inventan. El
-  // bloque de horario no se pinta y el JSON-LD no emite `openingHours` ni
-  // coordenadas (una dirección a medias es peor que ninguna).
+  // Horario confirmado por Cesar contra la ficha de Google del negocio
+  // (21-sep-2026). `label` es lo que se pinta en /contacto; `schema` es lo que
+  // el JSON-LD emite como `openingHours` del `LocalBusiness`: los dos tienen
+  // que decir lo mismo. Sábado y domingo cerrado = simplemente no se listan.
+  horario: {
+    label: "Lunes a viernes, 8:00 a. m. – 5:00 p. m. · Sábados y domingos, cerrado",
+    schema: ["Mo-Fr 08:00-17:00"],
+  },
+  // Sin `geo`: PIYC no ha confirmado coordenadas y no se inventan (una
+  // dirección a medias es peor que ninguna).
 };
 
 /* ===================================================================== */
@@ -194,14 +202,17 @@ export const nosotrosEstatico: AjustesNosotros = {
       height: 772,
     },
   },
-  // ⚠ Rótulos tal como los escribió PIYC. Ver aviso del encabezado.
+  // ⚠ Textos intercambiados respecto al documento original de PIYC por decisión
+  // de Cesar (21-sep-2026): lo que el documento rotulaba «Visión» describe lo
+  // que la empresa hace hoy —eso es la misión— y lo rotulado «Misión» describe
+  // a dónde quiere llegar —eso es la visión—. Los rótulos no se movieron.
   mision: {
     title: "Misión",
-    body: "Posicionarnos como el proveedor líder de servicios para el sector industrial, reafirmando nuestro profesionalismo al transformar cada idea en soluciones efectivas, con equilibrio entre las necesidades del cliente, el compromiso, los altos estándares de calidad y los resultados.",
+    body: "Proveer soluciones innovadoras en el desarrollo, el mantenimiento y el control de proyectos de ingeniería, adaptándonos a las necesidades específicas de cada cliente, con estándares de alta calidad y una cultura de mejora continua.",
   },
   vision: {
     title: "Visión",
-    body: "Proveer soluciones innovadoras en el desarrollo, el mantenimiento y el control de proyectos de ingeniería, adaptándonos a las necesidades específicas de cada cliente, con estándares de alta calidad y una cultura de mejora continua.",
+    body: "Posicionarnos como el proveedor líder de servicios para el sector industrial, reafirmando nuestro profesionalismo al transformar cada idea en soluciones efectivas, con equilibrio entre las necesidades del cliente, el compromiso, los altos estándares de calidad y los resultados.",
   },
   valores: {
     eyebrow: "Cómo trabajamos",

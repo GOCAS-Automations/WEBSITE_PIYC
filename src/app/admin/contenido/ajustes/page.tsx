@@ -96,7 +96,7 @@ export default async function AjustesPage() {
                 />
               </div>
 
-              <fieldset className="rounded-fino border border-acero-200 p-4">
+              <fieldset className="rounded-control p-4 ring-1 ring-separador">
                 <legend className="px-2 text-sm font-semibold text-azul-950">
                   Dirección
                 </legend>
@@ -148,7 +148,7 @@ export default async function AjustesPage() {
                 </div>
               </fieldset>
 
-              <fieldset className="rounded-fino border border-acero-200 p-4">
+              <fieldset className="rounded-control p-4 ring-1 ring-separador">
                 <legend className="px-2 text-sm font-semibold text-azul-950">
                   Teléfonos y WhatsApp
                 </legend>
@@ -196,7 +196,7 @@ export default async function AjustesPage() {
                 </div>
               </fieldset>
 
-              <fieldset className="rounded-fino border border-acero-200 p-4">
+              <fieldset className="rounded-control p-4 ring-1 ring-separador">
                 <legend className="px-2 text-sm font-semibold text-azul-950">
                   Correo, redes y horario
                 </legend>
@@ -236,8 +236,17 @@ export default async function AjustesPage() {
                       name="horario"
                       scope="contacto"
                       defaultValue={contact.horario?.label}
-                      placeholder="Lunes a viernes, 8:00 a. m. – 5:00 p. m."
-                      hint="Solo se muestra si lo escribes. Si no hay un horario confirmado, déjalo vacío: es mejor no decir nada que publicar uno equivocado."
+                      placeholder="Lunes a viernes, 8:00 a. m. – 5:00 p. m. · Sábados y domingos, cerrado"
+                      hint="Es el horario que se lee en la página de contacto. Si lo dejas vacío, el sitio no muestra ningún horario: es mejor no decir nada que publicar uno equivocado."
+                      className="sm:col-span-2"
+                    />
+                    <Campo
+                      label="Horario para Google"
+                      name="horario_schema"
+                      scope="contacto"
+                      defaultValue={(contact.horario?.schema ?? []).join(", ")}
+                      placeholder="Mo-Fr 08:00-17:00"
+                      hint="El mismo horario, en el formato que entiende Google: días en inglés abreviado y horas de 24 h (Mo, Tu, We, Th, Fr, Sa, Su). Varios tramos, separados por coma. Los días cerrados no se escriben. Si cambias el horario de arriba, cambia también este."
                       className="sm:col-span-2"
                     />
                   </div>
@@ -313,7 +322,7 @@ export default async function AjustesPage() {
                 </div>
               </div>
 
-              <fieldset className="rounded-fino border border-acero-200 p-4">
+              <fieldset className="rounded-control p-4 ring-1 ring-separador">
                 <legend className="px-2 text-sm font-semibold text-azul-950">
                   Página por página
                 </legend>

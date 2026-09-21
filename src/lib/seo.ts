@@ -140,6 +140,53 @@ function direccionPostal(contacto: AjustesContact): BloqueJsonLd | null {
   };
 }
 
+/** Los siete días, en el orden de schema.org y con la abreviatura que usa `openingHours`. */
+const DIAS_SCHEMA = [
+  ["Mo", "Monday"],
+  ["Tu", "Tuesday"],
+  ["We", "Wednesday"],
+  ["Th", "Thursday"],
+  ["Fr", "Friday"],
+  ["Sa", "Saturday"],
+  ["Su", "Sunday"],
+] as const;
+
+/**
+ * `["Mo-Fr 08:00-17:00"]` → un `OpeningHoursSpecification` por tramo, que es la
+ * forma que documenta Google para `LocalBusiness`. Un día que no aparece en
+ * ningún tramo es un día cerrado: no se emite nada para él.
+ *
+ * Un tramo mal escrito se ignora en silencio en vez de romper la página: el
+ * panel ya lo valida al guardar (`guardarContacto`), y un JSON-LD sin horario
+ * es mucho menos grave que un sitio caído.
+ */
+function horarioEspecificado(contacto: AjustesContact): BloqueJsonLd[] {
+  const tramos = contacto.horario?.schema ?? [];
+  const salida: BloqueJsonLd[] = [];
+
+  for (const tramo of tramos) {
+    const partes = /^([A-Za-z]{2})(?:-([A-Za-z]{2}))? (\d{2}:\d{2})-(\d{2}:\d{2})$/.exec(
+      tramo.trim(),
+    );
+    if (!partes) continue;
+
+    const [, desde, hasta, abre, cierra] = partes;
+    const inicio = DIAS_SCHEMA.findIndex(([corto]) => corto === desde);
+    if (inicio < 0) continue;
+    const fin = hasta ? DIAS_SCHEMA.findIndex(([corto]) => corto === hasta) : inicio;
+    if (fin < inicio) continue;
+
+    salida.push({
+      "@type": "OpeningHoursSpecification",
+      dayOfWeek: DIAS_SCHEMA.slice(inicio, fin + 1).map(([, largo]) => largo),
+      opens: abre,
+      closes: cierra,
+    });
+  }
+
+  return salida;
+}
+
 function perfilesSociales(contacto: AjustesContact): string[] {
   return Object.values(contacto.social ?? {}).filter(
     (url): url is string => typeof url === "string" && url.startsWith("http"),
@@ -156,6 +203,7 @@ export function jsonLdSitio(contacto: AjustesContact): BloqueJsonLd {
   const direccion = direccionPostal(contacto);
   const sameAs = perfilesSociales(contacto);
   const correo = contacto.emails?.[0]?.address;
+  const horarios = horarioEspecificado(contacto);
   const logo = `${base}/brand/logo-piyc.png`;
 
   const organizacion: BloqueJsonLd = {
@@ -176,8 +224,8 @@ export function jsonLdSitio(contacto: AjustesContact): BloqueJsonLd {
 
   const bloques: BloqueJsonLd[] = [organizacion];
 
-  // LocalBusiness: solo con dirección completa. Horario y geo, solo si PIYC
-  // los confirmó (no están en la semilla; ver docs/CONTENIDO.md §6).
+  // LocalBusiness: solo con dirección completa. El horario sale de la ficha de
+  // Google del negocio; `geo` sigue sin confirmar y por eso no se emite.
   if (direccion) {
     bloques.push({
       "@type": "ElectricalContractor",
@@ -198,9 +246,7 @@ export function jsonLdSitio(contacto: AjustesContact): BloqueJsonLd {
             },
           }
         : {}),
-      ...(contacto.horario?.schema?.length
-        ? { openingHours: contacto.horario.schema }
-        : {}),
+      ...(horarios.length ? { openingHoursSpecification: horarios } : {}),
       areaServed: { "@type": "AdministrativeArea", name: "Valle del Cauca, Colombia" },
     });
   }

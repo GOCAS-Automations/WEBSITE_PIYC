@@ -96,6 +96,7 @@ Todo lo que no es una ficha de servicio ni de proyecto, agrupado por página:
 Dos bloques:
 
 - **Datos de contacto:** nombre comercial, razón social, NIT, eslogan, dirección completa, los números de WhatsApp, teléfonos, correos, Instagram y horario de atención. El campo más delicado de todo el panel es el **WhatsApp que recibe los mensajes del formulario**: a ese número llega todo el que escribe desde el sitio. Va con indicativo del país y solo números, sin espacios (por ejemplo `573217617958`). Si se escribe mal, los mensajes se pierden sin que nadie se entere.
+  El horario va en **dos campos que tienen que decir lo mismo**: «Horario de atención» es el texto que se lee en la página de contacto, y «Horario para Google» es ese mismo horario en el formato que entienden los buscadores (`Mo-Fr 08:00-17:00`: días en inglés abreviado, horas de 24 h, varios tramos separados por coma, y los días cerrados simplemente no se escriben). Si se cambia uno, hay que cambiar el otro. Dejar vacío el primero borra el horario del sitio entero.
 - **Lo que se lee en Google:** el título y la descripción con los que aparece cada página en los resultados de búsqueda, y las mismas para cada página del sitio por separado.
 
 <!-- captura: pantalla de Datos de contacto y buscadores -->
@@ -248,6 +249,20 @@ Se administra desde **Jornadas → Administrar horarios**, o desde el enlace **H
 5. Pulsa **Guardar horario**.
 
 Mientras un mes no tenga su horario guardado, las jornadas de ese mes igual se calculan, usando el horario predeterminado como referencia.
+
+### Cómo se calculan las horas
+
+Estas son las reglas que aplica el sistema, las mismas que usa GPI. Todas son **horas trabajadas, nunca dinero**: PIYC no liquida nómina.
+
+1. **Jornada ordinaria del día.** Sale del horario del mes: *salida − entrada − almuerzo*. Con el horario predeterminado son 8,5 h de lunes a jueves y 8 h el viernes (42 h netas a la semana, el máximo legal desde el 15 de julio de 2026).
+2. **Horas extra.** Todo lo que exceda esa jornada ordinaria. Los topes legales (2 h al día, 12 h a la semana) **solo sirven de referencia: el sistema nunca recorta ni bloquea un registro**. Lo trabajado siempre queda registrado.
+3. **Almuerzo.** El horario dice cuántas horas de almuerzo tiene el día, pero la persona solo registra su entrada y su salida. Por eso: en un día laboral, si el turno **pasa de 6 horas** se descuenta el almuerzo de ese día (normalmente 1 hora); con 6 horas o menos no se descuenta nada; y en un día no laboral tampoco se descuenta. El almuerzo se ubica en el centro del tramo ordinario, que es lo que pasa en la práctica.
+4. **Franja nocturna.** De 7:00 p. m. a 6:00 a. m. (art. 160 del CST, modificado por la Ley 2466 de 2025). Es ajustable.
+5. **Domingos y festivos.** El recargo lo fija la ley según la fecha del turno: 80 % desde el 1-jul-2025, 90 % desde el 1-jul-2026 y 100 % desde el 1-jul-2027 (art. 179 del CST, mod. Ley 2466). Los festivos se calculan solos para cualquier año, con los traslados de la Ley Emiliani e incluido el 9 de julio a partir de 2026 (Ley 2578).
+6. **Día no laboral.** Un sábado o cualquier día apagado en el horario del mes no tiene jornada ordinaria: todo el turno se trata como dominical/festivo. Es la convención de GPI y es más favorable que el mínimo legal.
+7. **Turnos que cruzan la medianoche.** Cada minuto se clasifica con **su fecha real**, en hora de Colombia. Un turno que entra a un domingo o a un festivo cambia de tratamiento exactamente a las 12:00 a. m.
+8. **Duración máxima.** 24 horas. Dos jornadas de la misma persona no se pueden solapar; si ese día ya había otra, el sistema avisa pero no bloquea.
+9. **Qué puede editar cada quien.** La persona edita o elimina su jornada **solo mientras esté pendiente**. La orden de trabajo es opcional, la descripción de la labor es obligatoria, y no hay límite de días hacia atrás para registrar.
 
 ## 10. Exportar a Excel
 
