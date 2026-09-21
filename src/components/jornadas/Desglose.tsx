@@ -56,7 +56,7 @@ function Cifra({
       {/* `whitespace-nowrap` + 1.5rem: «8 h 30 min» partía en dos renglones y
           desalineaba la fila de widgets. */}
       <p
-        className={`whitespace-nowrap text-[1.5rem] font-semibold leading-none tracking-display tabular-nums ${
+        className={`whitespace-nowrap text-titular-sm font-semibold tracking-display tabular-nums ${
           destacada ? "text-blanco" : "text-azul-950"
         }`}
       >

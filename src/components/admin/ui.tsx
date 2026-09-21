@@ -197,7 +197,7 @@ export function CabeceraPanel({
           Nada de versalitas: era parte de lo que se leía antiguo. */}
       <div className="mt-5 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-[2rem] font-semibold leading-tight tracking-display text-azul-950 sm:text-[2.5rem]">
+          <h1 className="text-titular-lg font-semibold tracking-display text-azul-950 sm:text-titular-xl">
             {title}
           </h1>
           {description && (

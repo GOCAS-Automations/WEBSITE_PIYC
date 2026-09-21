@@ -40,9 +40,9 @@ Fuente de verdad: `src/lib/tokens.ts` + el bloque `@theme` de `src/app/globals.c
 | `verde-*` | 100 `#E5F6D9` · 300 `#A3DC80` · 400 `#77C64B` · **500 `#52AC26`** · 600 `#3A801A` · 700 `#2C6314` | Acento, ~10 % de la superficie: CTA de WhatsApp, indicadores, señal energizada del ladder |
 | `acero-*` | 50 `#F4F6F9` · 100 · 200 · **300 `#BFC4CD`** · 400 · 500 · 600 `#56606E` · 700 `#3B434F` | Neutros fríos del engranaje: base clara, bordes, texto secundario (600) |
 | `error-*` | 50 · 300 `#F4A8A0` · **500 `#B42318`** · 700 | Solo validación de formularios. No es color de marca |
-| `blanco` | `#FFFFFF` | Fondo base del sitio |
+| `blanco` | `#FFFFFF` | Fondo base de las tarjetas |
 
-Tipografías: **Barlow Condensed** (títulos) · **IBM Plex Sans** (texto). Radios `fino` 2 px / `medio` 4 px — nada de tarjetas redondeadas.
+Tipografía: **Geist**, familia única para títulos y texto (`--font-geist`; pesos 400/500/600, nunca 700+), con tracking negativo en titulares (`--tracking-titulo` −0,022 em, `--tracking-display` −0,035 em) y escala fija `text-titular-xs…2xl` — nada de mayúsculas espaciadas. Sistema v3 «iOS» — la piel, no la paleta: fondo `lienzo` `#EEF2F9` (`lienzo-alto` `#F7F9FD`) con tarjetas blancas encima; radios `chip` 10 · `control` 12 · `campo` 14 · `tarjeta` 20 · `panel` 28 · `lienzo` 36 · `capsula` (los `fino`/`medio` quedan solo por compatibilidad); sombras en capas con tinte `azul-950` (`sutil`/`tarjeta`/`elevada`/`flotante`), nunca negras; materiales translúcidos con `backdrop-filter` (`material`, `material-fuerte`, `material-oscuro`) y sus utilidades de fondo `fondo-plano`, `fondo-marca`, `fondo-noche`; listas agrupadas (`lista-agrupada` + `fila-agrupada`), botones cápsula, nav en cápsula flotante y `pulsable` para la presión táctil. Tokens de aviso `aviso-50/200/500/700`: **avisar no es informar ni errar** — es el acero llevado a neutro cálido, sin naranja ni ámbar.
 
 Uso: el azul domina y el verde se dosifica (nunca fondo de sección ni de bloque grande). Sobre `verde-500` va texto `azul-950` (6.6:1); **blanco sobre `verde-500` falla** (2.9:1) — si hace falta texto blanco, `verde-600` (4.9:1). Texto verde sobre fondo claro = `verde-700`; sobre fondo oscuro = `verde-400`/`verde-300`. Texto secundario = `acero-600`. Sobre `azul-950` va `blanco`/`acero-100`/`acero-200`. Sin naranja, en ningún caso.
 
@@ -50,7 +50,8 @@ Uso: el azul domina y el verde se dosifica (nunca fondo de sección ni de bloque
 
 - Razón social: PROGRAMACIÓN INDUSTRIAL Y CONTROL SAS · NIT 901.161.923 · nombre comercial PIYC.
 - Eslogan: «Tu socio confiable en soluciones industriales» · dominio `piycsas.com`.
-- Ciudad: Cali. Dirección oficial (la de Google): Cl. 33 #5-76, Comuna 4, Cali, Valle del Cauca. Las dos direcciones del Drive (B/ El Porvenir) NO se usan hasta que Jorge las confirme.
+- Ciudad: Cali. Dirección oficial (la de Google): Cl. 33 #5-76, Comuna 4, Cali, Valle del Cauca.
+- Horario de atención: lunes a viernes, 8:00 a. m. – 5:00 p. m.; sábados y domingos, cerrado (`ajustes.contact.horario`: `label` y `schema` dicen lo mismo).
 - WhatsApp principal, destino del formulario de contacto: +57 321 761 7958.
 - WhatsApp secundario: +57 310 637 3483 (Jorge Castillo, fundador).
 - Correo visible en el sitio: jorge.castillo@piycsas.com.
@@ -83,7 +84,7 @@ Variables de entorno en Vercel: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABAS
 10. CSP: `script-src` necesita `'unsafe-inline'` (el nonce obliga a renderizado dinámico y mata el ISR). El resto va estricto — ver `next.config.ts`.
 11. Cargar una variable de entorno en Vercel no basta: hay que volver a desplegar. Las páginas estáticas deciden en el build.
 12. Español de Colombia, con tildes. El cliente lee los textos.
-13. **El sitio no puede parecerse al de GPI.** Son empresas aliadas que comparten espacio físico, y GPI se lee verde y gris. PIYC se lee **azul** a primera vista: el verde del logo entra solo como acento (~10 %), nunca como fondo de sección ni como color de la página. Nada de tema ambiental ("ambiental", hojas, sostenibilidad). Otra retícula y otro ritmo (si GPI usa tarjetas con sombra y hero centrado, PIYC no) y otra tipografía. Verificable poniéndolos lado a lado.
+13. **El sitio no puede parecerse al de GPI.** Son empresas aliadas que comparten espacio físico, y GPI se lee verde y gris, con Inter + Manrope. PIYC se lee **azul** a primera vista: el verde del logo entra solo como acento (~10 %), nunca como fondo de sección ni como color de la página. Nada de tema ambiental ("ambiental", hojas, sostenibilidad). Y otro lenguaje de formas: PIYC es estilo iOS —lienzo gris-azulado, tarjetas y paneles de esquina generosa, nav en cápsula flotante, materiales translúcidos, Geist como familia única—, así que «sin tarjetas con sombra» ya **no** aplica; lo que separa a las dos marcas es el color, la retícula y la tipografía. Verificable poniéndolos lado a lado.
 14. Toda imagen de contenido se pinta con `ContentImage`, nunca con `next/image` directo (reservado para el chrome: logo del nav/pie, favicon). ≤ 400 KB, WebP, ancho máximo 1920 px. En la base de datos nunca van rutas `/images/` — todo va al bucket o a una URL externa permitida. `images.remotePatterns` de `next.config.ts` y `HOSTS_IMAGEN_OPTIMIZABLES` de `src/lib/imagenes.ts` son la misma lista escrita dos veces: se tocan juntas.
 15. `npm run build` limpio antes de cada commit. **Confirmar con Cesar antes de cada `git push`** — repo de organización con más de un miembro mirando. Mensajes de commit en español, describiendo el porqué y no solo el qué.
 

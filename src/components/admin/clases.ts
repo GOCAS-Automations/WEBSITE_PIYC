@@ -57,8 +57,12 @@ const botonBase =
 /** Botón primario: cápsula azul llena. */
 export const botonPrimario = `${botonBase} bg-azul-700 px-5 py-2.5 text-sm text-blanco shadow-sutil hover:bg-azul-600`;
 
-/** Botón secundario: cápsula **tintada** (relleno translúcido de marca). */
-export const botonSecundario = `${botonBase} bg-relleno-medio px-4 py-2.5 text-sm text-azul-800 hover:bg-azul-100`;
+/**
+ * Botón secundario: cápsula **tintada** (relleno translúcido de marca). El
+ * hover sube al siguiente escalón del mismo relleno —no a un azul opaco—, así
+ * el botón sigue dejando ver lo que tiene debajo sobre cualquier superficie.
+ */
+export const botonSecundario = `${botonBase} bg-relleno-medio px-4 py-2.5 text-sm text-azul-800 hover:bg-relleno-fuerte`;
 
 /**
  * Cápsula azul noche. Para la acción que confirma algo serio pero **no
@@ -109,8 +113,18 @@ export const CHIP_ROJO = "bg-error-50 text-error-500";
 /* Banners                                                             */
 /* ------------------------------------------------------------------ */
 
-/** Resultado de una acción: hoja redondeada con tinte, sin filete. */
-export const banner = (exito: boolean) =>
+/**
+ * Resultado de una acción: hoja redondeada con tinte, sin filete.
+ *
+ * `true` = salió bien · `false` = error · `"aviso"` = hay que leerlo antes de
+ * seguir. El aviso va en **neutro cálido**, no en el azul de marca: en azul se
+ * confundía con la ayuda informativa y se dejaba de leer.
+ */
+export const banner = (estado: boolean | "aviso") =>
   `rounded-tarjeta px-4 py-3.5 text-sm leading-relaxed ${
-    exito ? "bg-verde-100 text-verde-700" : "bg-error-50 text-error-700"
+    estado === "aviso"
+      ? "border border-aviso-200 bg-aviso-50 text-aviso-700"
+      : estado
+        ? "bg-verde-100 text-verde-700"
+        : "bg-error-50 text-error-700"
   }`;

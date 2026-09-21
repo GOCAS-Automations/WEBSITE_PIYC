@@ -56,3 +56,17 @@ El proyecto de Supabase de PIYC es propio (creado por Cesar con los accesos que 
 - La sal del `ip_hash` del formulario es `CONTACT_IP_SALT` (ya no cae a la service-role): crearla en Vercel.
 **Tropiezos:** en Tailwind v4 `utilities` va después de `components`: un `display:none` en `components` no le gana a `inline-flex`. `x-forwarded-for` se lee del último elemento o de `x-vercel-forwarded-for`, nunca del primero. El primer `<form>` del panel es «Cerrar sesión» (ojo en pruebas automatizadas).
 **Siguiente:** bajar las 40 fotos originales del Drive (faltan fotos de refrigeración, cuartos fríos y aires; ninguna actual sirve de cabecera ancha). Respuestas de Jorge (lista en `docs/PLAN_PRUEBAS.md` y `docs/CONTENIDO.md` §6). Antes de entregar: borrar `coordinador.prueba` y `empleado.prueba`, variables en Vercel + deploy, `site_url` de Auth, dominio sin tocar MX/SPF, Search Console.
+
+## 2026-09-21/22 · Rediseño estilo iOS, manual del sitio y marca v2.0
+
+**Hecho:** Cesar descartó el primer diseño por «verse antiguo». Rediseño completo (sitio, panel, portal, jornadas): nav en cápsula flotante (sin barra de datos arriba), hoja de menú en móvil, Geist como familia única, radios 10–36 px, sombras en capas, materiales translúcidos, listas agrupadas, barra de pestañas inferior en el panel móvil. Paleta del logo intacta. Lighthouse móvil 96–99 / 100 / 100 / 100; axe sin violaciones. Identidad de marca v2.0 (22 hojas) y `docs/manual/Manual_del_Sitio_PIYC.pdf` (30 hojas, sistema v2 de GOCAS, sin credenciales). `docs/ADMIN.md` recontrastado contra el código (22 correcciones).
+**Decisiones de Cesar:**
+- Se nombran los clientes del material entregado (JGB, Alival, B. Altman); no se publica nada que no esté en los documentos de PIYC (E&H queda sin expandir).
+- Misión y visión intercambiadas respecto al documento original (venían cruzadas).
+- Reglas de jornada = las de GPI (ya coincidían campo por campo, incluido el umbral de almuerzo de 6 h). Se conservan las correcciones técnicas/legales de PIYC.
+- Horario oficial L–V 8:00 a. m.–5:00 p. m. (ficha de Google); en el panel hay dos campos: texto visible y «Horario para Google» (JSON-LD).
+- Las direcciones de El Porvenir del Drive no se usan.
+- Cuentas iniciales: `admin`, `jorge.castillo` (admin), `coordinador.prueba`, `empleado.prueba`. Contraseñas solo en `PIYC/material/credenciales-iniciales.txt` (fuera del repo); nunca en manuales. PIYC crea las demás.
+- Todo lo visual (textos, títulos, descripciones, imágenes) debe seguir siendo editable desde el panel.
+**Tropiezos:** `ui.tsx` (servidor) importaba cadenas de clase desde `ui-base.tsx` (`"use client"`) y recibía una referencia de cliente: un botón salía sin estilo. Las clases compartidas viven ahora en `src/components/admin/clases.ts` (módulo neutro) — es la regla 4. `backdrop-filter` no sobrevive a la impresión en PDF: en documentos se simula con blanco translúcido sobre degradado. Un reinicio del PC cortó dos agentes; se reanudaron con SendMessage sin perder trabajo.
+**Siguiente:** push (pendiente de autorización), fotos originales del Drive, logo vectorial (o redibujarlo en SVG), despliegue en Vercel con las 5 variables, borrar las cuentas `.prueba` antes de entregar.

@@ -7,8 +7,8 @@ Esta guía explica cómo usar el panel de administración y el portal del equipo
 El panel y el portal se abren desde la misma dirección: **piycsas.com/mi-cuenta**.
 
 1. Entra a `/mi-cuenta` desde el navegador del computador o del celular.
-2. Escribe tu **usuario** (el que te asignó PIYC, por ejemplo `jperez` — no es un correo electrónico) y tu **contraseña**.
-3. Pulsa **Ingresar**.
+2. Escribe tu **Usuario** (el que te asignó PIYC, por ejemplo `jperez` — no es un correo electrónico) y tu **Contraseña**. La pantalla se titula «Portal del equipo · Iniciar sesión».
+3. Pulsa **Ingresar**. Si algo está mal, el sistema responde siempre lo mismo —«Usuario o contraseña incorrectos»— sin decir cuál de los dos falló, a propósito. Si la cuenta está desactivada, lo dice con una pantalla propia.
 
 <!-- captura: pantalla de inicio de sesión en /mi-cuenta -->
 
@@ -17,7 +17,7 @@ Si tu cuenta tiene acceso al panel (administrador o coordinador), al entrar ver�
 ### Cambiar la contraseña
 
 1. Dentro de tu portal, busca el bloque **Cambiar mi contraseña**.
-2. Escribe la nueva contraseña y repítela en el segundo campo.
+2. Escribe la nueva en **Nueva contraseña** y repítela en **Repite la contraseña**.
 3. La contraseña debe tener **al menos 10 caracteres**. Una frase corta y fácil de recordar (tres palabras seguidas, por ejemplo) sirve perfectamente.
 4. Pulsa **Cambiar contraseña**.
 
@@ -71,8 +71,8 @@ Bloques: **Cabecera de la página**, **Quiénes somos** (con su línea pequeña)
 
 Cada uno tiene un listado con las tarjetas existentes y un botón para agregar uno nuevo. Al abrir un servicio o un proyecto encuentras su ficha completa:
 
-- **Servicio:** título, dirección en el sitio (slug), nombre corto para el menú, resumen, ícono, orden, si se muestra en el sitio o no, descripción, qué incluye el servicio, foto de portada, galería, y opcionalmente un video de YouTube. Al final, el título y la descripción para buscadores.
-- **Proyecto:** título, dirección en el sitio (slug), cliente o sector, descripción corta, orden, si se muestra en el sitio o no, el texto de contexto/solución/resultado, foto de portada y galería del proyecto.
+- **Servicio:** cinco tarjetas. **Lo básico** (Título, Dirección en el sitio (slug), Nombre corto para el menú, Resumen, Icono —escrito sin tilde en el panel—, Orden y el interruptor ¿Se muestra en el sitio? con estados Visible/Oculto); **Descripción y alcances** (Descripción y «Qué incluye el servicio», con el botón «Agregar alcance»); **Fotos** (Foto de portada y Galería); **Video** (Enlace de YouTube, Título del video, Descripción del video y el interruptor ¿Mostrar el video?, apagado por defecto); y **Cómo lo ve Google** (Título para buscadores y Descripción para buscadores).
+- **Proyecto:** tres tarjetas. **Lo básico** (Título, Dirección en el sitio (slug), Cliente o sector, Descripción corta, Orden y ¿Se muestra en el sitio?); **La historia completa** (un solo campo, «Contexto, solución y resultado»); y **Fotos** (Foto de portada y Galería del proyecto). Los proyectos **no tienen bloque de video ni campos de buscadores**: esos datos los arma el sitio con el título y la descripción corta.
 
 El interruptor **¿Se muestra en el sitio?** es lo que decide si algo ya está listo pero todavía no publicado: puedes dejar un servicio o un proyecto guardado y oculto mientras lo terminas de revisar.
 
@@ -95,7 +95,7 @@ Todo lo que no es una ficha de servicio ni de proyecto, agrupado por página:
 
 Dos bloques:
 
-- **Datos de contacto:** nombre comercial, razón social, NIT, eslogan, dirección completa, los números de WhatsApp, teléfonos, correos, Instagram y horario de atención. El campo más delicado de todo el panel es el **WhatsApp que recibe los mensajes del formulario**: a ese número llega todo el que escribe desde el sitio. Va con indicativo del país y solo números, sin espacios (por ejemplo `573217617958`). Si se escribe mal, los mensajes se pierden sin que nadie se entere.
+- **Datos de contacto:** nombre comercial, razón social, NIT, eslogan, dirección completa, los números de WhatsApp, teléfonos, correos, Instagram y horario de atención. El campo más delicado de todo el panel es el rotulado literalmente **«WhatsApp que recibe los mensajes del formulario»** (lleva encima su propio aviso, «El campo que no se puede dejar mal»): a ese número llega todo el que escribe desde el sitio. Va con indicativo del país y solo números, sin espacios (por ejemplo `573217617958`). Si se escribe mal, los mensajes se pierden sin que nadie se entere.
   El horario va en **dos campos que tienen que decir lo mismo**: «Horario de atención» es el texto que se lee en la página de contacto, y «Horario para Google» es ese mismo horario en el formato que entienden los buscadores (`Mo-Fr 08:00-17:00`: días en inglés abreviado, horas de 24 h, varios tramos separados por coma, y los días cerrados simplemente no se escriben). Si se cambia uno, hay que cambiar el otro. Dejar vacío el primero borra el horario del sitio entero.
 - **Lo que se lee en Google:** el título y la descripción con los que aparece cada página en los resultados de búsqueda, y las mismas para cada página del sitio por separado.
 
@@ -114,7 +114,7 @@ El panel **comprime la foto sola**: la convierte a WebP, la reduce a 1920 píxel
 
 ### Texto alternativo (obligatorio)
 
-En cuanto hay una foto cargada, el campo de **descripción de la imagen** se vuelve obligatorio. Este texto lo leen en voz alta los programas de las personas con discapacidad visual, y también le sirve a Google para entender la foto. Para escribir uno bueno:
+En cuanto hay una foto cargada, el campo **Descripción de la imagen (texto alternativo)** se vuelve obligatorio. Este texto lo leen en voz alta los programas de las personas con discapacidad visual, y también le sirve a Google para entender la foto. Para escribir uno bueno:
 
 - Describe en pocas palabras lo que se ve, no lo que quieres vender. Ejemplo: «Tablero de control ensamblado en el taller de PIYC».
 - Evita frases como «imagen» o «foto 1»: no dicen nada.
@@ -134,7 +134,7 @@ Muchas personas cierran WhatsApp sin pulsar enviar — por eso existe esta panta
 
 <!-- captura: bandeja de Mensajes de contacto -->
 
-Esta pantalla es de **solo lectura**: los mensajes no se editan ni se borran. El botón **Responder por WhatsApp** abre una conversación con un saludo ya armado; revísalo antes de enviarlo.
+Esta pantalla es de **solo lectura**: los mensajes no se editan ni se borran. El botón **Responder por WhatsApp** abre una conversación con un saludo ya armado; revísalo antes de enviarlo. (En el Dashboard, donde salen los últimos cinco mensajes, ese mismo botón se llama solo **Responder**.) Si nadie ha escrito, la pantalla dice «Todavía no ha escrito nadie».
 
 ## 6. Equipo
 
@@ -145,14 +145,15 @@ Solo administradores y coordinadores ven esta sección.
 1. Entra a **Equipo** y pulsa **Nueva cuenta**.
 2. Completa nombre completo, cargo, cédula, teléfono y correo de contacto (estos últimos son opcionales, para ubicar a la persona).
 3. Define el **usuario** con el que va a entrar y el **rol**. El usuario se propone solo a partir del nombre; puedes cambiarlo.
-4. La **contraseña inicial** puedes dejarla en blanco —el sistema genera una— o escribirla tú (mínimo 10 caracteres). En los dos casos se muestra **una sola vez** al guardar: usa el botón **Copiar usuario y contraseña** antes de salir de esa pantalla, porque no se guarda en ningún lado y, si se pierde, hay que restablecerla.
+4. La **contraseña inicial** puedes dejarla en blanco —el sistema genera una— o escribirla tú (mínimo 10 caracteres). En los dos casos se muestra **una sola vez** al guardar, en el recuadro «Cuenta creada»: usa el botón **Copiar usuario y contraseña** (o **Enviar por WhatsApp**) antes de salir de esa pantalla, porque no se guarda en ningún lado y, si se pierde, hay que restablecerla.
 
 <!-- captura: pantalla de nueva cuenta con el usuario y la contraseña generados -->
 
 ### Desactivar una cuenta ≠ eliminarla
 
 - **Desactivar** es el interruptor **¿La cuenta está activa?** dentro de la ficha de la persona. Deja a la persona sin poder entrar desde ese momento, pero conserva su ficha y su historial de jornadas. Es lo correcto cuando alguien sale de la empresa.
-- **Eliminar** borra la cuenta y también sus jornadas registradas, de forma permanente. Se usa solo para cuentas de prueba o creadas por error. Lleva **doble confirmación**: primero hay que escribir el usuario exacto de la persona en el campo que aparece, y después aceptar el aviso del navegador.
+- **Eliminar** borra la cuenta y también sus jornadas registradas, de forma permanente. Se usa solo para cuentas de prueba o creadas por error. Lleva **doble confirmación**: primero hay que escribir el usuario exacto de la persona en el campo «Escribe `<usuario>` para confirmar» (el botón **Eliminar definitivamente** sigue deshabilitado hasta que coincida), y después aceptar el aviso del navegador.
+- En el listado, cada fila trae **Abrir ficha** y **Desactivar** / **Reactivar**. Para un coordinador, las filas de administradores dicen «Solo un administrador puede editarla».
 
 Cada persona debe tener su propia cuenta: compartir una entre varios hace que las jornadas dejen de decir quién trabajó realmente.
 
@@ -162,8 +163,8 @@ Si abres tu **propia** ficha, puedes cambiar tus datos pero no tu rol ni tu esta
 
 1. Abre la ficha de la persona desde **Equipo**.
 2. En el bloque **Contraseña**, pulsa **Restablecer contraseña**.
-3. Confirma el aviso: la contraseña anterior deja de funcionar de inmediato.
-4. El sistema muestra la nueva contraseña una sola vez; entrégasela para que pueda volver a entrar.
+3. Confirma el aviso del navegador: la contraseña anterior deja de funcionar de inmediato.
+4. El sistema muestra la nueva contraseña una sola vez, en el recuadro «Contraseña restablecida»; entrégasela para que pueda volver a entrar.
 
 ## 7. Jornadas para el empleado
 
@@ -173,14 +174,14 @@ Desde tu portal (`/mi-cuenta`) puedes registrar tus horas trabajadas, pensado pa
 2. En **Registrar jornada**, llena **Fecha del día laboral** —el día en que **empezaste** el turno—, **Hora de inicio** y **Hora de finalización**.
 3. Si el turno pasó de la medianoche (por ejemplo, empezaste a las 10:00 p. m. y terminaste a las 2:00 a. m.), marca la casilla **Terminé al día siguiente**. Si no la marcas pero la hora de fin es menor que la de inicio, el sistema entiende igual que cruzó la medianoche y te lo avisa en pantalla.
 4. Escribe la orden de trabajo si la tuviste (opcional), la descripción de la labor y, si quieres, observaciones.
-5. Revisa la **vista previa** de cómo quedarían repartidas tus horas: se recalcula sola mientras escribes. No es definitiva — las cifras finales las fija tu coordinador al aprobar.
+5. Revisa el recuadro **Así quedarían estas horas**: se recalcula solo mientras escribes. No es definitivo — las cifras finales las fija tu coordinador al aprobar.
 6. Pulsa **Registrar jornada**.
 
 <!-- captura: portal del empleado, formulario de registrar jornada con la vista previa -->
 
 ### Tu historial
 
-En **Mis jornadas** ves todas tus jornadas con su estado, y puedes filtrar por mes y por estado. Mientras una jornada está **pendiente**, puedes **editarla** o **eliminarla** (con confirmación) desde ahí mismo. Una vez que se revisó, cualquier corrección la hace tu coordinador.
+En **Mis jornadas** ves todas tus jornadas con su estado, y puedes filtrar por **Mes** (desplegable) y por **Estado** (control segmentado: Todas · Pendiente · Aprobada · Rechazada). Cada jornada trae el desplegable **Ver el desglose de horas**. Mientras una jornada está **pendiente**, puedes **editarla** o **eliminarla** (con confirmación) desde ahí mismo. Una vez que se revisó, cualquier corrección la hace tu coordinador.
 
 Los tres estados posibles son:
 
@@ -196,7 +197,7 @@ La sección **Jornadas** del panel muestra el registro de horas de todo el equip
 
 ### Filtros disponibles
 
-Persona, estado (todos, pendiente, aprobada o rechazada), fecha desde, fecha hasta y orden de trabajo (coincidencia parcial). Los filtros quedan guardados en el enlace de la página, así que se pueden compartir o volver atrás con el botón del navegador.
+Bloque **Filtrar**: Persona («Todo el equipo»), Estado («Todos los estados», Pendiente, Aprobada, Rechazada), Desde, Hasta y Orden de trabajo (coincidencia parcial). Botones **Aplicar filtros** y **Quitar filtros**. Los filtros quedan guardados en el enlace de la página, así que se pueden compartir o volver atrás con el botón del navegador. Los totales de arriba se titulan **Totales del filtro** cuando hay filtros puestos y **Totales de todo el histórico** cuando no.
 
 ### Revisar una jornada
 
@@ -206,7 +207,9 @@ Abre la ficha de una jornada pendiente («Revisar») para ver el detalle complet
 
    **Nadie puede aprobar su propia jornada**, ni siquiera un administrador: si registras tus horas, la revisión se la pide al otro coordinador o al administrador. El sistema lo impide y lo dice en pantalla.
 
-2. **Rechazar con una nota**: si algo está mal, escribe el motivo (es obligatorio) y pulsa **Rechazar y devolver**. La jornada vuelve al portal del empleado con tu nota, para que la corrija y la registre de nuevo.
+2. **Rechazar con una nota**: pulsa ese botón, escribe el **Motivo del rechazo** (obligatorio, máximo 600 caracteres) y pulsa **Rechazar y devolver**. La jornada vuelve al portal del empleado con tu nota, para que la corrija y la registre de nuevo.
+
+3. **Corregir esta jornada**: el desplegable **Abrir el formulario de corrección** permite cambiar las horas desde la ficha y se guarda con **Guardar la corrección**. Al corregir, la jornada vuelve a quedar pendiente y hay que aprobarla de nuevo.
 
 **Rechazar no es eliminar.** El registro se conserva siempre; rechazar solo lo devuelve con una explicación. Eliminar sí borra la jornada de forma permanente.
 
@@ -215,7 +218,7 @@ Una jornada ya revisada (aprobada o rechazada) se puede **volver a dejar pendien
 ### Eliminar (doble confirmación)
 
 1. En la ficha de la jornada, pulsa **Quiero eliminarla**: aparece el botón rojo de verdad.
-2. Púlsalo y confirma en el aviso del navegador. Solo entonces se borra.
+2. Pulsa **Sí, eliminar definitivamente** y confirma en el aviso del navegador. Solo entonces se borra.
 
 El registro desaparece para todos, también del portal de la persona, y **no se puede deshacer**. Se usa solo para registros de prueba o duplicados; para pedir una corrección, se rechaza.
 
@@ -243,8 +246,8 @@ Se administra desde **Jornadas → Administrar horarios**, o desde el enlace **H
 ### Cómo se llena cada mes
 
 1. Elige el mes con las flechas de navegación (← mes anterior / mes siguiente →).
-2. Si el mes todavía no tiene horario guardado, el sistema carga automáticamente el del mes anterior como punto de partida (o el horario predeterminado, si tampoco existe ese). Revísalo.
-3. Para cada día de la semana (lunes a domingo), marca si se trabaja y define la hora de entrada, la hora de salida y las horas de almuerzo.
+2. Si el mes todavía no tiene horario guardado, el sistema carga el **horario predeterminado** como punto de partida y lo avisa en pantalla. Si el mes anterior sí tiene horario guardado, aparece además el botón **Copiar el horario de {mes} de {año}**, que es la forma más rápida de arrancar. Revísalo siempre.
+3. En la tarjeta **Plantilla semanal del mes**, para cada día (lunes a domingo), usa el interruptor **¿Se trabaja?** (Laboral / No laboral) y define **Entrada**, **Salida** y **Almuerzo (horas)**. La columna **Horas de jornada** se calcula sola y abajo va el **Total de horas semanales**. Los atajos **Igualar todos los días laborales** y **Restablecer al horario predeterminado** ahorran trabajo. Hay también un campo **Nota del mes (opcional)**.
 4. Los festivos del mes se marcan solos según el calendario colombiano y no se pueden apagar: en un festivo, todo el turno se trata como dominical.
 5. Pulsa **Guardar horario**.
 
@@ -257,8 +260,8 @@ Estas son las reglas que aplica el sistema, las mismas que usa GPI. Todas son **
 1. **Jornada ordinaria del día.** Sale del horario del mes: *salida − entrada − almuerzo*. Con el horario predeterminado son 8,5 h de lunes a jueves y 8 h el viernes (42 h netas a la semana, el máximo legal desde el 15 de julio de 2026).
 2. **Horas extra.** Todo lo que exceda esa jornada ordinaria. Los topes legales (2 h al día, 12 h a la semana) **solo sirven de referencia: el sistema nunca recorta ni bloquea un registro**. Lo trabajado siempre queda registrado.
 3. **Almuerzo.** El horario dice cuántas horas de almuerzo tiene el día, pero la persona solo registra su entrada y su salida. Por eso: en un día laboral, si el turno **pasa de 6 horas** se descuenta el almuerzo de ese día (normalmente 1 hora); con 6 horas o menos no se descuenta nada; y en un día no laboral tampoco se descuenta. El almuerzo se ubica en el centro del tramo ordinario, que es lo que pasa en la práctica.
-4. **Franja nocturna.** De 7:00 p. m. a 6:00 a. m. (art. 160 del CST, modificado por la Ley 2466 de 2025). Es ajustable.
-5. **Domingos y festivos.** El recargo lo fija la ley según la fecha del turno: 80 % desde el 1-jul-2025, 90 % desde el 1-jul-2026 y 100 % desde el 1-jul-2027 (art. 179 del CST, mod. Ley 2466). Los festivos se calculan solos para cualquier año, con los traslados de la Ley Emiliani e incluido el 9 de julio a partir de 2026 (Ley 2578).
+4. **Franja nocturna.** De 7:00 p. m. a 6:00 a. m. (art. 160 del CST, modificado por la Ley 2466 de 2025). Es ajustable. Recargos (art. 168 del CST): extra diurna 25 %, extra nocturna 75 %, nocturno no extra 35 %.
+5. **Domingos y festivos.** El recargo lo fija la ley según la fecha del turno: 75 % hasta el 30-jun-2025, 80 % desde el 1-jul-2025, 90 % desde el 1-jul-2026 y 100 % desde el 1-jul-2027 (art. 179 del CST, mod. Ley 2466). Ese calendario manda: los tres campos dominicales de `jornada_config` son legado y el cálculo los ignora. Los festivos se calculan solos para cualquier año, con los traslados de la Ley Emiliani e incluido el 9 de julio a partir de 2026 (Ley 2578).
 6. **Día no laboral.** Un sábado o cualquier día apagado en el horario del mes no tiene jornada ordinaria: todo el turno se trata como dominical/festivo. Es la convención de GPI y es más favorable que el mínimo legal.
 7. **Turnos que cruzan la medianoche.** Cada minuto se clasifica con **su fecha real**, en hora de Colombia. Un turno que entra a un domingo o a un festivo cambia de tratamiento exactamente a las 12:00 a. m.
 8. **Duración máxima.** 24 horas. Dos jornadas de la misma persona no se pueden solapar; si ese día ya había otra, el sistema avisa pero no bloquea.
@@ -266,7 +269,7 @@ Estas son las reglas que aplica el sistema, las mismas que usa GPI. Todas son **
 
 ## 10. Exportar a Excel
 
-Desde **Jornadas**, con los filtros que quieras aplicar, pulsa **Exportar a CSV**. El archivo descargado se llama `jornadas-piyc-` seguido de la fecha, y contiene exactamente las jornadas que estabas viendo en pantalla en ese momento.
+Desde **Jornadas**, con los filtros que quieras aplicar, pulsa **Exportar a CSV**; el botón muestra entre paréntesis cuántas jornadas va a exportar. El archivo descargado se llama `jornadas-piyc-` seguido de la fecha, y contiene exactamente las jornadas que estabas viendo en pantalla en ese momento.
 
 <!-- captura: botón "Exportar a CSV" en el listado de jornadas -->
 

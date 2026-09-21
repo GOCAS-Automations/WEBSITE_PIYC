@@ -173,7 +173,7 @@ export default async function HorariosPage({
                     className={`inline-flex rounded-capsula px-3.5 py-1.5 text-sm font-semibold transition duration-200 ease-ios active:scale-[0.97] ${
                       esActual
                         ? "bg-azul-700 text-blanco shadow-sutil"
-                        : "bg-relleno-medio text-azul-800 hover:bg-azul-100"
+                        : "bg-relleno-medio text-azul-800 hover:bg-relleno-fuerte"
                     }`}
                   >
                     {etiquetaMes(m.anio, m.mes)}

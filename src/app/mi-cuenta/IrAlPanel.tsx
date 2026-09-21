@@ -35,7 +35,7 @@ export function IrAlPanel({ nombre }: { nombre: string }) {
       <p className="text-xs font-semibold uppercase tracking-ancho text-azul-700">
         Hola, {nombre}
       </p>
-      <h1 className="mt-2 text-[2rem] font-semibold leading-tight tracking-display text-azul-950">
+      <h1 className="mt-2 text-titular-lg font-semibold tracking-display text-azul-950">
         Abriendo el panel…
       </h1>
       <p className="mt-3 max-w-md text-sm leading-relaxed text-acero-600">

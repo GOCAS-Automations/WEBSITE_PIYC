@@ -77,9 +77,10 @@ export * from "./clases";
  * Nota de ayuda: un párrafo corto con icono, opcionalmente titulado.
  *
  * `tono="info"` (por defecto) para explicaciones y `tono="aviso"` para lo que
- * conviene leer antes de tocar algo. **El aviso NO es ámbar**: en esta paleta
- * no existe el ámbar y el rojo está reservado a los errores de validación, así
- * que un aviso se distingue con el azul de marca y un filete más marcado.
+ * conviene leer antes de tocar algo. El aviso va en el **neutro cálido**
+ * (`aviso-*`), con borde e icono propios: en el azul de marca se confundía con
+ * la ayuda informativa y se dejaba de leer. El rojo sigue reservado a los
+ * errores de validación.
  */
 export function AyudaSeccion({
   children,
@@ -96,15 +97,17 @@ export function AyudaSeccion({
   return (
     <div
       className={`flex items-start gap-3 rounded-tarjeta px-4 py-3.5 text-sm leading-relaxed ${
-        info ? "bg-relleno text-acero-700" : "bg-azul-50 text-azul-900"
+        info
+          ? "bg-relleno text-acero-700"
+          : "border border-aviso-200 bg-aviso-50 text-aviso-700"
       } ${className}`}
     >
       <IconoInfo
-        className={`mt-0.5 h-4 w-4 shrink-0 ${info ? "text-acero-500" : "text-azul-700"}`}
+        className={`mt-0.5 h-4 w-4 shrink-0 ${info ? "text-acero-500" : "text-aviso-500"}`}
       />
       <div className="min-w-0">
         {title && (
-          <p className={`font-semibold ${info ? "text-azul-950" : "text-azul-900"}`}>
+          <p className={`font-semibold ${info ? "text-azul-950" : "text-aviso-700"}`}>
             {title}
           </p>
         )}

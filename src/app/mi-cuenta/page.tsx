@@ -95,7 +95,7 @@ function Ingreso({ configurado }: { configurado: boolean }) {
             <p className="mt-5 text-xs font-semibold uppercase tracking-ancho text-azul-700">
               Portal del equipo
             </p>
-            <h1 className="mt-1 text-[2rem] font-semibold leading-tight tracking-display text-azul-950">
+            <h1 className="mt-1 text-titular-lg font-semibold tracking-display text-azul-950">
               Iniciar sesión
             </h1>
             <p className="mt-2 text-sm leading-relaxed text-acero-600">
@@ -196,7 +196,7 @@ async function Portal({ profile }: { profile: SessionProfile }) {
               <p className="text-xs font-semibold uppercase tracking-ancho text-azul-700">
                 Portal del equipo · PIYC
               </p>
-              <h1 className="mt-1 text-[2rem] font-semibold leading-tight tracking-display text-azul-950">
+              <h1 className="mt-1 text-titular-lg font-semibold tracking-display text-azul-950">
                 {profile.fullName}
               </h1>
               <p className="mt-1.5 text-sm text-acero-600">

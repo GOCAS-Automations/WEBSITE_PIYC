@@ -174,7 +174,7 @@ export function MisJornadas({
           <p className="text-[11px] font-semibold uppercase tracking-ancho text-azul-200">
             {mes === "" ? "Todo el historial" : "Periodo seleccionado"}
           </p>
-          <p className="mt-1.5 text-[2.25rem] font-semibold leading-none tracking-display tabular-nums text-blanco">
+          <p className="mt-1.5 text-titular-lg font-semibold tracking-display tabular-nums text-blanco">
             {formatearDuracion(totales.minutosTrabajados)}
           </p>
           <p className="mt-2 text-sm text-azul-100">
@@ -211,7 +211,7 @@ export function MisJornadas({
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-2">
-                        <h3 className="text-[17px] font-semibold tracking-titulo text-azul-950">
+                        <h3 className="text-lg font-semibold tracking-titulo text-azul-950">
                           {formatearFechaLarga(j.work_date)}
                         </h3>
                         <ChipEstado estado={j.status} />

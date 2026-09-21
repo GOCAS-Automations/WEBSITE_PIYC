@@ -95,7 +95,7 @@ export default async function AdminDashboardPage() {
         <p className="text-xs font-semibold uppercase tracking-ancho text-azul-700">
           Panel de PIYC
         </p>
-        <h1 className="mt-1 text-[2rem] font-semibold leading-tight tracking-display text-azul-950 sm:text-[2.5rem]">
+        <h1 className="mt-1 text-titular-lg font-semibold tracking-display text-azul-950 sm:text-titular-xl">
           Hola, {profile.fullName.split(" ")[0]}
         </h1>
         <p className="mt-2 max-w-2xl text-sm leading-relaxed text-acero-600">
@@ -115,7 +115,7 @@ export default async function AdminDashboardPage() {
               prefetch={false}
               className="rounded-tarjeta bg-blanco p-4 shadow-tarjeta transition duration-200 ease-ios hover:-translate-y-0.5 hover:shadow-elevada"
             >
-              <p className="text-[2.5rem] font-semibold leading-none tracking-display text-azul-700">
+              <p className="text-titular-xl font-semibold tracking-display text-azul-700">
                 {c.valor}
               </p>
               <p className="mt-1.5 text-sm font-semibold text-azul-950">{c.etiqueta}</p>
