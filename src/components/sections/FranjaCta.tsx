@@ -1,9 +1,9 @@
 /**
  * FRANJA DE CIERRE (CTA)
  * ======================
- * La banda oscura con la que cierran todas las páginas. Es el único lugar
- * donde el azul 950 ocupa el ancho completo, y sostiene el ritmo de fondos
- * blanco → retícula → oscuro.
+ * El panel oscuro con el que cierran todas las páginas. Sistema v3: ya no es
+ * una banda a sangre sino una **tarjeta grande** azul noche con luces difusas,
+ * flotando sobre el lienzo como el resto de superficies.
  *
  * El botón verde de WhatsApp es el acento; el resto es azul y acero.
  */
@@ -29,29 +29,30 @@ export function FranjaCta({
   children?: ReactNode;
 }) {
   return (
-    <section aria-labelledby="titulo-cta" className="sobre-oscuro relative bg-azul-950">
-      {/* Filete superior con el acento verde: una sola marca, sin fondo verde. */}
-      <div aria-hidden="true" className="h-1 w-full bg-verde-500" />
+    <section aria-labelledby="titulo-cta" className="bg-lienzo pb-6 pt-16 lg:pb-8 lg:pt-20">
+      <Contenedor>
+        {/* Panel oscuro redondeado, no una banda a sangre: el azul noche flota
+            sobre el lienzo como una tarjeta más, en clave iOS. */}
+        <div className="sobre-oscuro overflow-hidden rounded-lienzo fondo-marca px-6 py-12 shadow-elevada sm:px-10 lg:px-14 lg:py-14">
+          <div className="grid gap-8 lg:grid-cols-12 lg:items-end lg:gap-12">
+            <div className="lg:col-span-7">
+              <TituloSeccion id="titulo-cta" tono="oscuro">
+                {titulo}
+              </TituloSeccion>
+              {texto ? (
+                <p className="mt-5 max-w-[58ch] text-[1.0625rem] leading-[1.65] text-acero-200">
+                  {texto}
+                </p>
+              ) : null}
+              {children}
+            </div>
 
-      <Contenedor className="py-14 lg:py-16">
-        <div className="grid gap-8 lg:grid-cols-12 lg:items-end lg:gap-12">
-          <div className="lg:col-span-7">
-            <TituloSeccion id="titulo-cta" tono="oscuro">
-              {titulo}
-            </TituloSeccion>
-            {texto ? (
-              <p className="mt-5 max-w-[60ch] text-base leading-relaxed text-acero-200 sm:text-[1.0625rem]">
-                {texto}
-              </p>
-            ) : null}
-            {children}
-          </div>
-
-          <div className="flex flex-col gap-3 sm:flex-row lg:col-span-5 lg:justify-end">
-            <BotonWhatsApp href={hrefWhatsApp}>{etiquetaWhatsApp}</BotonWhatsApp>
-            <BotonSecundario href={hrefSecundario} tono="oscuro">
-              {etiquetaSecundaria}
-            </BotonSecundario>
+            <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap lg:col-span-5 lg:justify-end">
+              <BotonWhatsApp href={hrefWhatsApp}>{etiquetaWhatsApp}</BotonWhatsApp>
+              <BotonSecundario href={hrefSecundario} tono="oscuro">
+                {etiquetaSecundaria}
+              </BotonSecundario>
+            </div>
           </div>
         </div>
       </Contenedor>

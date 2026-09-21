@@ -126,7 +126,7 @@ export function Galeria({
                 disparadorRef.current = evento.currentTarget;
                 setAbierta(indice);
               }}
-              className="group block w-full cursor-zoom-in border border-acero-200 bg-acero-100 p-1 transition-colors hover:border-azul-700"
+              className="pulsable group block w-full cursor-zoom-in rounded-tarjeta bg-blanco p-1.5 shadow-tarjeta hover:shadow-elevada"
             >
               <ContentImage
                 src={imagen.src}
@@ -134,6 +134,7 @@ export function Galeria({
                 width={imagen.width}
                 height={imagen.height}
                 proporcion="aspect-[4/3]"
+                claseContenedor="rounded-chip bg-acero-100"
               />
               <span className="sr-only">Ampliar: {imagen.alt || `imagen ${indice + 1}`}</span>
             </button>
@@ -144,15 +145,15 @@ export function Galeria({
       <dialog
         ref={dialogoRef}
         aria-labelledby={idTitulo}
-        className="sobre-oscuro m-0 h-dvh max-h-none w-screen max-w-none bg-azul-950/95 p-0 text-blanco backdrop:bg-azul-950/80"
+        className="material-oscuro sobre-oscuro m-0 h-dvh max-h-none w-screen max-w-none p-0 text-blanco backdrop:bg-azul-950/70 backdrop:backdrop-blur-material"
         onClick={(evento) => {
           // Cierra solo si el clic fue en el fondo del diálogo, no en su contenido.
           if (evento.target === dialogoRef.current) cerrar();
         }}
       >
         <div className="flex h-dvh flex-col">
-          <div className="flex items-center justify-between gap-4 border-b border-azul-800 px-4 py-3 lg:px-6">
-            <p id={idTitulo} className="font-titulo text-lg font-semibold">
+          <div className="flex items-center justify-between gap-4 border-b border-separador-claro px-4 py-3 lg:px-6">
+            <p id={idTitulo} className="text-[17px] font-semibold">
               {titulo}
               {hayVarias && abierta !== null ? (
                 <span className="ml-3 text-sm font-medium tabular-nums text-acero-300">
@@ -163,7 +164,7 @@ export function Galeria({
             <button
               type="button"
               onClick={cerrar}
-              className="inline-flex size-10 items-center justify-center border border-azul-700 text-acero-200 transition-colors hover:bg-azul-900 hover:text-blanco"
+              className="pulsable inline-flex size-10 items-center justify-center rounded-capsula bg-relleno-claro text-acero-200 hover:bg-azul-800 hover:text-blanco"
             >
               <IconoCerrar className="size-5" />
               <span className="sr-only">Cerrar el visor</span>
@@ -179,23 +180,23 @@ export function Galeria({
                 height={actual.height}
                 ajuste="contain"
                 prioritaria
-                className="max-h-full w-auto max-w-full object-contain"
+                className="max-h-full w-auto max-w-full rounded-tarjeta object-contain shadow-elevada"
               />
             ) : null}
           </div>
 
           {actual?.alt ? (
-            <p className="border-t border-azul-800 px-4 py-3 text-center text-[13px] leading-snug text-acero-300 lg:px-6">
+            <p className="border-t border-separador-claro px-4 py-3 text-center text-[13px] leading-snug text-acero-300 lg:px-6">
               {actual.alt}
             </p>
           ) : null}
 
           {hayVarias ? (
-            <div className="flex items-center justify-between gap-4 border-t border-azul-800 px-4 py-3 lg:px-6">
+            <div className="flex items-center justify-between gap-4 border-t border-separador-claro px-4 py-3 lg:px-6">
               <button
                 type="button"
                 onClick={() => mover(-1)}
-                className="inline-flex items-center gap-2 border border-azul-700 px-4 py-2.5 text-sm font-semibold text-acero-200 transition-colors hover:bg-azul-900 hover:text-blanco"
+                className="pulsable inline-flex items-center gap-2 rounded-capsula bg-relleno-claro px-5 py-2.5 text-sm font-semibold text-acero-200 hover:bg-azul-800 hover:text-blanco"
               >
                 <IconoFlecha className="size-4 rotate-180" />
                 Anterior
@@ -203,7 +204,7 @@ export function Galeria({
               <button
                 type="button"
                 onClick={() => mover(1)}
-                className="inline-flex items-center gap-2 border border-azul-700 px-4 py-2.5 text-sm font-semibold text-acero-200 transition-colors hover:bg-azul-900 hover:text-blanco"
+                className="pulsable inline-flex items-center gap-2 rounded-capsula bg-relleno-claro px-5 py-2.5 text-sm font-semibold text-acero-200 hover:bg-azul-800 hover:text-blanco"
               >
                 Siguiente
                 <IconoFlecha className="size-4" />

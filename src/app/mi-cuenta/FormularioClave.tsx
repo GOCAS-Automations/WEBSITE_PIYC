@@ -2,7 +2,13 @@
 
 import { useActionState } from "react";
 import { idleState, PASSWORD_MINIMO, type ActionState } from "@/lib/admin-types";
-import { inputClass } from "@/components/admin/ui-base";
+import {
+  ayudaCampo,
+  banner,
+  botonPrimario,
+  etiquetaCampo,
+  inputClass,
+} from "@/components/admin/ui-base";
 import { IconoCandado } from "@/components/admin/iconos";
 
 /**
@@ -24,7 +30,7 @@ export function FormularioClave({
         <div>
           <label
             htmlFor="password"
-            className="mb-1.5 block text-sm font-semibold text-azul-950"
+            className={etiquetaCampo}
           >
             Nueva contraseña <span className="text-azul-700">*</span>
           </label>
@@ -37,7 +43,7 @@ export function FormularioClave({
             autoComplete="new-password"
             className={inputClass}
           />
-          <p className="mt-1 text-xs leading-relaxed text-acero-600">
+          <p className={ayudaCampo}>
             Mínimo {PASSWORD_MINIMO} caracteres. Una frase corta que recuerdes
             fácil sirve mejor que algo raro que tengas que anotar.
           </p>
@@ -45,7 +51,7 @@ export function FormularioClave({
         <div>
           <label
             htmlFor="password_confirm"
-            className="mb-1.5 block text-sm font-semibold text-azul-950"
+            className={etiquetaCampo}
           >
             Repite la contraseña <span className="text-azul-700">*</span>
           </label>
@@ -62,14 +68,7 @@ export function FormularioClave({
       </div>
 
       {state.status !== "idle" && state.message && (
-        <p
-          role="status"
-          className={`rounded-fino border px-4 py-3 text-sm leading-relaxed ${
-            state.status === "success"
-              ? "border-verde-300 bg-verde-100 text-verde-700"
-              : "border-error-300 bg-error-50 text-error-700"
-          }`}
-        >
+        <p role="status" className={banner(state.status === "success")}>
           {state.message}
         </p>
       )}
@@ -77,7 +76,7 @@ export function FormularioClave({
       <button
         type="submit"
         disabled={pending}
-        className="inline-flex items-center gap-2 rounded-fino bg-azul-700 px-5 py-2.5 text-sm font-semibold text-blanco transition-colors hover:bg-azul-800 disabled:pointer-events-none disabled:opacity-60"
+        className={botonPrimario}
       >
         <IconoCandado className="h-4 w-4" />
         {pending ? "Guardando…" : "Cambiar contraseña"}

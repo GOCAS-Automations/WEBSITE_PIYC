@@ -42,10 +42,9 @@ export async function PieDePagina() {
   const anio = new Date().getFullYear();
 
   return (
-    <footer className="sobre-oscuro bg-azul-950 text-acero-200">
-      <div aria-hidden="true" className="h-1 w-full bg-verde-500" />
-
-      <div className="mx-auto max-w-sitio px-4 py-14 lg:px-8 lg:py-16">
+    <footer className="sobre-oscuro bg-lienzo pb-4 text-acero-200 lg:pb-6">
+      <div className="mx-auto w-full max-w-sitio px-4 sm:px-6 lg:px-8">
+        <div className="overflow-hidden rounded-lienzo fondo-noche px-6 py-12 shadow-elevada sm:px-10 lg:px-12 lg:py-14">
         <div className="grid gap-10 lg:grid-cols-12 lg:gap-8">
           {/* Marca */}
           <div className="lg:col-span-4">
@@ -56,11 +55,11 @@ export async function PieDePagina() {
                 width={452}
                 height={192}
                 loading="lazy"
-                className="h-14 w-auto"
+                className="h-12 w-auto"
               />
             </Link>
             {contacto.tagline ? (
-              <p className="mt-5 max-w-[34ch] border-l-[3px] border-verde-500 pl-4 font-titulo text-xl font-medium leading-tight text-blanco">
+              <p className="mt-5 max-w-[32ch] text-[1.0625rem] font-medium leading-snug text-blanco">
                 {contacto.tagline}
               </p>
             ) : null}
@@ -70,9 +69,9 @@ export async function PieDePagina() {
                 href={instagram}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-6 inline-flex items-center gap-2.5 border border-azul-800 px-4 py-2.5 text-sm font-medium transition-colors hover:border-azul-300 hover:text-blanco"
+                className="pulsable mt-6 inline-flex items-center gap-2.5 rounded-capsula bg-relleno-claro px-4 py-2.5 text-sm font-medium hover:bg-azul-800 hover:text-blanco"
               >
-                <IconoInstagram className="size-5 text-acero-400" />
+                <IconoInstagram className="size-5 text-acero-300" />
                 <span>
                   <span className="sr-only">Instagram: </span>
                   {usuarioInstagram(instagram)}
@@ -83,10 +82,7 @@ export async function PieDePagina() {
 
           {/* Navegación */}
           <nav aria-labelledby="pie-navegacion" className="lg:col-span-2">
-            <h2
-              id="pie-navegacion"
-              className="text-[11px] font-semibold uppercase tracking-[0.14em] text-acero-400"
-            >
+            <h2 id="pie-navegacion" className="text-[13px] font-semibold text-acero-300">
               Navegación
             </h2>
             <ul className="mt-4 space-y-2.5 text-[15px]">
@@ -102,10 +98,7 @@ export async function PieDePagina() {
 
           {/* Servicios */}
           <nav aria-labelledby="pie-servicios" className="lg:col-span-3">
-            <h2
-              id="pie-servicios"
-              className="text-[11px] font-semibold uppercase tracking-[0.14em] text-acero-400"
-            >
+            <h2 id="pie-servicios" className="text-[13px] font-semibold text-acero-300">
               Servicios
             </h2>
             <ul className="mt-4 space-y-2.5 text-[15px]">
@@ -124,13 +117,11 @@ export async function PieDePagina() {
 
           {/* Contacto */}
           <div className="lg:col-span-3">
-            <h2 className="text-[11px] font-semibold uppercase tracking-[0.14em] text-acero-400">
-              Contacto
-            </h2>
+            <h2 className="text-[13px] font-semibold text-acero-300">Contacto</h2>
             <ul className="mt-4 space-y-3.5 text-[15px]">
               {direccion ? (
                 <li className="flex gap-3">
-                  <IconoUbicacion className="mt-0.5 size-5 shrink-0 text-acero-400" />
+                  <IconoUbicacion className="mt-0.5 size-5 shrink-0 text-acero-300" />
                   {mapa ? (
                     <a
                       href={mapa}
@@ -148,7 +139,7 @@ export async function PieDePagina() {
 
               {telefono ? (
                 <li className="flex gap-3">
-                  <IconoTelefono className="mt-0.5 size-5 shrink-0 text-acero-400" />
+                  <IconoTelefono className="mt-0.5 size-5 shrink-0 text-acero-300" />
                   <a
                     href={hrefTelefono(telefono)}
                     className="transition-colors hover:text-blanco"
@@ -174,7 +165,7 @@ export async function PieDePagina() {
 
               {correos.map((correo) => (
                 <li key={correo.address} className="flex gap-3">
-                  <IconoCorreo className="mt-0.5 size-5 shrink-0 text-acero-400" />
+                  <IconoCorreo className="mt-0.5 size-5 shrink-0 text-acero-300" />
                   <a
                     href={`mailto:${correo.address}`}
                     className="break-all transition-colors hover:text-blanco"
@@ -188,7 +179,7 @@ export async function PieDePagina() {
         </div>
 
         {/* Línea legal */}
-        <div className="mt-12 flex flex-col gap-4 border-t border-azul-800 pt-6 text-[13px] text-acero-400 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-12 flex flex-col gap-4 border-t border-separador-claro pt-6 text-[13px] text-acero-300 sm:flex-row sm:items-center sm:justify-between">
           <p className="leading-snug">
             © {anio} {contacto.legalName ?? "PIYC"}
             {contacto.nit ? ` · NIT ${contacto.nit}` : ""}
@@ -198,6 +189,7 @@ export async function PieDePagina() {
           <p className="leading-snug">
             Desarrollado por <span className="font-medium text-acero-300">GOCAS</span>
           </p>
+        </div>
         </div>
       </div>
     </footer>

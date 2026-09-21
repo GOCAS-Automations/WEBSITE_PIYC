@@ -22,9 +22,13 @@ import { useActionState, useState } from "react";
 import { idleState, type ActionState } from "@/lib/admin-types";
 import { LIMITES_JORNADA, type EstadoJornada } from "@/lib/jornada-types";
 import {
+  banner,
+  botonOscuro,
   botonPeligro,
+  botonPeligroFuerte,
   botonPrimario,
   botonSecundario,
+  etiquetaCampo,
   inputClass,
 } from "@/components/admin/ui-base";
 import { IconoCheck, IconoPapelera } from "@/components/admin/iconos";
@@ -37,11 +41,7 @@ function Mensaje({ state }: { state: ActionState }) {
   return (
     <p
       role={exito ? "status" : "alert"}
-      className={`mt-2 rounded-fino border px-3.5 py-2.5 text-sm leading-relaxed ${
-        exito
-          ? "border-verde-300 bg-verde-100 text-verde-700"
-          : "border-error-300 bg-error-50 text-error-700"
-      }`}
+      className={`mt-2 ${banner(exito)}`}
     >
       {state.message}
     </p>
@@ -110,7 +110,7 @@ export function AccionesRevision({
             </p>
           </div>
 
-          <div className="rounded-fino border border-acero-200 bg-acero-50 p-4">
+          <div className="rounded-control bg-lienzo-alto p-4 ring-1 ring-separador">
             <p className="text-sm font-semibold text-azul-950">
               ¿Hay algo que corregir?
             </p>
@@ -133,7 +133,7 @@ export function AccionesRevision({
                 <input type="hidden" name="id" value={id} />
                 <label
                   htmlFor={`nota-rechazo-${id}`}
-                  className="block text-sm font-semibold text-azul-950"
+                  className={etiquetaCampo}
                 >
                   Motivo del rechazo <span className="text-azul-700">*</span>
                 </label>
@@ -154,7 +154,7 @@ export function AccionesRevision({
                   <button
                     type="submit"
                     disabled={rechazando}
-                    className="inline-flex items-center gap-1.5 rounded-fino bg-azul-950 px-4 py-2.5 text-sm font-semibold text-blanco transition-colors hover:bg-azul-900 disabled:opacity-60"
+                    className={botonOscuro}
                   >
                     {rechazando ? "Rechazando…" : "Rechazar y devolver"}
                   </button>
@@ -203,7 +203,7 @@ export function AccionesRevision({
       )}
 
       {/* ---------------- Eliminar (doble confirmación) ---------------- */}
-      <div className="rounded-fino border border-acero-300 bg-blanco p-4">
+      <div className="rounded-control bg-lienzo-alto p-4 ring-1 ring-separador">
         <p className="text-sm font-semibold text-azul-950">Eliminar el registro</p>
         <p className="mt-1 text-xs leading-relaxed text-acero-600">
           Borra la jornada de la base de datos: desaparece también del portal de
@@ -239,7 +239,7 @@ export function AccionesRevision({
             <button
               type="submit"
               disabled={eliminando}
-              className="inline-flex items-center gap-1.5 rounded-fino bg-error-500 px-4 py-2.5 text-sm font-semibold text-blanco transition-colors hover:bg-error-700 disabled:opacity-60"
+              className={botonPeligroFuerte}
             >
               <IconoPapelera className="h-4 w-4" />
               {eliminando ? "Eliminando…" : "Sí, eliminar definitivamente"}

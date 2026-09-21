@@ -7,7 +7,9 @@
  *     1229 px y la de `cabeceras/` solo 658×493 (`docs/CONTENIDO.md` §2.4).
  *     Estiradas a pantalla completa se ven blandas.
  *  2. Es justo el recurso que usa GPI (hero centrado con foto de fondo). Aquí
- *     el fondo es la retícula de plano y la foto va en un recuadro medido.
+ *     el fondo es un degradado suave y la foto va en una tarjeta elevada.
+ *
+ * Deja sitio arriba para la cápsula flotante del nav (`--alto-nav`).
  */
 
 import Link from "next/link";
@@ -31,14 +33,14 @@ export function Migas({ migas, className = "" }: { migas: readonly Miga[]; class
 
   return (
     <nav aria-label="Ruta de navegación" className={className}>
-      <ol className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px] text-acero-600">
+      <ol className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[13px] text-acero-600">
         {migas.map((miga, indice) => {
           const esUltima = indice === migas.length - 1;
           return (
-            <li key={miga.href} className="flex items-center gap-2">
+            <li key={miga.href} className="flex items-center gap-1.5">
               {indice > 0 ? (
                 <span aria-hidden="true" className="text-acero-400">
-                  /
+                  ›
                 </span>
               ) : null}
               {esUltima ? (
@@ -46,7 +48,10 @@ export function Migas({ migas, className = "" }: { migas: readonly Miga[]; class
                   {miga.etiqueta}
                 </span>
               ) : (
-                <Link href={miga.href} className="hover:text-azul-700 hover:underline">
+                <Link
+                  href={miga.href}
+                  className="rounded-chip px-1 transition-colors hover:text-azul-700"
+                >
                   {miga.etiqueta}
                 </Link>
               )}
@@ -94,14 +99,14 @@ export function CabeceraInterna({
   const columnaDerecha = aside ?? (imagenFinal ? <FotoDeCabecera imagen={imagenFinal} /> : null);
 
   return (
-    <section className="fondo-plano border-b border-acero-200">
-      <Contenedor className="pb-12 pt-6 sm:pb-14 sm:pt-8 lg:pb-16">
-        <Migas migas={migas} className="mb-8" />
+    <section className="fondo-plano">
+      <Contenedor className="pb-10 pt-[calc(var(--alto-nav)+0.5rem)] lg:pb-12 lg:pt-[calc(var(--alto-nav)+1.5rem)]">
+        <Migas migas={migas} className="mb-7" />
 
         <div
           className={
             columnaDerecha
-              ? "grid gap-10 lg:grid-cols-12 lg:items-start lg:gap-12"
+              ? "grid gap-10 lg:grid-cols-12 lg:items-center lg:gap-12"
               : "max-w-4xl"
           }
         >
@@ -111,16 +116,12 @@ export function CabeceraInterna({
               {tituloFinal}
             </TituloSeccion>
             {bajadaFinal ? (
-              <EntradaSeccion className="mt-6 border-l-[3px] border-azul-700 pl-4">
-                {bajadaFinal}
-              </EntradaSeccion>
+              <EntradaSeccion className="mt-6">{bajadaFinal}</EntradaSeccion>
             ) : null}
             {children}
           </div>
 
-          {columnaDerecha ? (
-            <div className="lg:col-span-5 lg:pt-2">{columnaDerecha}</div>
-          ) : null}
+          {columnaDerecha ? <div className="lg:col-span-5">{columnaDerecha}</div> : null}
         </div>
       </Contenedor>
     </section>
@@ -143,8 +144,9 @@ function FotoDeCabecera({ imagen }: { imagen: ImagenContenido }) {
 }
 
 /**
- * Ficha técnica: pares dato/valor en rejilla, como el cajetín de un plano.
- * Se usa como columna derecha de la cabecera en las páginas de detalle.
+ * Ficha técnica: lista agrupada tipo iOS (dato a la izquierda, valor a la
+ * derecha), sobre panel azul noche. Se usa como columna derecha de la cabecera
+ * en las páginas de detalle.
  *
  * Una fila cuyo valor sea vacío, `null` o `"0"` **no se pinta** (regla 9 de
  * AGENTS.md: `0` nunca se muestra como dato).
@@ -162,17 +164,18 @@ export function FichaTecnica({
   if (visibles.length === 0) return null;
 
   return (
-    <div className="sobre-oscuro border border-azul-800 bg-azul-950">
-      <p className="border-b border-azul-800 px-4 py-2.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-acero-300">
-        {titulo}
-      </p>
-      <dl className="divide-y divide-azul-800">
+    <div className="sobre-oscuro overflow-hidden rounded-panel fondo-noche shadow-elevada ring-1 ring-separador-claro">
+      <p className="px-5 pb-1 pt-4 text-[13px] font-medium text-acero-300">{titulo}</p>
+      <dl className="p-3">
         {visibles.map((fila) => (
-          <div key={fila.dato} className="grid grid-cols-[9rem_1fr] gap-3 px-4 py-3">
-            <dt className="text-[11px] font-semibold uppercase tracking-[0.12em] text-acero-400">
-              {fila.dato}
-            </dt>
-            <dd className="text-[14px] leading-snug text-acero-100">{fila.valor}</dd>
+          <div
+            key={fila.dato}
+            className="flex items-baseline justify-between gap-6 border-t border-separador-claro px-2 py-3 first:border-t-0"
+          >
+            <dt className="text-[14px] text-acero-300">{fila.dato}</dt>
+            <dd className="text-right text-[14px] font-medium leading-snug text-acero-100">
+              {fila.valor}
+            </dd>
           </div>
         ))}
       </dl>

@@ -15,6 +15,7 @@ import {
 import { FormularioEliminar } from "@/components/admin/FormularioAdmin";
 import { eliminarServicio } from "../actions";
 import { ICONOS_CONTENIDO, IconoEngranaje, IconoLapiz, IconoMas } from "@/components/admin/iconos";
+import { botonChico, botonPrimario, botonSecundario } from "@/components/admin/clases";
 
 export const dynamic = "force-dynamic";
 
@@ -74,15 +75,15 @@ export default async function ServiciosPage({
               return (
                 <li
                   key={servicio.id}
-                  className="flex flex-wrap items-center gap-4 rounded-fino border border-acero-200 bg-blanco p-4"
+                  className="flex flex-wrap items-center gap-4 rounded-tarjeta bg-blanco p-4 shadow-tarjeta"
                 >
-                  <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-fino border border-acero-200 bg-acero-50 text-azul-700">
+                  <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-control bg-azul-700 text-blanco shadow-sutil">
                     <Icono className="h-5 w-5" />
                   </span>
 
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <h2 className="font-titulo text-lg font-semibold uppercase tracking-wide text-azul-950">
+                      <h2 className="text-lg font-semibold tracking-titulo text-azul-950">
                         {servicio.title}
                       </h2>
                       <InsigniaPublicado published={servicio.published} />
@@ -100,14 +101,14 @@ export default async function ServiciosPage({
                       prefetch={false}
                       href={`/servicios/${servicio.slug}`}
                       target="_blank"
-                      className="inline-flex items-center gap-1.5 rounded-fino border border-acero-300 bg-blanco px-3 py-2 text-xs font-semibold text-acero-700 transition-colors hover:border-azul-700 hover:text-azul-700"
+                      className={`${botonSecundario} ${botonChico}`}
                     >
                       Ver en el sitio
                     </Link>
                     <Link
                       prefetch={false}
                       href={`/admin/contenido/servicios/${servicio.id}`}
-                      className="inline-flex items-center gap-1.5 rounded-fino bg-azul-700 px-3 py-2 text-xs font-semibold text-blanco transition-colors hover:bg-azul-800"
+                      className={`${botonPrimario} ${botonChico}`}
                     >
                       <IconoLapiz className="h-3.5 w-3.5" />
                       Editar

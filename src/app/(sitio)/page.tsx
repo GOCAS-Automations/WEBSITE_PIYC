@@ -1,9 +1,10 @@
 /**
  * INICIO — `/`
  *
- * Ritmo de la página: retícula (hero) → blanco (qué hacemos) → acero
- * (servicios) → blanco (casos) → retícula (proceso) → oscuro (valores) →
- * oscuro (CTA). Ningún fondo se repite dos veces seguidas salvo el cierre.
+ * Sistema v3: el ritmo ya no lo hacen los fondos alternados sino las
+ * superficies. Todo se apoya en el mismo lienzo gris-azulado y lo que cambia
+ * es qué flota encima: tarjetas blancas (servicios, casos, proceso) y dos
+ * paneles azul noche (valores y cierre). Es el patrón «grouped» de iOS.
  */
 
 import type { Metadata } from "next";
@@ -96,9 +97,9 @@ export default async function Inicio() {
 
       {/* Qué hace PIYC */}
       {intro?.body ? (
-        <section aria-labelledby="titulo-intro" className="bg-blanco">
-          <Contenedor className="py-14 lg:py-18">
-            <div className="grid gap-10 lg:grid-cols-12 lg:items-start lg:gap-12">
+        <section aria-labelledby="titulo-intro" className="bg-lienzo-alto">
+          <Contenedor className="py-16 lg:py-20">
+            <div className="grid gap-10 lg:grid-cols-12 lg:items-center lg:gap-12">
               <div className="lg:col-span-7">
                 {intro.eyebrow ? <Rotulo>{intro.eyebrow}</Rotulo> : null}
                 <TituloSeccion id="titulo-intro" className="mt-5">
@@ -132,8 +133,8 @@ export default async function Inicio() {
 
       {/* Servicios destacados */}
       {serviciosDestacados.length > 0 ? (
-        <section aria-labelledby="titulo-servicios" className="border-t border-acero-200 bg-acero-50">
-          <Contenedor className="py-14 lg:py-18">
+        <section aria-labelledby="titulo-servicios" className="bg-lienzo">
+          <Contenedor className="py-16 lg:py-20">
             <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
               <div className="max-w-2xl">
                 {seccionServicios?.eyebrow ? <Rotulo>{seccionServicios.eyebrow}</Rotulo> : null}
@@ -157,7 +158,7 @@ export default async function Inicio() {
               ) : null}
             </div>
 
-            <div className="mt-10 border border-acero-200">
+            <div className="mt-10">
               <RejillaDeServicios servicios={serviciosDestacados} columnas={4} numerar />
             </div>
           </Contenedor>
@@ -166,8 +167,8 @@ export default async function Inicio() {
 
       {/* Casos de éxito */}
       {proyectosDestacados.length > 0 ? (
-        <section aria-labelledby="titulo-casos" className="border-t border-acero-200 bg-blanco">
-          <Contenedor className="py-14 lg:py-18">
+        <section aria-labelledby="titulo-casos" className="bg-lienzo-alto">
+          <Contenedor className="py-16 lg:py-20">
             <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
               <div className="max-w-2xl">
                 {seccionProyectos?.eyebrow ? <Rotulo>{seccionProyectos.eyebrow}</Rotulo> : null}
@@ -218,12 +219,12 @@ export default async function Inicio() {
         {/* Nota del cierre: se edita en tres piezas (texto · enlace · texto)
             para que el panel no tenga que escribir HTML. */}
         {notaCierre?.texto || notaCierre?.enlace?.etiqueta || notaCierre?.textoFinal ? (
-          <p className="mt-6 text-sm text-acero-300">
+          <p className="mt-6 text-sm text-acero-200">
             {notaCierre.texto ? `${notaCierre.texto} ` : null}
             {notaCierre.enlace?.etiqueta ? (
               <Link
                 href={notaCierre.enlace.href || "/servicios"}
-                className="font-medium text-azul-300 underline-offset-2 hover:text-blanco hover:underline"
+                className="font-medium text-blanco underline underline-offset-2 decoration-acero-400 hover:decoration-blanco"
               >
                 {notaCierre.enlace.etiqueta}
               </Link>

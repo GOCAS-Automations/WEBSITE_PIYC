@@ -19,6 +19,7 @@ import {
   IconoReloj,
   IconoSalir,
 } from "@/components/admin/iconos";
+import { botonOscuro, botonPrimario, botonSecundario } from "@/components/admin/clases";
 
 export const metadata: Metadata = {
   title: "Mi cuenta",
@@ -71,9 +72,15 @@ export default async function MiCuentaPage({
 
 function Ingreso({ configurado }: { configurado: boolean }) {
   return (
-    <main id="contenido" className="fondo-plano min-h-[70vh] px-4 py-12 sm:py-16">
+    <main
+      id="contenido"
+      className="fondo-plano flex min-h-dvh items-center px-4 py-12 sm:py-16"
+    >
       <div className="mx-auto w-full max-w-md">
-        <div className="rounded-fino border border-acero-200 bg-blanco p-6 sm:p-8">
+        {/* Tarjeta de material sobre la luz azul del fondo: la puerta de
+            entrada tiene que verse como una hoja de iOS, no como un formulario
+            administrativo. */}
+        <div className="material-fuerte rounded-panel p-6 shadow-flotante sm:p-8">
           <div className="flex flex-col items-center text-center">
             {/* `next/image` directo está permitido aquí: el logo es chrome, no
                 contenido editable (regla 14). */}
@@ -85,10 +92,10 @@ function Ingreso({ configurado }: { configurado: boolean }) {
               priority
               className="h-12 w-auto"
             />
-            <p className="mt-5 font-titulo text-xs font-semibold uppercase tracking-[0.18em] text-azul-700">
+            <p className="mt-5 text-xs font-semibold uppercase tracking-ancho text-azul-700">
               Portal del equipo
             </p>
-            <h1 className="mt-1 font-titulo text-3xl font-semibold uppercase tracking-wide text-azul-950">
+            <h1 className="mt-1 text-[2rem] font-semibold leading-tight tracking-display text-azul-950">
               Iniciar sesión
             </h1>
             <p className="mt-2 text-sm leading-relaxed text-acero-600">
@@ -105,7 +112,7 @@ function Ingreso({ configurado }: { configurado: boolean }) {
             {configurado ? (
               <FormularioIngreso />
             ) : (
-              <p className="rounded-fino border border-azul-300 bg-azul-50 px-4 py-3 text-sm leading-relaxed text-azul-900">
+              <p className="rounded-tarjeta bg-azul-50 px-4 py-3.5 text-sm leading-relaxed text-azul-900">
                 El portal todavía no está conectado a la base de datos. Faltan
                 las variables de entorno del servidor; cárgalas y vuelve a
                 desplegar (cargarlas no basta: las páginas deciden en el build).
@@ -129,9 +136,12 @@ function Ingreso({ configurado }: { configurado: boolean }) {
 
 function CuentaDesactivada() {
   return (
-    <main id="contenido" className="fondo-plano min-h-[70vh] px-4 py-16">
-      <div className="mx-auto w-full max-w-md rounded-fino border border-azul-300 bg-blanco p-6 text-center sm:p-8">
-        <h1 className="font-titulo text-2xl font-semibold uppercase tracking-wide text-azul-950">
+    <main
+      id="contenido"
+      className="fondo-plano flex min-h-dvh items-center px-4 py-16"
+    >
+      <div className="mx-auto w-full max-w-md rounded-tarjeta bg-blanco p-6 text-center shadow-tarjeta sm:p-8">
+        <h1 className="text-2xl font-semibold tracking-titulo text-azul-950">
           Tu cuenta está desactivada
         </h1>
         <p className="mt-3 text-sm leading-relaxed text-acero-700">
@@ -142,7 +152,7 @@ function CuentaDesactivada() {
         <form action={signOutAction} className="mt-6">
           <button
             type="submit"
-            className="inline-flex items-center gap-2 rounded-fino bg-azul-950 px-5 py-2.5 text-sm font-semibold text-blanco transition-colors hover:bg-azul-900"
+            className={botonOscuro}
           >
             <IconoSalir className="h-4 w-4" />
             Cerrar sesión
@@ -177,16 +187,16 @@ async function Portal({ profile }: { profile: SessionProfile }) {
   const jornadas = { config, horarios, propias, hoy: hoyEnColombia() };
 
   return (
-    <main id="contenido" className="fondo-plano min-h-[70vh] px-4 py-10 sm:py-12">
-      <div className="mx-auto w-full max-w-3xl space-y-6">
-        {/* Cabecera */}
-        <header className="rounded-fino border border-acero-200 bg-blanco p-5 sm:p-6">
+    <main id="contenido" className="fondo-plano min-h-dvh px-4 py-8 sm:py-12">
+      <div className="mx-auto w-full max-w-3xl space-y-5 sm:space-y-6">
+        {/* Cabecera, en material sobre la luz del fondo */}
+        <header className="material-fuerte rounded-panel p-5 shadow-tarjeta sm:p-6">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="min-w-0">
-              <p className="font-titulo text-xs font-semibold uppercase tracking-[0.18em] text-azul-700">
+              <p className="text-xs font-semibold uppercase tracking-ancho text-azul-700">
                 Portal del equipo · PIYC
               </p>
-              <h1 className="mt-1 font-titulo text-3xl font-semibold uppercase tracking-wide text-azul-950">
+              <h1 className="mt-1 text-[2rem] font-semibold leading-tight tracking-display text-azul-950">
                 {profile.fullName}
               </h1>
               <p className="mt-1.5 text-sm text-acero-600">
@@ -195,7 +205,7 @@ async function Portal({ profile }: { profile: SessionProfile }) {
                   {profile.identificador}
                 </span>
                 {profile.cargo && <> · {profile.cargo}</>}{" "}
-                <span className="whitespace-nowrap rounded-fino border border-acero-300 bg-acero-50 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-acero-600">
+                <span className="whitespace-nowrap rounded-capsula bg-relleno px-2.5 py-1 text-[11px] font-semibold leading-none text-acero-600">
                   {ETIQUETA_ROL[profile.role]}
                 </span>
               </p>
@@ -206,7 +216,7 @@ async function Portal({ profile }: { profile: SessionProfile }) {
                 <Link
                   prefetch={false}
                   href="/admin"
-                  className="inline-flex items-center gap-2 rounded-fino bg-azul-700 px-4 py-2.5 text-sm font-semibold text-blanco transition-colors hover:bg-azul-800"
+                  className={botonPrimario}
                 >
                   Ir al panel
                   <IconoFlecha className="h-4 w-4" />
@@ -215,7 +225,7 @@ async function Portal({ profile }: { profile: SessionProfile }) {
               <form action={signOutAction}>
                 <button
                   type="submit"
-                  className="inline-flex items-center gap-1.5 rounded-fino border border-acero-300 bg-blanco px-4 py-2.5 text-sm font-semibold text-acero-700 transition-colors hover:border-azul-700 hover:text-azul-700"
+                  className={botonSecundario}
                 >
                   <IconoSalir className="h-4 w-4" />
                   Cerrar sesión
@@ -226,13 +236,13 @@ async function Portal({ profile }: { profile: SessionProfile }) {
         </header>
 
         {/* ---------------- Registrar jornada ---------------- */}
-        <section className="rounded-fino border border-acero-200 bg-blanco p-5 sm:p-6">
-          <div className="mb-5 flex items-start gap-3 border-b border-acero-200 pb-4">
-            <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-fino border border-acero-200 bg-acero-50 text-azul-700">
+        <section className="rounded-tarjeta bg-blanco p-5 shadow-tarjeta sm:p-6">
+          <div className="mb-5 flex items-start gap-3 border-b border-separador pb-4">
+            <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-control bg-azul-700 text-blanco shadow-sutil">
               <IconoReloj className="h-5 w-5" />
             </span>
             <div>
-              <h2 className="font-titulo text-xl font-semibold uppercase tracking-wide text-azul-950">
+              <h2 className="text-xl font-semibold tracking-titulo text-azul-950">
                 Registrar jornada
               </h2>
               <p className="mt-1 text-sm leading-relaxed text-acero-600">
@@ -252,9 +262,9 @@ async function Portal({ profile }: { profile: SessionProfile }) {
         </section>
 
         {/* ---------------- Historial ---------------- */}
-        <section className="rounded-fino border border-acero-200 bg-blanco p-5 sm:p-6">
-          <div className="mb-5 border-b border-acero-200 pb-4">
-            <h2 className="font-titulo text-xl font-semibold uppercase tracking-wide text-azul-950">
+        <section className="rounded-tarjeta bg-blanco p-5 shadow-tarjeta sm:p-6">
+          <div className="mb-5 border-b border-separador pb-4">
+            <h2 className="text-xl font-semibold tracking-titulo text-azul-950">
               Mis jornadas
             </h2>
             <p className="mt-1 text-sm leading-relaxed text-acero-600">
@@ -275,13 +285,13 @@ async function Portal({ profile }: { profile: SessionProfile }) {
         </section>
 
         {/* Cambio de contraseña */}
-        <section className="rounded-fino border border-acero-200 bg-blanco p-5 sm:p-6">
-          <div className="mb-5 flex items-start gap-3 border-b border-acero-200 pb-4">
-            <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-fino border border-acero-200 bg-acero-50 text-azul-700">
+        <section className="rounded-tarjeta bg-blanco p-5 shadow-tarjeta sm:p-6">
+          <div className="mb-5 flex items-start gap-3 border-b border-separador pb-4">
+            <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-control bg-azul-700 text-blanco shadow-sutil">
               <IconoCandado className="h-5 w-5" />
             </span>
             <div>
-              <h2 className="font-titulo text-xl font-semibold uppercase tracking-wide text-azul-950">
+              <h2 className="text-xl font-semibold tracking-titulo text-azul-950">
                 Cambiar mi contraseña
               </h2>
               <p className="mt-1 text-sm leading-relaxed text-acero-600">

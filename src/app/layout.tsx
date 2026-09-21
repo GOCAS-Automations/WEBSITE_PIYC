@@ -9,26 +9,23 @@
  */
 
 import type { Metadata, Viewport } from "next";
-import { Barlow_Condensed, IBM_Plex_Sans } from "next/font/google";
+import { Geist } from "next/font/google";
 import "./globals.css";
 import { colores } from "@/lib/tokens";
 import { seoEstatico } from "@/data/ajustes";
 import { urlSitio } from "@/lib/seo";
 
-// Títulos: condensada de señalética industrial.
-const barlow = Barlow_Condensed({
+/**
+ * Una sola familia para todo el producto, como SF Pro en iOS: Geist, grotesco
+ * de eje variable con altura de x alta. En titulares aguanta 600–700 con
+ * tracking negativo; en párrafo es cómoda a 16–18 px. Al ser variable, el eje
+ * de peso viaja en un solo archivo (menos peticiones que las tres estáticas
+ * de antes). Sustituye a Barlow Condensed + IBM Plex Sans del sistema v2.
+ */
+const geist = Geist({
   subsets: ["latin"],
-  weight: ["500", "600", "700"],
   display: "swap",
-  variable: "--font-barlow",
-});
-
-// Texto: sans de ingeniería, legible en párrafos y datos técnicos.
-const plex = IBM_Plex_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  display: "swap",
-  variable: "--font-plex",
+  variable: "--font-geist",
 });
 
 /**
@@ -60,13 +57,14 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: colores.blanco,
+  // El fondo agrupado del sitio, para que la barra del navegador no corte.
+  themeColor: colores.lienzo,
   colorScheme: "light",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="es-CO" className={`${barlow.variable} ${plex.variable}`}>
+    <html lang="es-CO" className={geist.variable}>
       <body className="min-h-dvh">{children}</body>
     </html>
   );

@@ -3,9 +3,9 @@ import type { SVGProps } from "react";
 /**
  * ICONOS DEL PANEL
  * ================
- * Trazo de 1.6 px y remates **cuadrados**: es el mismo lenguaje del plano
- * técnico que usa el sitio público de PIYC, no la línea redondeada de las
- * librerías de moda (regla 13: el panel tampoco puede parecerse al de GPI).
+ * SISTEMA v3: trazo de 1.7 px con remates y uniones **redondeados**, como los
+ * SF Symbols de iOS. Los remates cuadrados del sistema v2 eran, junto con las
+ * versalitas condensadas, lo que más hacía ver antiguo el panel.
  *
  * Módulo sin `"use client"` a propósito: son componentes puros sin estado, así
  * que los puede usar por igual un Server Component y uno de cliente. Por eso NO
@@ -19,9 +19,9 @@ const base = {
   viewBox: "0 0 24 24",
   fill: "none",
   stroke: "currentColor",
-  strokeWidth: 1.6,
-  strokeLinecap: "square",
-  strokeLinejoin: "miter",
+  strokeWidth: 1.7,
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
   "aria-hidden": true,
   focusable: false,
 } as const;

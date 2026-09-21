@@ -2,15 +2,19 @@
  * PRIMITIVAS DE SECCIÓN
  * =====================
  * Las piezas que se repiten en todas las páginas: contenedor, rótulo de
- * sección, título, botones y separadores.
+ * sección, título, botones y listas.
  *
- * Lenguaje visual del sitio (regla 13 de AGENTS.md — no puede parecerse a GPI):
- *  - **Filetes, no sombras.** Ninguna tarjeta lleva `box-shadow`; la sombra
- *    está desactivada en el tema (`--shadow-*: initial`).
- *  - **Retícula de plano** (`fondo-plano`) en las superficies claras.
- *  - **Ritmo de fondos**: blanco → retícula acero → azul 950, alternando.
+ * Lenguaje visual del sitio — SISTEMA v3 «iOS» (regla 13 de AGENTS.md: no
+ * puede parecerse a GPI):
+ *  - **Superficies agrupadas.** Fondo `lienzo` gris-azulado y tarjetas blancas
+ *    elevadas con sombras en capas de tinte azul. Nada de filetes de 1 px
+ *    dibujando retículas.
+ *  - **Esquinas continuas y generosas**: `rounded-control` en controles,
+ *    `rounded-tarjeta`/`rounded-panel` en tarjetas y paneles, cápsula en
+ *    botones y chips.
  *  - **Azul dominante, verde al 10 %**: el verde solo en WhatsApp e indicadores.
- *  - Bordes casi rectos (`rounded-fino`, 2 px). Nada redondeado.
+ *  - **Antetítulos discretos**: chip pequeño en caja normal, no versalitas
+ *    espaciadas en cada bloque.
  */
 
 import Link from "next/link";
@@ -32,7 +36,7 @@ export function Contenedor({
   as?: "div" | "section" | "header" | "footer" | "nav";
 }) {
   return (
-    <Etiqueta className={`mx-auto w-full max-w-sitio px-4 lg:px-8 ${className}`}>
+    <Etiqueta className={`mx-auto w-full max-w-sitio px-4 sm:px-6 lg:px-8 ${className}`}>
       {children}
     </Etiqueta>
   );
@@ -42,7 +46,11 @@ export function Contenedor({
 /* Rótulos y títulos                                                      */
 /* ===================================================================== */
 
-/** Rótulo pequeño en versalitas, con el cuadro verde de señal a la izquierda. */
+/**
+ * Antetítulo: chip pequeño con punto verde, en caja normal. Sustituye a las
+ * versalitas espaciadas del sistema anterior, que era lo que más envejecía la
+ * página al repetirse en cada bloque.
+ */
 export function Rotulo({
   children,
   tono = "claro",
@@ -54,11 +62,13 @@ export function Rotulo({
 }) {
   return (
     <p
-      className={`flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.14em] ${
-        tono === "oscuro" ? "text-acero-300" : "text-acero-600"
+      className={`inline-flex items-center gap-2 rounded-capsula py-1.5 pl-2.5 pr-3.5 text-[13px] font-medium ${
+        tono === "oscuro"
+          ? "bg-relleno-claro text-acero-200"
+          : "bg-relleno text-acero-600"
       } ${className}`}
     >
-      <span aria-hidden="true" className="size-2.5 shrink-0 bg-verde-500" />
+      <span aria-hidden="true" className="size-2 shrink-0 rounded-capsula bg-verde-500" />
       <span>{children}</span>
     </p>
   );
@@ -81,10 +91,10 @@ export function TituloSeccion({
   return (
     <Etiqueta
       id={id}
-      className={`text-balance font-semibold leading-[1.05] tracking-[-0.01em] ${
+      className={`text-balance font-semibold leading-[1.08] ${
         Etiqueta === "h1"
-          ? "text-[2.375rem] sm:text-5xl lg:text-[3.75rem]"
-          : "text-[1.875rem] sm:text-4xl lg:text-[2.75rem]"
+          ? "text-[2.25rem] sm:text-5xl lg:text-[3.5rem]"
+          : "text-[1.75rem] sm:text-[2.125rem] lg:text-[2.5rem]"
       } ${tono === "oscuro" ? "text-blanco" : "text-azul-950"} ${className}`}
     >
       {children}
@@ -104,7 +114,7 @@ export function EntradaSeccion({
 }) {
   return (
     <p
-      className={`max-w-[68ch] text-base leading-relaxed sm:text-[1.0625rem] ${
+      className={`max-w-[66ch] text-[1.0625rem] leading-[1.65] sm:text-[1.125rem] ${
         tono === "oscuro" ? "text-acero-200" : "text-acero-600"
       } ${className}`}
     >
@@ -126,12 +136,12 @@ export function Parrafos({
   if (textos.length === 0) return null;
   return (
     <div
-      className={`space-y-4 text-base leading-relaxed sm:text-[1.0625rem] ${
+      className={`space-y-4 text-[1.0625rem] leading-[1.7] ${
         tono === "oscuro" ? "text-acero-200" : "text-acero-700"
       } ${className}`}
     >
       {textos.map((texto, indice) => (
-        <p key={indice} className="max-w-[72ch]">
+        <p key={indice} className="max-w-[70ch]">
           {texto}
         </p>
       ))}
@@ -140,13 +150,47 @@ export function Parrafos({
 }
 
 /* ===================================================================== */
+/* Tarjeta                                                                */
+/* ===================================================================== */
+
+/**
+ * Tarjeta blanca elevada: la superficie base de todo el sitio. `elevable`
+ * añade el levantamiento al pasar el puntero (solo donde la tarjeta entera es
+ * un enlace).
+ */
+export function Tarjeta({
+  children,
+  className = "",
+  elevable = false,
+  as: Etiqueta = "div",
+}: {
+  children: ReactNode;
+  className?: string;
+  elevable?: boolean;
+  as?: "div" | "article" | "li" | "section";
+}) {
+  return (
+    <Etiqueta
+      className={`rounded-tarjeta bg-blanco shadow-tarjeta ${
+        elevable
+          ? "transition-[transform,box-shadow] duration-300 ease-ios hover:-translate-y-1 hover:shadow-elevada"
+          : ""
+      } ${className}`}
+    >
+      {children}
+    </Etiqueta>
+  );
+}
+
+/* ===================================================================== */
 /* Botones y enlaces de acción                                            */
 /* ===================================================================== */
 
+/** `whitespace-nowrap`: una cápsula de alto fijo no puede partir su etiqueta. */
 const CLASES_BOTON =
-  "group inline-flex h-12 items-center justify-center gap-3 rounded-fino px-6 text-center font-semibold transition-colors";
+  "pulsable group inline-flex h-12 shrink-0 items-center justify-center gap-2.5 whitespace-nowrap rounded-capsula px-6 text-center text-[15px] font-semibold";
 
-/** Botón primario: azul de marca. */
+/** Botón primario: azul de marca, cápsula con sombra suave. */
 export function BotonPrimario({
   href,
   children,
@@ -159,16 +203,17 @@ export function BotonPrimario({
   return (
     <Link
       href={href}
-      className={`${CLASES_BOTON} bg-azul-700 text-blanco hover:bg-azul-800 ${className}`}
+      className={`${CLASES_BOTON} bg-azul-700 text-blanco shadow-tarjeta hover:bg-azul-600 ${className}`}
     >
       {children}
-      <IconoFlecha className="size-5 shrink-0 transition-transform group-hover:translate-x-1" />
+      <IconoFlecha className="size-4.5 shrink-0 transition-transform duration-300 ease-ios group-hover:translate-x-1" />
     </Link>
   );
 }
 
 /**
- * Botón secundario: contorno. Sobre fondo oscuro cambia de contraste.
+ * Botón secundario: relleno suave tipo iOS (no contorno duro). Sobre fondo
+ * oscuro usa el relleno claro translúcido.
  * Nunca lleva verde: el verde está reservado para WhatsApp.
  */
 export function BotonSecundario({
@@ -184,12 +229,12 @@ export function BotonSecundario({
 }) {
   const clasesTono =
     tono === "oscuro"
-      ? "border-azul-300 text-acero-100 hover:bg-azul-900"
-      : "border-azul-700 text-azul-700 hover:bg-azul-50";
+      ? "bg-relleno-claro text-blanco hover:bg-azul-800"
+      : "bg-relleno-medio text-azul-700 hover:bg-azul-100";
   return (
-    <Link href={href} className={`${CLASES_BOTON} border ${clasesTono} ${className}`}>
+    <Link href={href} className={`${CLASES_BOTON} ${clasesTono} ${className}`}>
       {children}
-      <IconoFlecha className="size-5 shrink-0 transition-transform group-hover:translate-x-1" />
+      <IconoFlecha className="size-4.5 shrink-0 transition-transform duration-300 ease-ios group-hover:translate-x-1" />
     </Link>
   );
 }
@@ -212,7 +257,7 @@ export function BotonWhatsApp({
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className={`${CLASES_BOTON} bg-verde-500 text-azul-950 hover:bg-verde-400 ${className}`}
+      className={`${CLASES_BOTON} bg-verde-500 text-azul-950 shadow-tarjeta hover:bg-verde-400 ${className}`}
     >
       <IconoWhatsApp className="size-5 shrink-0" />
       {children}
@@ -220,7 +265,7 @@ export function BotonWhatsApp({
   );
 }
 
-/** Enlace de texto con flecha, para cierres de sección. */
+/** Enlace de texto con flecha en disco, para cierres de sección. */
 export function EnlaceConFlecha({
   href,
   children,
@@ -232,15 +277,27 @@ export function EnlaceConFlecha({
   tono?: "claro" | "oscuro";
   className?: string;
 }) {
+  const oscuro = tono === "oscuro";
   return (
     <Link
       href={href}
-      className={`group inline-flex items-center gap-2.5 font-semibold ${
-        tono === "oscuro" ? "text-azul-300 hover:text-blanco" : "text-azul-700 hover:text-azul-900"
+      // `w-fit`: en una columna flex, un elemento de ancho `auto` se estira a
+      // todo el ancho y la cápsula dejaría de leerse como tal en móvil.
+      className={`pulsable group inline-flex w-fit items-center gap-2.5 rounded-capsula py-1.5 pl-4 pr-1.5 text-[15px] font-semibold ${
+        oscuro
+          ? "bg-relleno-claro text-blanco hover:bg-azul-800"
+          : "bg-relleno text-azul-700 hover:bg-relleno-medio"
       } ${className}`}
     >
       {children}
-      <IconoFlecha className="size-4 transition-transform group-hover:translate-x-1" />
+      <span
+        aria-hidden="true"
+        className={`inline-flex size-8 items-center justify-center rounded-capsula ${
+          oscuro ? "bg-azul-700 text-blanco" : "bg-azul-700 text-blanco"
+        }`}
+      >
+        <IconoFlecha className="size-4 transition-transform duration-300 ease-ios group-hover:translate-x-0.5" />
+      </span>
     </Link>
   );
 }
@@ -250,12 +307,10 @@ export function EnlaceConFlecha({
 /* ===================================================================== */
 
 /**
- * Lista de alcances: filete a la izquierda y marca verde, sin viñeta redonda.
- *
- * La rejilla se dibuja con `gap-px` sobre un fondo `acero-200`: los filetes son
- * el fondo asomando entre celdas. Por eso, con un número **impar** de ítems, la
- * celda sobrante de la última fila quedaba pintada de gris. El último ítem
- * ocupa las dos columnas cuando la cuenta es impar y el hueco desaparece.
+ * Lista agrupada tipo iOS para los alcances de un servicio: tarjeta blanca con
+ * separadores internos, marca verde de verificación y dos columnas desde `sm`.
+ * En dos columnas los separadores se dibujan con `border` por celda para que
+ * no quede una línea suelta al final de cada columna.
  */
 export function ListaDeAlcances({
   items,
@@ -267,17 +322,40 @@ export function ListaDeAlcances({
   className?: string;
 }) {
   if (items.length === 0) return null;
+  const oscuro = tono === "oscuro";
+  // Con un número impar de ítems, el último ocupa las dos columnas: si no,
+  // queda media tarjeta vacía abajo a la derecha y se lee como un error.
   const impar = items.length % 2 === 1;
+
   return (
-    <ul className={`grid gap-px bg-acero-200 sm:grid-cols-2 ${className}`}>
+    <ul
+      className={`grid overflow-hidden rounded-tarjeta sm:grid-cols-2 ${
+        oscuro ? "bg-azul-900/60 ring-1 ring-separador-claro" : "bg-blanco shadow-tarjeta"
+      } ${className}`}
+    >
       {items.map((item, indice) => (
         <li
           key={item}
-          className={`flex gap-3 px-4 py-3.5 text-[15px] leading-snug ${
-            tono === "oscuro" ? "bg-azul-950 text-acero-200" : "bg-blanco text-azul-900"
+          className={`flex items-start gap-3 border-t px-5 py-4 text-[15px] leading-snug first:border-t-0 sm:even:border-l sm:[&:nth-child(2)]:border-t-0 ${
+            oscuro
+              ? "border-separador-claro text-acero-200"
+              : "border-separador text-azul-900"
           } ${impar && indice === items.length - 1 ? "sm:col-span-2" : ""}`}
         >
-          <span aria-hidden="true" className="mt-[7px] size-2 shrink-0 bg-verde-500" />
+          <span
+            aria-hidden="true"
+            className="mt-0.5 inline-flex size-5 shrink-0 items-center justify-center rounded-capsula bg-verde-100 text-verde-700"
+          >
+            <svg viewBox="0 0 16 16" fill="none" className="size-3">
+              <path
+                d="M3.5 8.5l3 3 6-7"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </span>
           <span>{item}</span>
         </li>
       ))}

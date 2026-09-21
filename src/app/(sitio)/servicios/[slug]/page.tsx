@@ -137,8 +137,8 @@ export default async function PaginaDeServicio({
       />
 
       {/* Descripción + alcances */}
-      <section aria-labelledby="titulo-alcance" className="bg-blanco">
-        <Contenedor className="py-14 lg:py-18">
+      <section aria-labelledby="titulo-alcance" className="bg-lienzo">
+        <Contenedor className="py-16 lg:py-20">
           <div className="grid gap-12 lg:grid-cols-12 lg:gap-12">
             <div className="lg:col-span-7">
               <Rotulo>En qué consiste</Rotulo>
@@ -168,12 +168,10 @@ export default async function PaginaDeServicio({
 
           {servicio.items.length > 0 ? (
             <div className="mt-12">
-              <h3 className="font-titulo text-[1.5rem] font-semibold leading-tight text-azul-950">
+              <h3 className="text-[1.375rem] font-semibold leading-tight text-azul-950">
                 Qué incluye
               </h3>
-              <div className="mt-5 border border-acero-200">
-                <ListaDeAlcances items={servicio.items} />
-              </div>
+              <ListaDeAlcances items={servicio.items} className="mt-5" />
             </div>
           ) : null}
         </Contenedor>
@@ -183,9 +181,9 @@ export default async function PaginaDeServicio({
       {galeria.length > 0 ? (
         <section
           aria-labelledby="titulo-galeria-servicio"
-          className="fondo-plano border-y border-acero-200"
+          className="bg-lienzo-alto"
         >
-          <Contenedor className="py-14 lg:py-16">
+          <Contenedor className="py-16 lg:py-20">
             <Rotulo>Del trabajo</Rotulo>
             <TituloSeccion id="titulo-galeria-servicio" className="mt-5">
               Galería
@@ -202,8 +200,8 @@ export default async function PaginaDeServicio({
 
       {/* Proyectos relacionados */}
       {relacionados.length > 0 ? (
-        <section aria-labelledby="titulo-relacionados" className="bg-blanco">
-          <Contenedor className="py-14 lg:py-16">
+        <section aria-labelledby="titulo-relacionados" className="bg-lienzo">
+          <Contenedor className="py-16 lg:py-20">
             <Rotulo>Casos de éxito</Rotulo>
             <TituloSeccion id="titulo-relacionados" className="mt-5">
               Proyectos con este servicio
@@ -219,11 +217,11 @@ export default async function PaginaDeServicio({
       {otros.length > 0 ? (
         <section
           aria-labelledby="titulo-otros"
-          className="border-t border-acero-200 bg-acero-50"
+          className="bg-lienzo-alto"
         >
-          <Contenedor className="py-14 lg:py-16">
+          <Contenedor className="py-16 lg:py-20">
             <TituloSeccion id="titulo-otros">Otros servicios</TituloSeccion>
-            <div className="mt-8 border border-acero-200">
+            <div className="mt-8">
               <RejillaDeServicios servicios={otros} columnas={3} />
             </div>
           </Contenedor>

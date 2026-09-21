@@ -5,8 +5,10 @@
  * servidor registra el lead y devuelve el enlace `wa.me` (ver
  * `src/app/api/contacto/route.ts`).
  *
- * El horario **solo se pinta si está en `site_settings.contact.horario`**: PIYC
- * no lo ha confirmado y no se inventa (`docs/CONTENIDO.md` §6).
+ * El horario **solo se pinta si está en `site_settings.contact.horario`**. El
+ * vigente —lunes a viernes de 8:00 a. m. a 5:00 p. m.— salió de la ficha de
+ * Google del negocio; si algún día se borra desde el panel, el bloque
+ * desaparece en vez de quedar en blanco.
  */
 
 import type { Metadata } from "next";
@@ -81,8 +83,8 @@ export default async function Contacto() {
         migas={MIGAS}
       />
 
-      <section aria-labelledby="titulo-contacto" className="bg-blanco">
-        <Contenedor className="py-14 lg:py-18">
+      <section aria-labelledby="titulo-contacto" className="bg-lienzo">
+        <Contenedor className="py-16 lg:py-20">
           <h2 id="titulo-contacto" className="sr-only">
             Datos de contacto y formulario
           </h2>
@@ -95,11 +97,11 @@ export default async function Contacto() {
                 Dónde encontrarnos
               </TituloSeccion>
 
-              <dl className="mt-7 space-y-6">
+              <dl className="mt-7 overflow-hidden rounded-tarjeta bg-blanco shadow-tarjeta">
                 {direccion ? (
-                  <div className="grid grid-cols-[1.5rem_1fr] items-start gap-x-4">
-                    <IconoUbicacion className="row-span-2 mt-0.5 size-6 shrink-0 text-azul-700" />
-                    <dt className="text-[11px] font-semibold uppercase tracking-[0.12em] text-acero-600">
+                  <div className="grid grid-cols-[1.75rem_1fr] items-start gap-x-4 border-t border-separador px-5 py-4 first:border-t-0">
+                    <IconoUbicacion className="row-span-2 mt-0.5 size-6 shrink-0 text-azul-600" />
+                    <dt className="text-[13px] text-acero-600">
                       Dirección
                     </dt>
                     <dd className="mt-1 text-[15px] leading-relaxed text-azul-950">
@@ -122,9 +124,9 @@ export default async function Contacto() {
                 ) : null}
 
                 {numerosWhatsApp.length > 0 ? (
-                  <div className="grid grid-cols-[1.5rem_1fr] items-start gap-x-4">
+                  <div className="grid grid-cols-[1.75rem_1fr] items-start gap-x-4 border-t border-separador px-5 py-4 first:border-t-0">
                     <IconoWhatsApp className="row-span-2 mt-0.5 size-6 shrink-0 text-verde-600" />
-                    <dt className="text-[11px] font-semibold uppercase tracking-[0.12em] text-acero-600">
+                    <dt className="text-[13px] text-acero-600">
                       WhatsApp
                     </dt>
                     <dd className="mt-1 space-y-1.5">
@@ -155,9 +157,9 @@ export default async function Contacto() {
                     número y pintarlo dos veces confunde. */}
                 {telefono &&
                 !numerosWhatsApp.some((numero) => numero.intl === telefono.intl) ? (
-                  <div className="grid grid-cols-[1.5rem_1fr] items-start gap-x-4">
-                    <IconoTelefono className="row-span-2 mt-0.5 size-6 shrink-0 text-azul-700" />
-                    <dt className="text-[11px] font-semibold uppercase tracking-[0.12em] text-acero-600">
+                  <div className="grid grid-cols-[1.75rem_1fr] items-start gap-x-4 border-t border-separador px-5 py-4 first:border-t-0">
+                    <IconoTelefono className="row-span-2 mt-0.5 size-6 shrink-0 text-azul-600" />
+                    <dt className="text-[13px] text-acero-600">
                       Teléfono
                     </dt>
                     <dd className="mt-1 text-[15px] text-azul-950">
@@ -172,9 +174,9 @@ export default async function Contacto() {
                 ) : null}
 
                 {correos.length > 0 ? (
-                  <div className="grid grid-cols-[1.5rem_1fr] items-start gap-x-4">
-                    <IconoCorreo className="row-span-2 mt-0.5 size-6 shrink-0 text-azul-700" />
-                    <dt className="text-[11px] font-semibold uppercase tracking-[0.12em] text-acero-600">
+                  <div className="grid grid-cols-[1.75rem_1fr] items-start gap-x-4 border-t border-separador px-5 py-4 first:border-t-0">
+                    <IconoCorreo className="row-span-2 mt-0.5 size-6 shrink-0 text-azul-600" />
+                    <dt className="text-[13px] text-acero-600">
                       Correo
                     </dt>
                     <dd className="mt-1 space-y-1.5">
@@ -194,9 +196,9 @@ export default async function Contacto() {
 
                 {/* Horario: solo si está en los ajustes. Nunca se inventa. */}
                 {horario ? (
-                  <div className="grid grid-cols-[1.5rem_1fr] items-start gap-x-4">
-                    <IconoReloj className="row-span-2 mt-0.5 size-6 shrink-0 text-azul-700" />
-                    <dt className="text-[11px] font-semibold uppercase tracking-[0.12em] text-acero-600">
+                  <div className="grid grid-cols-[1.75rem_1fr] items-start gap-x-4 border-t border-separador px-5 py-4 first:border-t-0">
+                    <IconoReloj className="row-span-2 mt-0.5 size-6 shrink-0 text-azul-600" />
+                    <dt className="text-[13px] text-acero-600">
                       Horario
                     </dt>
                     <dd className="mt-1 text-[15px] text-azul-950">{horario}</dd>
@@ -204,9 +206,9 @@ export default async function Contacto() {
                 ) : null}
 
                 {instagram ? (
-                  <div className="grid grid-cols-[1.5rem_1fr] items-start gap-x-4">
-                    <IconoInstagram className="row-span-2 mt-0.5 size-6 shrink-0 text-azul-700" />
-                    <dt className="text-[11px] font-semibold uppercase tracking-[0.12em] text-acero-600">
+                  <div className="grid grid-cols-[1.75rem_1fr] items-start gap-x-4 border-t border-separador px-5 py-4 first:border-t-0">
+                    <IconoInstagram className="row-span-2 mt-0.5 size-6 shrink-0 text-azul-600" />
+                    <dt className="text-[13px] text-acero-600">
                       Instagram
                     </dt>
                     <dd className="mt-1 text-[15px]">
@@ -223,7 +225,7 @@ export default async function Contacto() {
                 ) : null}
               </dl>
 
-              <div className="mt-8 border-l-[3px] border-azul-700 bg-azul-50 p-4">
+              <div className="mt-4 rounded-tarjeta bg-azul-50 px-5 py-4">
                 <p className="text-[14px] leading-relaxed text-azul-900">
                   {contacto.legalName}
                   {contacto.nit ? ` · NIT ${contacto.nit}` : ""}
@@ -262,22 +264,22 @@ export default async function Contacto() {
       {mapaEmbebido ? (
         <section
           aria-labelledby="titulo-mapa"
-          className="border-t border-acero-200 bg-acero-50"
+          className="bg-lienzo-alto"
         >
-          <Contenedor className="py-14 lg:py-16">
+          <Contenedor className="py-16 lg:py-20">
             <Rotulo>Ubicación</Rotulo>
             <TituloSeccion id="titulo-mapa" className="mt-5">
               Cómo llegar
             </TituloSeccion>
             <p className="mt-4 text-[15px] text-acero-600">{direccion}</p>
 
-            <div className="mt-8 border border-acero-300 bg-blanco p-1.5">
+            <div className="mt-8 overflow-hidden rounded-panel bg-blanco p-2 shadow-elevada">
               <iframe
                 src={mapaEmbebido}
                 title={`Mapa de Google con la ubicación de PIYC: ${direccion}`}
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
-                className="block aspect-[16/10] w-full border-0 sm:aspect-[21/9]"
+                className="block aspect-[16/10] w-full rounded-tarjeta border-0 sm:aspect-[21/9]"
               />
             </div>
           </Contenedor>

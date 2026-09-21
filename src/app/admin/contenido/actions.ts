@@ -868,6 +868,17 @@ export async function guardarContacto(
   const completa = text(formData, "direccion_completa");
 
   const horarioTexto = text(formData, "horario");
+  // `Mo-Fr 08:00-17:00, Sa 08:00-12:00` → ["Mo-Fr 08:00-17:00","Sa 08:00-12:00"].
+  const horarioSchema = text(formData, "horario_schema")
+    .split(",")
+    .map((tramo) => tramo.trim())
+    .filter(Boolean);
+  const TRAMO_HORARIO = /^(Mo|Tu|We|Th|Fr|Sa|Su)(-(Mo|Tu|We|Th|Fr|Sa|Su))? ([01]\d|2[0-3]):[0-5]\d-([01]\d|2[0-3]):[0-5]\d$/;
+  const tramoMalo = horarioSchema.find((tramo) => !TRAMO_HORARIO.test(tramo));
+  if (tramoMalo !== undefined)
+    return fail(
+      `«${tramoMalo}» no es un tramo de horario válido para Google. Se escribe con los días en inglés abreviado y las horas de 24 h, por ejemplo «Mo-Fr 08:00-17:00». Varios tramos van separados por coma.`,
+    );
 
   const estado = await actualizarAjuste<AjustesContact>("contact", (c) => {
     const nuevo: AjustesContact = {
@@ -906,8 +917,13 @@ export async function guardarContacto(
     if (mapsQuery !== "") nuevo.mapsQuery = mapsQuery;
     else delete nuevo.mapsQuery;
 
-    if (horarioTexto !== "") nuevo.horario = { ...(c.horario ?? {}), label: horarioTexto };
-    else delete nuevo.horario;
+    // El horario visible y el que lee Google son el mismo dato escrito de dos
+    // formas: se guardan y se borran juntos. Sin `label` no hay horario que
+    // mostrar, así que la clave entera se va.
+    if (horarioTexto !== "") {
+      nuevo.horario = { label: horarioTexto };
+      if (horarioSchema.length > 0) nuevo.horario.schema = horarioSchema;
+    } else delete nuevo.horario;
 
     return nuevo;
   });

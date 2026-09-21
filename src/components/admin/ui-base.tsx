@@ -21,12 +21,17 @@
  * REGLA: **un componente `"use client"` importa estas piezas de AQUÍ, nunca de
  * `ui.tsx`.**
  *
- * ESTILO — no es el panel de GPI (regla 13)
- * -----------------------------------------
- * Azul dominante, verde solo como acento, **filetes de 1 px en vez de sombras**
- * (la paleta de Tailwind anula `--shadow-*`: las utilidades `shadow-…` no
- * existen en este proyecto) y radios casi rectos (`rounded-fino` = 2 px).
- * Ningún color escrito a mano: todo sale de los tokens de `@theme`.
+ * ESTILO — SISTEMA v3 «iOS» (y no es el panel de GPI, regla 13)
+ * -------------------------------------------------------------
+ * Fondo agrupado (`lienzo`), contenido en **tarjetas blancas redondeadas**
+ * (`rounded-tarjeta`) con sombra difusa de tinte azul (`shadow-tarjeta`),
+ * listas agrupadas con separadores hairline (`separador`), botones cápsula,
+ * campos rellenos con anillo de foco y chips en cápsula.
+ *
+ * Ningún color ni radio escrito a mano: todo sale de los tokens de `@theme`
+ * (`src/app/globals.css`, espejo de `src/lib/tokens.ts`). `rounded-fino` y
+ * `rounded-medio` siguen existiendo por compatibilidad, pero **no se usan
+ * aquí**: son del sistema v2.
  */
 
 import Link from "next/link";
@@ -45,29 +50,24 @@ import {
   type PaginaDe,
 } from "@/lib/paginacion";
 import { PuntoDeCarga } from "./PuntoDeCarga";
+import {
+  CHIP_NEUTRO,
+  CHIP_VERDE,
+  inputClass,
+  interruptorRiel,
+  tarjetaClase,
+} from "./clases";
 
 /* ------------------------------------------------------------------ */
 /* Clases compartidas                                                  */
 /* ------------------------------------------------------------------ */
 
-export const inputClass =
-  "w-full rounded-fino border border-acero-300 bg-blanco px-3 py-2.5 text-sm text-azul-950 placeholder:text-acero-400 transition-colors focus:border-azul-700 focus:outline-none focus:ring-2 focus:ring-azul-700/25";
-
-/** Botón primario del panel. Azul lleno, sin sombra, esquina casi recta. */
-export const botonPrimario =
-  "inline-flex items-center justify-center gap-2 rounded-fino bg-azul-700 px-5 py-2.5 text-sm font-semibold text-blanco transition-colors hover:bg-azul-800 disabled:pointer-events-none disabled:opacity-60";
-
-/** Botón secundario: filete azul sobre blanco. */
-export const botonSecundario =
-  "inline-flex items-center justify-center gap-2 rounded-fino border border-acero-300 bg-blanco px-4 py-2.5 text-sm font-semibold text-acero-700 transition-colors hover:border-azul-700 hover:text-azul-700";
-
-/** Botón destructivo. `error` es el ÚNICO uso del rojo en la paleta. */
-export const botonPeligro =
-  "inline-flex items-center justify-center gap-1.5 rounded-fino border border-acero-300 bg-blanco px-3 py-2 text-xs font-semibold text-acero-600 transition-colors hover:border-error-300 hover:bg-error-50 hover:text-error-500 disabled:opacity-60";
-
-/** Rótulo de sección: condensada, versalita, con interletrado. */
-export const rotulo =
-  "font-titulo text-xs font-semibold uppercase tracking-[0.18em] text-azul-700";
+/**
+ * Viven en `./clases` —módulo NEUTRO, sin `"use client"`— para que también las
+ * puedan leer las páginas de servidor (regla 4). Aquí se reexportan para no
+ * romper a los componentes de cliente que ya importaban de `./ui-base`.
+ */
+export * from "./clases";
 
 /* ------------------------------------------------------------------ */
 /* Ayuda para personas no técnicas                                     */
@@ -95,10 +95,8 @@ export function AyudaSeccion({
   const info = tono === "info";
   return (
     <div
-      className={`flex items-start gap-2.5 rounded-fino border px-4 py-3 text-sm leading-relaxed ${
-        info
-          ? "border-acero-200 bg-acero-50 text-acero-700"
-          : "border-azul-300 bg-azul-50 text-azul-900"
+      className={`flex items-start gap-3 rounded-tarjeta px-4 py-3.5 text-sm leading-relaxed ${
+        info ? "bg-relleno text-acero-700" : "bg-azul-50 text-azul-900"
       } ${className}`}
     >
       <IconoInfo
@@ -131,13 +129,11 @@ export function AyudaDesplegable({
   className?: string;
 }) {
   return (
-    <details
-      className={`group rounded-fino border border-acero-200 bg-acero-50 px-4 py-3 ${className}`}
-    >
+    <details className={`group rounded-tarjeta bg-relleno px-4 py-3.5 ${className}`}>
       <summary className="flex cursor-pointer list-none items-center gap-2 text-sm font-semibold text-acero-700 transition-colors hover:text-azul-700 [&::-webkit-details-marker]:hidden">
         <IconoInfo className="h-4 w-4 shrink-0 text-azul-700" />
         {label}
-        <IconoChevronAbajo className="ml-auto h-4 w-4 shrink-0 transition-transform group-open:rotate-180" />
+        <IconoChevronAbajo className="ml-auto h-4 w-4 shrink-0 transition-transform duration-200 ease-ios group-open:rotate-180" />
       </summary>
       <div className="mt-3 text-sm leading-relaxed text-acero-700">{children}</div>
     </details>
@@ -195,7 +191,7 @@ export function Campo({
     <div className={`block ${className}`}>
       <label
         htmlFor={idCampo(name, scope)}
-        className="mb-1.5 block text-sm font-semibold text-azul-950"
+        className="mb-2 block text-[13px] font-semibold text-acero-600"
       >
         {label}
         {required && <span className="text-azul-700"> *</span>}
@@ -212,7 +208,7 @@ export function Campo({
         aria-describedby={hint ? idAyuda(name, scope) : undefined}
         defaultValue={defaultValue ?? ""}
         placeholder={placeholder}
-        className={`${inputClass} ${readOnly ? "cursor-not-allowed bg-acero-100 text-acero-600" : ""}`}
+        className={`${inputClass} ${readOnly ? "cursor-not-allowed bg-relleno text-acero-500" : ""}`}
       />
       {hint && (
         <span
@@ -242,7 +238,7 @@ export function AreaTexto({
     <div className={`block ${className}`}>
       <label
         htmlFor={idCampo(name, scope)}
-        className="mb-1.5 block text-sm font-semibold text-azul-950"
+        className="mb-2 block text-[13px] font-semibold text-acero-600"
       >
         {label}
         {required && <span className="text-azul-700"> *</span>}
@@ -294,7 +290,7 @@ export function Selector({
     <div className={`block ${className}`}>
       <label
         htmlFor={idCampo(name, scope)}
-        className="mb-1.5 block text-sm font-semibold text-azul-950"
+        className="mb-2 block text-[13px] font-semibold text-acero-600"
       >
         {label}
       </label>
@@ -304,7 +300,7 @@ export function Selector({
         defaultValue={defaultValue}
         disabled={disabled}
         aria-describedby={hint ? idAyuda(name, scope) : undefined}
-        className={`${inputClass} ${disabled ? "cursor-not-allowed bg-acero-100 text-acero-600" : ""}`}
+        className={`${inputClass} ${disabled ? "cursor-not-allowed bg-relleno text-acero-500" : ""}`}
       >
         {options.map((o) => (
           <option key={o.value} value={o.value}>
@@ -352,17 +348,19 @@ export function Interruptor({
 }) {
   return (
     <div>
-      <span className="mb-1.5 block text-sm font-semibold text-azul-950">{label}</span>
-      <label className="inline-flex cursor-pointer items-center gap-3 rounded-fino border border-acero-300 bg-blanco px-3 py-2.5 transition-colors hover:border-azul-700">
+      <span className="mb-2 block text-[13px] font-semibold text-acero-600">{label}</span>
+      <label className="inline-flex cursor-pointer items-center gap-3 rounded-campo bg-lienzo-alto px-3.5 py-2.5 transition duration-200 ease-ios hover:bg-relleno">
         <input type="hidden" name={name} value="false" />
         {/* El checkbox es el riel (appearance-none) y su ::before la perilla:
-            los estados dependen solo de :checked, sin JavaScript. */}
+            los estados dependen solo de :checked, sin JavaScript. El `input`
+            real sigue ahí, así que el teclado y el lector de pantalla lo tratan
+            como la casilla que es. */}
         <input
           type="checkbox"
           name={name}
           value="true"
           defaultChecked={defaultChecked}
-          className="peer relative h-6 w-11 shrink-0 cursor-pointer appearance-none rounded-full bg-acero-300 outline-none transition-colors before:absolute before:left-0.5 before:top-0.5 before:h-5 before:w-5 before:rounded-full before:bg-blanco before:transition-transform before:content-[''] checked:bg-verde-500 checked:before:translate-x-5 focus-visible:ring-2 focus-visible:ring-azul-700/40 focus-visible:ring-offset-2"
+          className={interruptorRiel}
         />
         <span className="text-sm font-semibold text-acero-600 peer-checked:hidden">
           {offLabel}
@@ -380,16 +378,17 @@ export function Interruptor({
 /* Insignias y contenedores                                            */
 /* ------------------------------------------------------------------ */
 
+/** Chip en cápsula, con tinte suave y texto que cumple AA sobre él. */
 export function Insignia({
   children,
-  className = "border-acero-300 bg-acero-50 text-acero-600",
+  className = CHIP_NEUTRO,
 }: {
   children: ReactNode;
   className?: string;
 }) {
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded-fino border px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider ${className}`}
+      className={`inline-flex items-center gap-1 rounded-capsula px-2.5 py-1 text-[11px] font-semibold leading-none ${className}`}
     >
       {children}
     </span>
@@ -399,19 +398,13 @@ export function Insignia({
 /** Insignia de visibilidad de un elemento de contenido. */
 export function InsigniaPublicado({ published }: { published: boolean }) {
   return (
-    <Insignia
-      className={
-        published
-          ? "border-verde-300 bg-verde-100 text-verde-700"
-          : "border-acero-300 bg-acero-100 text-acero-600"
-      }
-    >
+    <Insignia className={published ? CHIP_VERDE : CHIP_NEUTRO}>
       {published ? "Visible" : "Oculto"}
     </Insignia>
   );
 }
 
-/** Superficie del panel: filete, sin sombra. */
+/** Superficie del panel: tarjeta blanca redondeada, sombra difusa azulada. */
 export function Tarjeta({
   children,
   className = "",
@@ -420,11 +413,7 @@ export function Tarjeta({
   className?: string;
 }) {
   return (
-    <div
-      className={`rounded-fino border border-acero-200 bg-blanco p-5 sm:p-6 ${className}`}
-    >
-      {children}
-    </div>
+    <div className={`${tarjetaClase} p-5 sm:p-6 ${className}`}>{children}</div>
   );
 }
 
@@ -438,9 +427,9 @@ export function TituloTarjeta({
   action?: ReactNode;
 }) {
   return (
-    <div className="mb-5 flex flex-wrap items-start justify-between gap-3 border-b border-acero-200 pb-4">
+    <div className="mb-5 flex flex-wrap items-start justify-between gap-3 border-b border-separador pb-4">
       <div>
-        <h2 className="font-titulo text-xl font-semibold uppercase tracking-wide text-azul-950">
+        <h2 className="text-lg font-semibold tracking-titulo text-azul-950">
           {title}
         </h2>
         {description && (
@@ -464,14 +453,66 @@ export function EstadoVacio({
   action?: ReactNode;
 }) {
   return (
-    <div className="rounded-fino border border-dashed border-acero-300 bg-acero-50 p-10 text-center">
-      <p className="font-titulo text-lg font-semibold uppercase tracking-wide text-azul-950">
-        {title}
-      </p>
+    <div className={`${tarjetaClase} px-6 py-12 text-center`}>
+      <p className="text-lg font-semibold tracking-titulo text-azul-950">{title}</p>
       <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-acero-600">
         {description}
       </p>
-      {action && <div className="mt-5 flex justify-center">{action}</div>}
+      {action && <div className="mt-6 flex justify-center">{action}</div>}
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Control segmentado                                                  */
+/* ------------------------------------------------------------------ */
+
+/**
+ * CONTROL SEGMENTADO, como el de iOS: un riel relleno con la pastilla blanca
+ * sobre la opción activa. Se usa para los filtros de estado, donde las opciones
+ * son pocas y conviene verlas todas a la vez en vez de abrir un desplegable.
+ *
+ * Por dentro son `<button type="button">`, así que **no envía el formulario**
+ * que lo contenga; el valor se comunica por `onCambiar`. Para un `<form
+ * method="get">` está `Selector`, que sí viaja en la petición.
+ */
+export function ControlSegmentado<T extends string>({
+  etiqueta,
+  valor,
+  opciones,
+  onCambiar,
+  className = "",
+}: {
+  etiqueta: string;
+  valor: T;
+  opciones: { value: T; label: string }[];
+  onCambiar: (valor: T) => void;
+  className?: string;
+}) {
+  return (
+    <div
+      role="group"
+      aria-label={etiqueta}
+      className={`inline-flex w-full min-w-0 gap-1 rounded-control bg-relleno p-1 ${className}`}
+    >
+      {opciones.map((o) => {
+        const activa = o.value === valor;
+        return (
+          <button
+            key={o.value}
+            type="button"
+            aria-pressed={activa}
+            onClick={() => onCambiar(o.value)}
+            className={`min-w-0 flex-1 truncate rounded-chip px-2 py-1.5 text-[12px] font-semibold transition duration-200 ease-ios sm:px-3 sm:text-[13px] ${
+              activa
+                ? "bg-blanco text-azul-800 shadow-sutil"
+                : "text-acero-600 hover:text-azul-800"
+            }`}
+          >
+            {o.label}
+          </button>
+        );
+      })}
     </div>
   );
 }
@@ -499,7 +540,7 @@ type PropsPaginacion = PaginacionComun &
   );
 
 const BOTON_PAGINA =
-  "inline-flex items-center gap-1 rounded-fino border border-acero-300 bg-blanco px-3 py-1.5 text-xs font-semibold text-acero-700 transition-colors hover:border-azul-700 hover:text-azul-700";
+  "inline-flex items-center gap-1 rounded-capsula bg-blanco px-3.5 py-2 text-xs font-semibold text-azul-800 shadow-sutil transition duration-200 ease-ios hover:bg-azul-50 active:scale-[0.97]";
 
 /** «Mostrando a–b de N» · Anterior · Página [n] de N · Siguiente. */
 export function Paginacion(props: PropsPaginacion) {
@@ -656,7 +697,7 @@ export function Paginacion(props: PropsPaginacion) {
               }
             }}
             aria-label={`Ir a la página (de 1 a ${totalPaginas})`}
-            className="w-10 rounded-fino border border-acero-300 bg-blanco px-1.5 py-1 text-center text-xs font-semibold text-azul-950 focus:border-azul-700 focus:outline-none focus:ring-2 focus:ring-azul-700/25"
+            className="w-11 rounded-chip border border-separador bg-blanco px-1.5 py-1.5 text-center text-xs font-semibold text-azul-950 focus:border-azul-500 focus:outline-none focus:ring-4 focus:ring-azul-700/15"
           />
           de {totalPaginas}
         </span>

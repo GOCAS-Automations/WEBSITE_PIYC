@@ -31,9 +31,16 @@ import { getBrowserSupabase } from "@/lib/supabase/client";
 import { credencialDeAcceso } from "@/lib/usuarios";
 import { isContentEditorRole, normalizeRole } from "@/lib/supabase/roles";
 import { IconoCandado, IconoFlecha, IconoUsuario } from "@/components/admin/iconos";
+import {
+  ayudaCampo,
+  botonPrimario,
+  botonSecundario,
+  etiquetaCampo,
+  inputClass,
+} from "@/components/admin/ui-base";
 
-const inputIngreso =
-  "w-full rounded-fino border border-acero-300 bg-blanco py-3 pl-10 pr-3 text-sm text-azul-950 placeholder:text-acero-400 transition-colors focus:border-azul-700 focus:outline-none focus:ring-2 focus:ring-azul-700/25";
+/** El mismo campo relleno del panel, con sitio para el icono a la izquierda. */
+const inputIngreso = `${inputClass} py-3 pl-11`;
 
 type Estado =
   | { tipo: "reposo" }
@@ -112,8 +119,8 @@ export function FormularioIngreso() {
 
   if (estado.tipo === "inactiva") {
     return (
-      <div className="rounded-fino border border-azul-300 bg-azul-50 p-6 text-center">
-        <p className="font-titulo text-xl font-semibold uppercase tracking-wide text-azul-950">
+      <div className="rounded-tarjeta bg-azul-50 p-6 text-center">
+        <p className="text-xl font-semibold tracking-titulo text-azul-950">
           Tu cuenta está desactivada
         </p>
         <p className="mt-2 text-sm leading-relaxed text-acero-700">
@@ -124,7 +131,7 @@ export function FormularioIngreso() {
         <button
           type="button"
           onClick={() => setEstado({ tipo: "reposo" })}
-          className="mt-5 inline-flex items-center justify-center rounded-fino border border-acero-300 bg-blanco px-5 py-2.5 text-sm font-semibold text-azul-950 transition-colors hover:border-azul-700 hover:text-azul-700"
+          className={`${botonSecundario} mt-5`}
         >
           Volver a intentar
         </button>
@@ -139,12 +146,12 @@ export function FormularioIngreso() {
       <div>
         <label
           htmlFor="usuario"
-          className="mb-1.5 block text-sm font-semibold text-azul-950"
+          className={etiquetaCampo}
         >
           Usuario
         </label>
         <div className="relative">
-          <IconoUsuario className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-acero-400" />
+          <IconoUsuario className="pointer-events-none absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-acero-400" />
           <input
             id="usuario"
             name="usuario"
@@ -160,7 +167,7 @@ export function FormularioIngreso() {
             placeholder="jperez"
           />
         </div>
-        <p className="mt-1.5 text-xs leading-relaxed text-acero-600">
+        <p className={`${ayudaCampo} mt-1.5`}>
           Es el usuario que te asignó PIYC, no un correo electrónico.
         </p>
       </div>
@@ -168,12 +175,12 @@ export function FormularioIngreso() {
       <div>
         <label
           htmlFor="password"
-          className="mb-1.5 block text-sm font-semibold text-azul-950"
+          className={etiquetaCampo}
         >
           Contraseña
         </label>
         <div className="relative">
-          <IconoCandado className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-acero-400" />
+          <IconoCandado className="pointer-events-none absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-acero-400" />
           <input
             id="password"
             name="password"
@@ -191,7 +198,7 @@ export function FormularioIngreso() {
       {estado.tipo === "error" && (
         <p
           role="alert"
-          className="rounded-fino border border-error-300 bg-error-50 px-4 py-3 text-sm text-error-700"
+          className="rounded-tarjeta bg-error-50 px-4 py-3.5 text-sm text-error-700"
         >
           {estado.mensaje}
         </p>
@@ -200,7 +207,7 @@ export function FormularioIngreso() {
       <button
         type="submit"
         disabled={cargando}
-        className="inline-flex w-full items-center justify-center gap-2 rounded-fino bg-azul-700 px-6 py-3.5 text-base font-semibold text-blanco transition-colors hover:bg-azul-800 disabled:pointer-events-none disabled:opacity-60"
+        className={`${botonPrimario} w-full px-6 py-3.5 text-base`}
       >
         {cargando ? "Verificando…" : "Ingresar"}
         {!cargando && <IconoFlecha className="h-5 w-5" />}

@@ -124,8 +124,8 @@ export default async function PaginaDeProyecto({
       />
 
       {/* Cuerpo del caso */}
-      <section aria-labelledby="titulo-caso" className="bg-blanco">
-        <Contenedor className="py-14 lg:py-18">
+      <section aria-labelledby="titulo-caso" className="bg-lienzo">
+        <Contenedor className="py-16 lg:py-20">
           <div className="grid gap-12 lg:grid-cols-12">
             <div className="lg:col-span-7">
               <Rotulo>El proyecto</Rotulo>
@@ -160,9 +160,9 @@ export default async function PaginaDeProyecto({
       {galeria.length > 0 ? (
         <section
           aria-labelledby="titulo-galeria-proyecto"
-          className="fondo-plano border-y border-acero-200"
+          className="bg-lienzo-alto"
         >
-          <Contenedor className="py-14 lg:py-16">
+          <Contenedor className="py-16 lg:py-20">
             <Rotulo>Del proyecto</Rotulo>
             <TituloSeccion id="titulo-galeria-proyecto" className="mt-5">
               Galería
@@ -179,12 +179,12 @@ export default async function PaginaDeProyecto({
 
       {/* Servicios que intervinieron */}
       {serviciosDelCaso.length > 0 ? (
-        <section aria-labelledby="titulo-servicios-caso" className="bg-blanco">
-          <Contenedor className="py-14 lg:py-16">
+        <section aria-labelledby="titulo-servicios-caso" className="bg-lienzo">
+          <Contenedor className="py-16 lg:py-20">
             <TituloSeccion id="titulo-servicios-caso">
               Servicios que intervinieron
             </TituloSeccion>
-            <div className="mt-8 border border-acero-200">
+            <div className="mt-8">
               <RejillaDeServicios
                 servicios={serviciosDelCaso}
                 columnas={columnasParaCantidad(serviciosDelCaso.length)}
@@ -196,45 +196,48 @@ export default async function PaginaDeProyecto({
 
       {/* Anterior / siguiente */}
       {vecinos.anterior || vecinos.siguiente ? (
-        <nav
-          aria-label="Navegación entre proyectos"
-          className="border-t border-acero-200 bg-acero-50"
-        >
-          <Contenedor className="py-6">
-            <ul className="grid gap-px bg-acero-200 sm:grid-cols-2">
-              <li className="bg-acero-50">
+        <nav aria-label="Navegación entre proyectos" className="bg-lienzo">
+          <Contenedor className="pb-4">
+            <ul className="grid gap-4 sm:grid-cols-2">
+              <li>
                 {vecinos.anterior ? (
                   <Link
                     href={`/proyectos/${vecinos.anterior.slug}`}
-                    className="group flex h-full items-center gap-4 p-5 transition-colors hover:bg-blanco"
+                    className="pulsable group flex h-full items-center gap-4 rounded-tarjeta bg-blanco p-5 shadow-tarjeta hover:shadow-elevada"
                   >
-                    <IconoFlecha className="size-5 shrink-0 rotate-180 text-azul-700 transition-transform group-hover:-translate-x-1" />
+                    <span
+                      aria-hidden="true"
+                      className="inline-flex size-9 shrink-0 items-center justify-center rounded-capsula bg-relleno text-azul-700"
+                    >
+                      <IconoFlecha className="size-4 rotate-180 transition-transform duration-300 ease-ios group-hover:-translate-x-0.5" />
+                    </span>
                     <span>
-                      <span className="block text-[11px] font-semibold uppercase tracking-[0.12em] text-acero-600">
-                        Anterior
-                      </span>
-                      <span className="mt-1 block font-titulo text-lg font-semibold leading-tight text-azul-950">
+                      <span className="block text-[13px] text-acero-600">Anterior</span>
+                      <span className="mt-0.5 block text-[1.0625rem] font-semibold leading-tight text-azul-950">
                         {vecinos.anterior.title}
                       </span>
                     </span>
                   </Link>
                 ) : null}
               </li>
-              <li className="bg-acero-50">
+              <li>
                 {vecinos.siguiente ? (
                   <Link
                     href={`/proyectos/${vecinos.siguiente.slug}`}
-                    className="group flex h-full items-center justify-end gap-4 p-5 text-right transition-colors hover:bg-blanco"
+                    className="pulsable group flex h-full items-center justify-end gap-4 rounded-tarjeta bg-blanco p-5 text-right shadow-tarjeta hover:shadow-elevada"
                   >
                     <span>
-                      <span className="block text-[11px] font-semibold uppercase tracking-[0.12em] text-acero-600">
-                        Siguiente
-                      </span>
-                      <span className="mt-1 block font-titulo text-lg font-semibold leading-tight text-azul-950">
+                      <span className="block text-[13px] text-acero-600">Siguiente</span>
+                      <span className="mt-0.5 block text-[1.0625rem] font-semibold leading-tight text-azul-950">
                         {vecinos.siguiente.title}
                       </span>
                     </span>
-                    <IconoFlecha className="size-5 shrink-0 text-azul-700 transition-transform group-hover:translate-x-1" />
+                    <span
+                      aria-hidden="true"
+                      className="inline-flex size-9 shrink-0 items-center justify-center rounded-capsula bg-relleno text-azul-700"
+                    >
+                      <IconoFlecha className="size-4 transition-transform duration-300 ease-ios group-hover:translate-x-0.5" />
+                    </span>
                   </Link>
                 ) : null}
               </li>

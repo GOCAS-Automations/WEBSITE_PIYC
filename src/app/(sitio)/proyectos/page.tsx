@@ -53,8 +53,8 @@ export default async function ListadoDeProyectos() {
         migas={MIGAS}
       />
 
-      <section aria-labelledby="titulo-listado" className="bg-blanco">
-        <Contenedor className="py-14 lg:py-18">
+      <section aria-labelledby="titulo-listado" className="bg-lienzo">
+        <Contenedor className="py-16 lg:py-20">
           <h2 id="titulo-listado" className="sr-only">
             Listado de proyectos
           </h2>
@@ -66,7 +66,7 @@ export default async function ListadoDeProyectos() {
           {proyectos.length > 0 ? (
             <RejillaDeProyectos proyectos={proyectos} columnas={3} prioritariaLaPrimera />
           ) : (
-            <p className="border border-acero-200 px-5 py-8 text-center text-acero-600">
+            <p className="rounded-tarjeta bg-blanco px-5 py-10 text-center text-acero-600 shadow-tarjeta">
               Todavía no hay casos publicados.
             </p>
           )}

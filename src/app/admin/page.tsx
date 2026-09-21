@@ -17,6 +17,7 @@ import {
   IconoWhatsApp,
 } from "@/components/admin/iconos";
 import { formatearFechaCorta, enlaceWhatsAppLead } from "@/lib/admin/mensajes";
+import { botonWhatsApp } from "@/components/admin/clases";
 
 export const dynamic = "force-dynamic";
 
@@ -90,11 +91,11 @@ export default async function AdminDashboardPage() {
 
   return (
     <>
-      <header className="mb-7 border-b border-acero-200 pb-5">
-        <p className="font-titulo text-xs font-semibold uppercase tracking-[0.18em] text-azul-700">
+      <header className="mb-7">
+        <p className="text-xs font-semibold uppercase tracking-ancho text-azul-700">
           Panel de PIYC
         </p>
-        <h1 className="mt-1 font-titulo text-3xl font-semibold uppercase tracking-wide text-azul-950 sm:text-4xl">
+        <h1 className="mt-1 text-[2rem] font-semibold leading-tight tracking-display text-azul-950 sm:text-[2.5rem]">
           Hola, {profile.fullName.split(" ")[0]}
         </h1>
         <p className="mt-2 max-w-2xl text-sm leading-relaxed text-acero-600">
@@ -112,9 +113,9 @@ export default async function AdminDashboardPage() {
               key={c.etiqueta}
               href={c.href}
               prefetch={false}
-              className="rounded-fino border border-acero-200 bg-blanco p-4 transition-colors hover:border-azul-700"
+              className="rounded-tarjeta bg-blanco p-4 shadow-tarjeta transition duration-200 ease-ios hover:-translate-y-0.5 hover:shadow-elevada"
             >
-              <p className="font-titulo text-4xl font-semibold leading-none text-azul-700">
+              <p className="text-[2.5rem] font-semibold leading-none tracking-display text-azul-700">
                 {c.valor}
               </p>
               <p className="mt-1.5 text-sm font-semibold text-azul-950">{c.etiqueta}</p>
@@ -171,12 +172,12 @@ export default async function AdminDashboardPage() {
       {esManager && mensajes.length > 0 && (
         <section className="mt-8">
           <div className="mb-3 flex flex-wrap items-end justify-between gap-2">
-            <h2 className="font-titulo text-xl font-semibold uppercase tracking-wide text-azul-950">
+            <h2 className="text-xl font-semibold tracking-titulo text-azul-950">
               Últimos mensajes
             </h2>
             <EnlaceSiguiente href="/admin/mensajes" label="Ver todos" />
           </div>
-          <ul className="divide-y divide-acero-200 rounded-fino border border-acero-200 bg-blanco">
+          <ul className="divide-y divide-separador overflow-hidden rounded-tarjeta bg-blanco shadow-tarjeta">
             {mensajes.map((m) => (
               <li key={m.id} className="flex flex-wrap items-center gap-3 p-4">
                 <div className="min-w-0 flex-1">
@@ -193,7 +194,7 @@ export default async function AdminDashboardPage() {
                   href={enlaceWhatsAppLead(m)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 rounded-fino border border-verde-300 bg-verde-100 px-3 py-1.5 text-xs font-semibold text-verde-700 transition-colors hover:bg-verde-300"
+                  className={botonWhatsApp}
                 >
                   <IconoWhatsApp className="h-3.5 w-3.5" />
                   Responder

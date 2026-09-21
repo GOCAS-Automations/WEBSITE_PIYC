@@ -4,6 +4,7 @@ import { useActionState } from "react";
 import { idleCredentialState, type CredentialState } from "@/lib/admin-types";
 import { IconoCandado } from "@/components/admin/iconos";
 import { PanelCredenciales } from "./FormularioCuenta";
+import { botonSecundario } from "@/components/admin/ui-base";
 
 /**
  * Restablecer la contraseña de otra persona.
@@ -50,7 +51,7 @@ export function BotonRestablecer({
         <button
           type="submit"
           disabled={pending}
-          className="inline-flex items-center gap-2 rounded-fino border border-acero-300 bg-blanco px-4 py-2.5 text-sm font-semibold text-acero-700 transition-colors hover:border-azul-700 hover:text-azul-700 disabled:opacity-60"
+          className={botonSecundario}
         >
           <IconoCandado className="h-4 w-4" />
           {pending ? "Generando…" : "Restablecer contraseña"}

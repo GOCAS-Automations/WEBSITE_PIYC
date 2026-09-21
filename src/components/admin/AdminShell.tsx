@@ -104,12 +104,12 @@ export function AdminShell({
   const secciones = seccionesDelRol(role);
 
   return (
-    <div className="min-h-dvh bg-acero-50">
-      {/* Barra superior */}
-      <div className="border-b border-acero-200 bg-blanco">
-        <div className="mx-auto flex max-w-sitio flex-wrap items-center justify-between gap-3 px-4 py-4 sm:px-6 lg:px-8">
+    <div className="fondo-plano min-h-dvh">
+      {/* ---------------- Barra superior translúcida ---------------- */}
+      <header className="material-fuerte sticky top-0 z-30 border-b border-separador">
+        <div className="mx-auto flex max-w-sitio flex-wrap items-center justify-between gap-3 px-4 py-3.5 sm:px-6 lg:px-8">
           <div className="min-w-0">
-            <p className="font-titulo text-xs font-semibold uppercase tracking-[0.18em] text-azul-700">
+            <p className="text-xs font-semibold uppercase tracking-ancho text-azul-700">
               Panel de administración · PIYC
             </p>
             {/* Envuelve en vez de truncar: a 390 px el `truncate` se comía la
@@ -119,7 +119,7 @@ export function AdminShell({
                 Sesión de <span className="font-semibold text-azul-950">{nombre}</span>{" "}
                 <span className="text-acero-600">({identificador})</span>
               </span>
-              <span className="whitespace-nowrap rounded-fino border border-acero-300 bg-acero-50 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-acero-600">
+              <span className="whitespace-nowrap rounded-capsula bg-relleno px-2.5 py-1 text-[11px] font-semibold leading-none text-acero-600">
                 {ETIQUETA_ROL[role]}
               </span>
             </p>
@@ -131,25 +131,20 @@ export function AdminShell({
             <Link
               href="/mi-cuenta?portal=1"
               prefetch={false}
-              className="inline-flex items-center gap-1.5 rounded-fino border border-acero-300 bg-blanco px-3.5 py-2 text-sm font-semibold text-acero-700 transition-colors hover:border-azul-700 hover:text-azul-700"
+              className={ACCION_BARRA}
             >
               <IconoUsuario className="h-4 w-4" />
               Mi cuenta
               <PuntoDeCarga className="ml-0.5" />
             </Link>
-            <a
-              href="/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 rounded-fino border border-acero-300 bg-blanco px-3.5 py-2 text-sm font-semibold text-acero-700 transition-colors hover:border-azul-700 hover:text-azul-700"
-            >
+            <a href="/" target="_blank" rel="noopener noreferrer" className={ACCION_BARRA}>
               Ver sitio
               <IconoFlecha className="h-4 w-4" />
             </a>
             <form action={signOut}>
               <button
                 type="submit"
-                className="inline-flex items-center gap-1.5 rounded-fino bg-azul-950 px-3.5 py-2 text-sm font-semibold text-blanco transition-colors hover:bg-azul-900"
+                className="inline-flex items-center gap-1.5 rounded-capsula bg-azul-950 px-3 py-1.5 text-xs font-semibold text-blanco shadow-sutil transition duration-200 ease-ios hover:bg-azul-900 active:scale-[0.97] sm:px-4 sm:py-2 sm:text-sm"
               >
                 <IconoSalir className="h-4 w-4" />
                 Cerrar sesión
@@ -157,44 +152,16 @@ export function AdminShell({
             </form>
           </div>
         </div>
+      </header>
 
-        {/* Pestañas móviles */}
-        <nav
-          aria-label="Secciones del panel (móvil)"
-          className="border-t border-acero-200 lg:hidden"
-        >
-          <ul className="flex gap-1 overflow-x-auto px-4 py-2">
-            {secciones.map((seccion) => {
-              const activa = estaActiva(seccion);
-              const Icono = seccion.icon;
-              return (
-                <li key={seccion.href} className="shrink-0">
-                  <Link
-                    href={seccion.href}
-                    prefetch={false}
-                    aria-current={activa ? "page" : undefined}
-                    className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-fino px-3 py-2 text-sm font-semibold transition-colors ${
-                      activa
-                        ? "bg-azul-700 text-blanco"
-                        : "text-acero-700 hover:bg-acero-100"
-                    }`}
-                  >
-                    <Icono className="h-4 w-4" />
-                    {seccion.label}
-                    <PuntoDeCarga className="ml-0.5" />
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        </nav>
-      </div>
-
-      <div className="mx-auto flex max-w-sitio gap-8 px-4 py-8 sm:px-6 lg:px-8">
-        {/* Menú lateral en escritorio */}
+      <div className="mx-auto flex max-w-sitio gap-7 px-4 py-7 sm:px-6 lg:px-8">
+        {/* ---------------- Panel lateral flotante (escritorio) ---------------- */}
         <aside className="hidden w-60 shrink-0 lg:block">
-          <nav aria-label="Secciones del panel" className="sticky top-8">
-            <ul className="space-y-1 border-l border-acero-200">
+          <nav
+            aria-label="Secciones del panel"
+            className="material sticky top-24 rounded-panel p-2 shadow-tarjeta"
+          >
+            <ul className="space-y-1">
               {secciones.map((seccion) => {
                 const activa = estaActiva(seccion);
                 const Icono = seccion.icon;
@@ -204,14 +171,14 @@ export function AdminShell({
                       href={seccion.href}
                       prefetch={false}
                       aria-current={activa ? "page" : undefined}
-                      className={`-ml-px flex items-center gap-2.5 border-l-2 px-3.5 py-2.5 text-sm font-semibold transition-colors ${
+                      className={`flex items-center gap-2.5 rounded-control px-3.5 py-2.5 text-sm font-semibold transition duration-200 ease-ios ${
                         activa
-                          ? "border-azul-700 bg-blanco text-azul-700"
-                          : "border-transparent text-acero-600 hover:border-acero-300 hover:text-azul-950"
+                          ? "bg-azul-700 text-blanco shadow-sutil"
+                          : "text-acero-600 hover:bg-relleno hover:text-azul-950"
                       }`}
                     >
                       <Icono
-                        className={`h-4 w-4 ${activa ? "text-azul-700" : "text-acero-500"}`}
+                        className={`h-[18px] w-[18px] ${activa ? "text-blanco" : "text-acero-500"}`}
                       />
                       {seccion.label}
                       <PuntoDeCarga className="ml-auto" />
@@ -223,8 +190,69 @@ export function AdminShell({
           </nav>
         </aside>
 
-        <main className="min-w-0 flex-1 pb-12">{children}</main>
+        {/* El relleno inferior deja sitio a la barra de pestañas del móvil. */}
+        <main className="min-w-0 flex-1 pb-[calc(6.5rem+env(safe-area-inset-bottom))] lg:pb-12">
+          {children}
+        </main>
       </div>
+
+      {/* ---------------- Barra de pestañas inferior (móvil) ----------------
+          Las CUATRO entradas del panel, siempre visibles, al alcance del
+          pulgar. Respeta el área segura del iPhone. */}
+      <nav
+        aria-label="Secciones del panel"
+        className="material-fuerte fixed inset-x-0 bottom-0 z-40 border-t border-separador pb-[env(safe-area-inset-bottom)] lg:hidden"
+      >
+        <ul className="mx-auto flex max-w-md items-stretch">
+          {secciones.map((seccion) => {
+            const activa = estaActiva(seccion);
+            const Icono = seccion.icon;
+            return (
+              <li key={seccion.href} className="min-w-0 flex-1">
+                <Link
+                  href={seccion.href}
+                  prefetch={false}
+                  aria-current={activa ? "page" : undefined}
+                  className={`flex flex-col items-center gap-1 px-1 pb-2 pt-2.5 text-[10px] font-semibold leading-tight transition-colors duration-200 ease-ios ${
+                    activa ? "text-azul-700" : "text-acero-500"
+                  }`}
+                >
+                  <span
+                    className={`relative inline-flex h-8 w-14 items-center justify-center rounded-capsula transition duration-200 ease-ios ${
+                      activa ? "bg-azul-100" : ""
+                    }`}
+                  >
+                    <Icono className="h-[22px] w-[22px]" />
+                    {/* El punto de carga vive aquí para no ensanchar la
+                        pestaña cuando aparece (regla 2). */}
+                    <PuntoDeCarga className="absolute -right-0.5 top-0" />
+                  </span>
+                  <span className="w-full truncate text-center">
+                    {ETIQUETA_CORTA[seccion.href] ?? seccion.label}
+                  </span>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
     </div>
   );
 }
+
+/**
+ * Cápsula blanca de las acciones de la barra superior. Más pequeña en el
+ * teléfono: a 390 px las tres acciones se apilaban en tres renglones y la barra
+ * se comía un tercio de la pantalla.
+ */
+const ACCION_BARRA =
+  "inline-flex items-center gap-1.5 rounded-capsula bg-blanco px-3 py-1.5 text-xs font-semibold text-azul-800 shadow-sutil transition duration-200 ease-ios hover:bg-azul-50 active:scale-[0.97] sm:px-3.5 sm:py-2 sm:text-sm";
+
+/**
+ * En una pestaña de 90 px «Contenido del sitio» no cabe. El nombre largo sigue
+ * siendo el del menú de escritorio y el de las migas; aquí se acorta al
+ * sustantivo, que es lo que se lee de un vistazo.
+ */
+const ETIQUETA_CORTA: Record<string, string> = {
+  "/admin/contenido": "Contenido",
+};

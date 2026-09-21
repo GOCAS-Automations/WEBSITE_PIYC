@@ -100,9 +100,12 @@ export function ContentImage({
 }
 
 /**
- * Marco de plano: la foto dentro de un recuadro con filete y marcas de corte
- * en las esquinas. Es el tratamiento estándar de las fotos del sitio — ninguna
- * va suelta ni a sangre.
+ * Foto dentro de una tarjeta iOS: esquinas continuas, sombra en capas y un
+ * borde interior claro que despega la foto del lienzo. Es el tratamiento
+ * estándar de las fotos del sitio — ninguna va suelta ni a sangre.
+ *
+ * (Antes este marco llevaba filete técnico y marcas de corte en las esquinas;
+ * era justo lo que hacía ver antiguo el sitio, sistema v2.)
  */
 export function FotoEnmarcada({
   src,
@@ -118,8 +121,7 @@ export function FotoEnmarcada({
 
   return (
     <figure className={`relative ${className}`}>
-      <MarcasDeCorte />
-      <div className="border border-acero-300 bg-blanco p-1.5">
+      <div className="overflow-hidden rounded-panel bg-blanco p-2 shadow-elevada">
         <ContentImage
           src={src}
           alt={alt}
@@ -127,27 +129,14 @@ export function FotoEnmarcada({
           height={height}
           prioritaria={prioritaria}
           proporcion={proporcion}
-          claseContenedor="bg-acero-100"
+          claseContenedor="rounded-tarjeta bg-acero-100"
         />
       </div>
       {pie ? (
-        <figcaption className="mt-2.5 border-l-2 border-acero-300 pl-3 text-[13px] leading-snug text-acero-600">
+        <figcaption className="mt-3 px-1 text-[13px] leading-snug text-acero-600">
           {pie}
         </figcaption>
       ) : null}
     </figure>
-  );
-}
-
-/** Marcas de corte en las esquinas, como en un plano impreso. */
-export function MarcasDeCorte({ className = "" }: { className?: string }) {
-  const comun = `pointer-events-none absolute size-3.5 border-acero-400 ${className}`;
-  return (
-    <>
-      <span aria-hidden="true" className={`${comun} -left-1.5 -top-1.5 border-l-2 border-t-2`} />
-      <span aria-hidden="true" className={`${comun} -right-1.5 -top-1.5 border-r-2 border-t-2`} />
-      <span aria-hidden="true" className={`${comun} -bottom-1.5 -left-1.5 border-b-2 border-l-2`} />
-      <span aria-hidden="true" className={`${comun} -bottom-1.5 -right-1.5 border-b-2 border-r-2`} />
-    </>
   );
 }

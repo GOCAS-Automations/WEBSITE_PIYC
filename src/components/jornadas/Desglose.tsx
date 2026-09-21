@@ -23,7 +23,16 @@ import {
   type DesgloseJornada,
   type TotalesJornadas,
 } from "@/lib/jornada";
+import { ETIQUETA_ESTADO, type EstadoJornada } from "@/lib/jornada-types";
 import { Insignia } from "@/components/admin/ui-base";
+import {
+  CHIP_AZUL,
+  CHIP_NEUTRO,
+  CHIP_ROJO,
+  CHIP_VERDE,
+  tarjetaClase,
+  tituloSeccion,
+} from "@/components/admin/clases";
 
 /* ------------------------------------------------------------------ */
 /* Cifra suelta                                                        */
@@ -40,23 +49,51 @@ function Cifra({
 }) {
   return (
     <div
-      className={`rounded-fino border p-3 ${
-        destacada ? "border-azul-300 bg-azul-50" : "border-acero-200 bg-acero-50"
+      className={`rounded-control p-3.5 ${
+        destacada ? "bg-azul-700 shadow-sutil" : "bg-lienzo-alto ring-1 ring-separador"
       }`}
     >
+      {/* `whitespace-nowrap` + 1.5rem: «8 h 30 min» partía en dos renglones y
+          desalineaba la fila de widgets. */}
       <p
-        className={`font-titulo text-2xl font-semibold leading-none tabular-nums ${
-          destacada ? "text-azul-700" : "text-azul-950"
+        className={`whitespace-nowrap text-[1.5rem] font-semibold leading-none tracking-display tabular-nums ${
+          destacada ? "text-blanco" : "text-azul-950"
         }`}
       >
         {formatearDuracion(minutos)}
       </p>
-      <p className="mt-1 text-xs font-semibold uppercase tracking-wider text-acero-600">
+      <p
+        className={`mt-1.5 text-[11px] font-semibold uppercase tracking-ancho ${
+          destacada ? "text-azul-200" : "text-acero-500"
+        }`}
+      >
         {etiqueta}
       </p>
     </div>
   );
 }
+
+/* ------------------------------------------------------------------ */
+/* Chip de estado de una jornada                                       */
+/* ------------------------------------------------------------------ */
+
+/**
+ * PENDIENTE · APROBADA · RECHAZADA, con el tinte suave de cada una.
+ *
+ * Vive aquí y no en `src/lib/jornada-types.ts` porque es **presentación**: el
+ * módulo de tipos es puro y no debe saber de la piel del panel. Que sea un solo
+ * componente evita que el listado, la ficha y el portal pinten tres chips
+ * distintos para lo mismo.
+ */
+export function ChipEstado({ estado }: { estado: EstadoJornada }) {
+  return <Insignia className={TINTE_ESTADO[estado]}>{ETIQUETA_ESTADO[estado]}</Insignia>;
+}
+
+const TINTE_ESTADO: Record<EstadoJornada, string> = {
+  pendiente: CHIP_AZUL,
+  aprobada: CHIP_VERDE,
+  rechazada: CHIP_ROJO,
+};
 
 /* ------------------------------------------------------------------ */
 /* Desglose de una jornada                                             */
@@ -78,7 +115,7 @@ export function Desglose({
 }) {
   if (!desglose.valido) {
     return (
-      <p className="rounded-fino border border-error-300 bg-error-50 px-4 py-3 text-sm leading-relaxed text-error-700">
+      <p className="rounded-tarjeta bg-error-50 px-4 py-3.5 text-sm leading-relaxed text-error-700">
         {desglose.error ?? "No se pudieron calcular las horas de esta jornada."}
       </p>
     );
@@ -114,25 +151,18 @@ export function Desglose({
         desglose.almuerzoMinutos > 0) && (
         <div className="flex flex-wrap items-center gap-2">
           {desglose.cruzaMedianoche && (
-            <Insignia className="border-azul-300 bg-azul-50 text-azul-800">
-              Cruza la medianoche
-            </Insignia>
+            <Insignia className={CHIP_AZUL}>Cruza la medianoche</Insignia>
           )}
           {!desglose.diaLaboral && desglose.festivos.length === 0 && (
-            <Insignia className="border-azul-300 bg-azul-50 text-azul-800">
-              Día no laboral
-            </Insignia>
+            <Insignia className={CHIP_AZUL}>Día no laboral</Insignia>
           )}
           {desglose.festivos.map((festivo) => (
-            <Insignia
-              key={festivo}
-              className="border-verde-300 bg-verde-100 text-verde-700"
-            >
+            <Insignia key={festivo} className={CHIP_VERDE}>
               Festivo: {festivo}
             </Insignia>
           ))}
           {desglose.almuerzoMinutos > 0 && (
-            <Insignia>
+            <Insignia className={CHIP_NEUTRO}>
               {formatearDuracion(desglose.almuerzoMinutos)} de almuerzo, descontada
             </Insignia>
           )}
@@ -141,14 +171,14 @@ export function Desglose({
 
       {/* Tabla por categoría */}
       {!compacto && filas.length > 0 && (
-        <div className="overflow-hidden rounded-fino border border-acero-200">
+        <div className="overflow-hidden rounded-control ring-1 ring-separador">
           <table className="w-full border-collapse text-sm">
             <caption className="sr-only">
               Reparto de las horas de la jornada por categoría.
             </caption>
             <tbody>
               {filas.map((fila) => (
-                <tr key={fila.clave} className="border-b border-acero-200 last:border-0">
+                <tr key={fila.clave} className="border-b border-separador last:border-0">
                   <th
                     scope="row"
                     className="px-3.5 py-2 text-left font-normal text-acero-700"
@@ -162,7 +192,7 @@ export function Desglose({
               ))}
             </tbody>
             <tfoot>
-              <tr className="border-t border-acero-300 bg-acero-50">
+              <tr className="border-t border-separador bg-lienzo-alto">
                 <th scope="row" className="px-3.5 py-2 text-left font-semibold text-azul-950">
                   Total trabajado
                 </th>
@@ -223,11 +253,9 @@ export function TotalesDesglose({
   const filas = CATEGORIAS_DESGLOSE.filter((clave) => totales[clave] > 0);
 
   return (
-    <section className="rounded-fino border border-acero-200 bg-blanco p-5">
-      <div className="mb-4 border-b border-acero-200 pb-3">
-        <h2 className="font-titulo text-xl font-semibold uppercase tracking-wide text-azul-950">
-          {titulo}
-        </h2>
+    <section className={`${tarjetaClase} p-5`}>
+      <div className="mb-4 border-b border-separador pb-3">
+        <h2 className={tituloSeccion}>{titulo}</h2>
         <p className="mt-1 text-sm leading-relaxed text-acero-600">
           {descripcion ??
             `${totales.jornadas} ${totales.jornadas === 1 ? "jornada" : "jornadas"}. Las aprobadas aportan sus cifras congeladas; las demás, las que se ven ahora en pantalla.`}
@@ -249,7 +277,7 @@ export function TotalesDesglose({
       </div>
 
       {filas.length > 0 && (
-        <dl className="mt-4 grid gap-x-6 gap-y-1.5 border-t border-acero-200 pt-3 sm:grid-cols-2">
+        <dl className="mt-4 grid gap-x-6 gap-y-1.5 border-t border-separador pt-3 sm:grid-cols-2">
           {filas.map((clave) => (
             <div key={clave} className="flex items-baseline justify-between gap-3">
               <dt className="text-sm text-acero-700">{ETIQUETA_CATEGORIA[clave]}</dt>

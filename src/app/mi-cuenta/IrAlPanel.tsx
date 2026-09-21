@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { IconoFlecha } from "@/components/admin/iconos";
+import { botonPrimario, botonSecundario } from "@/components/admin/ui-base";
 
 /**
  * REDIRECCIÓN AL PANEL, HECHA EN EL CLIENTE
@@ -31,10 +32,10 @@ export function IrAlPanel({ nombre }: { nombre: string }) {
       id="contenido"
       className="mx-auto flex min-h-[60vh] max-w-sitio flex-col items-center justify-center px-4 py-16 text-center"
     >
-      <p className="font-titulo text-xs font-semibold uppercase tracking-[0.18em] text-azul-700">
+      <p className="text-xs font-semibold uppercase tracking-ancho text-azul-700">
         Hola, {nombre}
       </p>
-      <h1 className="mt-2 font-titulo text-3xl font-semibold uppercase tracking-wide text-azul-950">
+      <h1 className="mt-2 text-[2rem] font-semibold leading-tight tracking-display text-azul-950">
         Abriendo el panel…
       </h1>
       <p className="mt-3 max-w-md text-sm leading-relaxed text-acero-600">
@@ -45,7 +46,7 @@ export function IrAlPanel({ nombre }: { nombre: string }) {
         <Link
           prefetch={false}
           href="/admin"
-          className="inline-flex items-center gap-2 rounded-fino bg-azul-700 px-5 py-2.5 text-sm font-semibold text-blanco transition-colors hover:bg-azul-800"
+          className={botonPrimario}
         >
           Ir al panel
           <IconoFlecha className="h-4 w-4" />
@@ -53,7 +54,7 @@ export function IrAlPanel({ nombre }: { nombre: string }) {
         <Link
           prefetch={false}
           href="/mi-cuenta?portal=1"
-          className="inline-flex items-center gap-2 rounded-fino border border-acero-300 bg-blanco px-5 py-2.5 text-sm font-semibold text-acero-700 transition-colors hover:border-azul-700 hover:text-azul-700"
+          className={botonSecundario}
         >
           Ver mi portal
         </Link>

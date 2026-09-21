@@ -21,6 +21,8 @@ import {
   IconoMas,
   IconoUsuario,
 } from "@/components/admin/iconos";
+import { botonChico, botonPrimario, botonSecundario } from "@/components/admin/clases";
+import { CHIP_AZUL, CHIP_NEUTRO, CHIP_ROJO, CHIP_VERDE } from "@/components/admin/clases";
 
 export const dynamic = "force-dynamic";
 
@@ -114,11 +116,11 @@ export default async function EquipoPage({
               return (
                 <li
                   key={cuenta.id}
-                  className={`flex flex-wrap items-center gap-4 rounded-fino border bg-blanco p-4 ${
-                    cuenta.active ? "border-acero-200" : "border-acero-300 bg-acero-50"
+                  className={`flex flex-wrap items-center gap-4 rounded-tarjeta p-4 shadow-tarjeta ${
+                    cuenta.active ? "bg-blanco" : "bg-lienzo-alto"
                   }`}
                 >
-                  <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-fino border border-acero-200 bg-acero-50 text-azul-700">
+                  <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-control bg-azul-700 text-blanco shadow-sutil">
                     <IconoUsuario className="h-5 w-5" />
                   </span>
 
@@ -129,25 +131,25 @@ export default async function EquipoPage({
                       lo suyo y los botones bajan a su propia línea. */}
                   <div className="min-w-[12rem] flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <h2 className="font-titulo text-lg font-semibold uppercase tracking-wide text-azul-950">
+                      <h2 className="text-lg font-semibold tracking-titulo text-azul-950">
                         {cuenta.full_name}
                       </h2>
                       <Insignia
                         className={
                           cuenta.role === "admin"
-                            ? "border-azul-300 bg-azul-50 text-azul-800"
-                            : "border-acero-300 bg-acero-50 text-acero-600"
+                            ? CHIP_AZUL
+                            : CHIP_NEUTRO
                         }
                       >
                         {ETIQUETA_ROL[cuenta.role]}
                       </Insignia>
                       {!cuenta.active && (
-                        <Insignia className="border-error-300 bg-error-50 text-error-700">
+                        <Insignia className={CHIP_ROJO}>
                           Desactivada
                         </Insignia>
                       )}
                       {esUnoMismo && (
-                        <Insignia className="border-verde-300 bg-verde-100 text-verde-700">
+                        <Insignia className={CHIP_VERDE}>
                           Eres tú
                         </Insignia>
                       )}
@@ -178,7 +180,7 @@ export default async function EquipoPage({
                       <Link
                         prefetch={false}
                         href={`/admin/equipo/${cuenta.id}`}
-                        className="inline-flex items-center gap-1.5 rounded-fino bg-azul-700 px-3 py-2 text-xs font-semibold text-blanco transition-colors hover:bg-azul-800"
+                        className={`${botonPrimario} ${botonChico}`}
                       >
                         <IconoLapiz className="h-3.5 w-3.5" />
                         Abrir ficha
@@ -204,8 +206,8 @@ export default async function EquipoPage({
       )}
 
       {/* Enlace a Horarios mensuales — lo construye el agente de jornadas. */}
-      <div className="mt-8 rounded-fino border border-acero-200 bg-blanco p-5">
-        <h2 className="font-titulo text-xl font-semibold uppercase tracking-wide text-azul-950">
+      <div className="mt-8 rounded-tarjeta bg-blanco p-5 shadow-tarjeta">
+        <h2 className="text-xl font-semibold tracking-titulo text-azul-950">
           Horarios mensuales
         </h2>
         <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-acero-600">
@@ -216,7 +218,7 @@ export default async function EquipoPage({
         <Link
           prefetch={false}
           href="/admin/jornadas/horarios"
-          className="mt-4 inline-flex items-center gap-2 rounded-fino border border-acero-300 bg-blanco px-4 py-2.5 text-sm font-semibold text-acero-700 transition-colors hover:border-azul-700 hover:text-azul-700"
+          className={`${botonSecundario} mt-4`}
         >
           <IconoCalendario className="h-4 w-4" />
           Ir a Horarios mensuales

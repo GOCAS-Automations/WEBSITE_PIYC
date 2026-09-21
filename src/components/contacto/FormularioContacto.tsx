@@ -36,8 +36,15 @@ type Estado =
   | { fase: "ok"; whatsappUrl: string; guardado: boolean }
   | { fase: "error"; mensaje: string; campos?: Record<string, string> };
 
+/**
+ * Campo relleno estilo iOS: fondo gris-azulado muy claro, sin borde duro, y
+ * anillo azul al enfocar. El contorno global de `:focus-visible` se conserva
+ * —es el que ve quien navega con teclado—; el anillo es el acabado visual.
+ */
 const CLASES_CAMPO =
-  "h-12 w-full rounded-fino border border-acero-300 bg-blanco px-3.5 text-[15px] text-azul-950 transition-colors placeholder:text-acero-400 hover:border-acero-500 focus:border-azul-700";
+  "h-12 w-full rounded-campo bg-acero-50 px-4 text-[15px] text-azul-950 ring-1 ring-separador transition-[background-color,box-shadow] duration-200 ease-ios placeholder:text-acero-600 hover:bg-acero-100 focus:bg-blanco focus:ring-2 focus:ring-azul-600";
+
+const CLASES_ETIQUETA = "block pl-1 text-[13px] font-medium text-acero-600";
 
 export function FormularioContacto({
   servicios,
@@ -162,21 +169,17 @@ export function FormularioContacto({
         />
 
         <div className="sm:col-span-2">
-          <label
-            htmlFor="contacto-servicio"
-            className="block text-[13px] font-semibold text-azul-950"
-          >
-            Servicio de interés{" "}
-            <span className="font-normal text-acero-600">(opcional)</span>
+          <label htmlFor="contacto-servicio" className={CLASES_ETIQUETA}>
+            Servicio de interés <span className="text-acero-600">(opcional)</span>
           </label>
           <select
             id="contacto-servicio"
             name="servicio"
             defaultValue=""
-            className={`${CLASES_CAMPO} mt-2 appearance-none bg-[length:12px] bg-[right_1rem_center] bg-no-repeat pr-10`}
+            className={`${CLASES_CAMPO} mt-2 appearance-none bg-[length:12px] bg-[right_1.125rem_center] bg-no-repeat pr-11`}
             style={{
               backgroundImage:
-                "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8' fill='none' stroke='%2356606E' stroke-width='1.6'%3E%3Cpath d='M1 1l5 5 5-5'/%3E%3C/svg%3E\")",
+                "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8' fill='none' stroke='%2356606E' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1 1.5l5 5 5-5'/%3E%3C/svg%3E\")",
             }}
           >
             <option value="">No estoy seguro / otro</option>
@@ -189,10 +192,7 @@ export function FormularioContacto({
         </div>
 
         <div className="sm:col-span-2">
-          <label
-            htmlFor="contacto-mensaje"
-            className="block text-[13px] font-semibold text-azul-950"
-          >
+          <label htmlFor="contacto-mensaje" className={CLASES_ETIQUETA}>
             Mensaje <span aria-hidden="true">*</span>
           </label>
           <textarea
@@ -204,12 +204,12 @@ export function FormularioContacto({
             aria-invalid={errores.mensaje ? true : undefined}
             aria-describedby={errores.mensaje ? "error-mensaje" : undefined}
             placeholder="Cuéntenos qué proceso o equipo quiere intervenir, y cualquier restricción de su planta."
-            className={`mt-2 w-full rounded-fino border bg-blanco px-3.5 py-3 text-[15px] leading-relaxed text-azul-950 transition-colors placeholder:text-acero-400 hover:border-acero-500 focus:border-azul-700 ${
-              errores.mensaje ? "border-error-500" : "border-acero-300"
+            className={`mt-2 w-full rounded-campo bg-acero-50 px-4 py-3.5 text-[15px] leading-relaxed text-azul-950 ring-1 transition-[background-color,box-shadow] duration-200 ease-ios placeholder:text-acero-600 hover:bg-acero-100 focus:bg-blanco focus:ring-2 focus:ring-azul-600 ${
+              errores.mensaje ? "ring-error-500" : "ring-separador"
             }`}
           />
           {errores.mensaje ? (
-            <p id="error-mensaje" className="mt-1.5 text-[13px] font-medium text-error-500">
+            <p id="error-mensaje" className="mt-1.5 pl-1 text-[13px] font-medium text-error-500">
               {errores.mensaje}
             </p>
           ) : null}
@@ -235,7 +235,7 @@ export function FormularioContacto({
           <button
             type="submit"
             disabled={enviando}
-            className="inline-flex h-12 items-center justify-center gap-3 rounded-fino bg-verde-500 px-6 font-semibold text-azul-950 transition-colors hover:bg-verde-400 disabled:cursor-not-allowed disabled:bg-acero-300 disabled:text-acero-600"
+            className="pulsable inline-flex h-12 items-center justify-center gap-2.5 rounded-capsula bg-verde-500 px-6 text-[15px] font-semibold text-azul-950 shadow-tarjeta hover:bg-verde-400 disabled:cursor-not-allowed disabled:bg-acero-200 disabled:text-acero-600 disabled:shadow-none"
           >
             <IconoWhatsApp className="size-5" />
             {enviando ? "Enviando…" : "Enviar y abrir WhatsApp"}
@@ -257,8 +257,8 @@ export function FormularioContacto({
         className="mt-6 empty:mt-0 focus:outline-none"
       >
         {estado.fase === "ok" ? (
-          <div className="border-l-4 border-verde-500 bg-verde-100 p-5">
-            <p className="font-titulo text-xl font-semibold text-azul-950">
+          <div className="rounded-tarjeta bg-verde-100 p-5 ring-1 ring-verde-300">
+            <p className="text-[1.0625rem] font-semibold text-azul-950">
               Listo, su mensaje quedó armado
             </p>
             <p className="mt-2 text-[15px] leading-relaxed text-azul-900">
@@ -270,7 +270,7 @@ export function FormularioContacto({
                 href={estado.whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-4 inline-flex h-12 items-center gap-3 rounded-fino border border-verde-700 px-5 font-semibold text-verde-700 transition-colors hover:bg-verde-500 hover:text-azul-950"
+                className="pulsable mt-4 inline-flex h-12 items-center gap-2.5 rounded-capsula bg-verde-500 px-6 text-[15px] font-semibold text-azul-950 shadow-tarjeta hover:bg-verde-400"
               >
                 <IconoWhatsApp className="size-5" />
                 Abrir WhatsApp
@@ -286,8 +286,8 @@ export function FormularioContacto({
         ) : null}
 
         {estado.fase === "error" ? (
-          <div className="border-l-4 border-error-500 bg-error-50 p-5">
-            <p className="font-titulo text-xl font-semibold text-azul-950">
+          <div className="rounded-tarjeta bg-error-50 p-5 ring-1 ring-error-300">
+            <p className="text-[1.0625rem] font-semibold text-azul-950">
               No pudimos enviar el mensaje
             </p>
             <p className="mt-2 text-[15px] leading-relaxed text-azul-900">{estado.mensaje}</p>
@@ -328,12 +328,12 @@ function Campo({
 
   return (
     <div>
-      <label htmlFor={id} className="block text-[13px] font-semibold text-azul-950">
+      <label htmlFor={id} className={CLASES_ETIQUETA}>
         {etiqueta}{" "}
         {requerido ? (
           <span aria-hidden="true">*</span>
         ) : (
-          <span className="font-normal text-acero-600">({ayuda ?? "opcional"})</span>
+          <span className="text-acero-600">({ayuda ?? "opcional"})</span>
         )}
       </label>
       <input
@@ -346,10 +346,10 @@ function Campo({
         inputMode={inputMode}
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? idError : undefined}
-        className={`${CLASES_CAMPO} mt-2 ${error ? "border-error-500" : ""}`}
+        className={`${CLASES_CAMPO} mt-2 ${error ? "ring-error-500" : ""}`}
       />
       {error ? (
-        <p id={idError} className="mt-1.5 text-[13px] font-medium text-error-500">
+        <p id={idError} className="mt-1.5 pl-1 text-[13px] font-medium text-error-500">
           {error}
         </p>
       ) : null}

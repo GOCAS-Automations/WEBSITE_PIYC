@@ -74,8 +74,8 @@ export default async function Nosotros() {
 
       {/* Quiénes somos */}
       {quienesSomos?.body ? (
-        <section aria-labelledby="titulo-quienes-somos" className="bg-blanco">
-          <Contenedor className="py-14 lg:py-18">
+        <section aria-labelledby="titulo-quienes-somos" className="bg-lienzo">
+          <Contenedor className="py-16 lg:py-20">
             <div className="grid gap-10 lg:grid-cols-12 lg:items-start lg:gap-12">
               <div className="lg:col-span-7">
                 {quienesSomos.eyebrow !== "" ? (
@@ -86,21 +86,17 @@ export default async function Nosotros() {
                 </TituloSeccion>
                 <Parrafos textos={enParrafos(quienesSomos.body)} className="mt-6" />
 
-                <dl className="mt-8 grid gap-px border border-acero-200 bg-acero-200 sm:grid-cols-2">
-                  <div className="bg-blanco px-4 py-3.5">
-                    <dt className="text-[11px] font-semibold uppercase tracking-[0.12em] text-acero-600">
-                      Razón social
-                    </dt>
-                    <dd className="mt-1 text-[15px] font-medium text-azul-950">
+                <dl className="mt-8 grid overflow-hidden rounded-tarjeta bg-blanco shadow-tarjeta sm:grid-cols-2">
+                  <div className="px-5 py-4">
+                    <dt className="text-[13px] text-acero-600">Razón social</dt>
+                    <dd className="mt-0.5 text-[15px] font-medium text-azul-950">
                       {contacto.legalName}
                     </dd>
                   </div>
                   {contacto.nit ? (
-                    <div className="bg-blanco px-4 py-3.5">
-                      <dt className="text-[11px] font-semibold uppercase tracking-[0.12em] text-acero-600">
-                        NIT
-                      </dt>
-                      <dd className="mt-1 text-[15px] font-medium text-azul-950">
+                    <div className="border-t border-separador px-5 py-4 sm:border-l sm:border-t-0">
+                      <dt className="text-[13px] text-acero-600">NIT</dt>
+                      <dd className="mt-0.5 text-[15px] font-medium text-azul-950">
                         {contacto.nit}
                       </dd>
                     </div>
@@ -130,25 +126,27 @@ export default async function Nosotros() {
       {nosotros.mision?.body || nosotros.vision?.body ? (
         <section
           aria-labelledby="titulo-mision-vision"
-          className="fondo-plano border-y border-acero-200"
+          className="bg-lienzo-alto"
         >
-          <Contenedor className="py-14 lg:py-18">
+          <Contenedor className="py-16 lg:py-20">
             <h2 id="titulo-mision-vision" className="sr-only">
               Misión y visión
             </h2>
-            <div className="grid gap-px border border-acero-200 bg-acero-200 lg:grid-cols-2">
+            <div className="grid gap-4 lg:grid-cols-2 lg:gap-5">
               {[nosotros.mision, nosotros.vision]
                 .filter((bloque) => Boolean(bloque?.body))
                 .map((bloque, indice) => (
-                  <article key={bloque!.title ?? indice} className="bg-blanco p-6 lg:p-9">
-                    <p className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.14em] text-acero-600">
-                      <span aria-hidden="true" className="size-2.5 shrink-0 bg-verde-500" />
-                      <span>{indice === 0 ? "01" : "02"}</span>
-                    </p>
-                    <h3 className="mt-4 font-titulo text-[1.75rem] font-semibold leading-tight text-azul-950 sm:text-[2rem]">
+                  <article
+                    key={bloque!.title ?? indice}
+                    className="rounded-panel bg-blanco p-6 shadow-tarjeta lg:p-9"
+                  >
+                    <span className="inline-flex size-9 items-center justify-center rounded-capsula bg-relleno text-[13px] font-semibold tabular-nums text-azul-700">
+                      {indice === 0 ? "01" : "02"}
+                    </span>
+                    <h3 className="mt-4 text-[1.625rem] font-semibold leading-tight text-azul-950 sm:text-[1.875rem]">
                       {bloque!.title}
                     </h3>
-                    <p className="mt-4 max-w-[60ch] text-base leading-relaxed text-acero-700 sm:text-[1.0625rem]">
+                    <p className="mt-4 max-w-[60ch] text-[1.0625rem] leading-[1.7] text-acero-700">
                       {bloque!.body}
                     </p>
                   </article>
@@ -167,8 +165,8 @@ export default async function Nosotros() {
 
       {/* Galería */}
       {galeria.length > 0 ? (
-        <section aria-labelledby="titulo-galeria" className="bg-blanco">
-          <Contenedor className="py-14 lg:py-18">
+        <section aria-labelledby="titulo-galeria" className="bg-lienzo">
+          <Contenedor className="py-16 lg:py-20">
             {bloqueGaleria?.eyebrow !== "" ? (
               <Rotulo>{bloqueGaleria?.eyebrow ?? "En obra"}</Rotulo>
             ) : null}

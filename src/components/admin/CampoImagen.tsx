@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import { esImagenOptimizable } from "@/lib/imagenes";
 import { subirImagenAlBucket, pesoLegible } from "./subir-imagen";
-import { inputClass } from "./ui-base";
+import { botonChico, botonSecundario, inputClass } from "./ui-base";
 import { IconoFoto, IconoSubir } from "./iconos";
 import type { CarpetaImagen } from "@/lib/admin-types";
 
@@ -94,7 +94,7 @@ export function CampoImagen({
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
         {/* Vista previa */}
-        <div className="flex h-24 w-32 shrink-0 items-center justify-center overflow-hidden rounded-fino border border-acero-200 bg-acero-50">
+        <div className="flex h-24 w-32 shrink-0 items-center justify-center overflow-hidden rounded-control bg-lienzo-alto ring-1 ring-separador">
           {value ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={value} alt="Vista previa" className="h-full w-full object-contain" />
@@ -120,7 +120,7 @@ export function CampoImagen({
               type="button"
               onClick={() => fileRef.current?.click()}
               disabled={subiendo}
-              className="inline-flex items-center gap-1.5 rounded-fino border border-acero-300 bg-blanco px-3.5 py-2 text-xs font-semibold text-acero-700 transition-colors hover:border-azul-700 hover:text-azul-700 disabled:opacity-60"
+              className={`${botonSecundario} ${botonChico}`}
             >
               <IconoSubir className="h-4 w-4" />
               {subiendo ? "Subiendo…" : "Subir imagen"}
@@ -181,7 +181,7 @@ export function CampoImagen({
           <p className="text-xs leading-relaxed text-acero-600">{AYUDA_IMAGEN}</p>
 
           {aviso && (
-            <p className="rounded-fino border border-verde-300 bg-verde-100 px-2.5 py-2 text-xs leading-relaxed text-verde-700">
+            <p className="rounded-control bg-verde-100 px-3 py-2 text-xs leading-relaxed text-verde-700">
               {aviso}
             </p>
           )}
@@ -201,7 +201,7 @@ export function CampoImagen({
             «léeme antes de guardar».
           */}
           {enlaceNoPermitido && (
-            <p className="rounded-fino border border-azul-300 bg-azul-50 px-2.5 py-2 text-xs leading-relaxed text-azul-900">
+            <p className="rounded-control bg-azul-50 px-3 py-2 text-xs leading-relaxed text-azul-900">
               Este enlace no es del almacenamiento del sitio ni de Cloudinary, así
               que lo más probable es que la imagen no llegue a verse. Sube el
               archivo con el botón de arriba, o publícala en Cloudinary
@@ -211,7 +211,7 @@ export function CampoImagen({
           {error && (
             <p
               role="alert"
-              className="rounded-fino border border-error-300 bg-error-50 px-2.5 py-2 text-xs leading-relaxed text-error-700"
+              className="rounded-control bg-error-50 px-3 py-2 text-xs leading-relaxed text-error-700"
             >
               {error}
             </p>

@@ -9,15 +9,11 @@ import {
   totalesDeJornadas,
 } from "@/lib/jornadas-lecturas";
 import {
-  CLASES_ESTADO,
-  ETIQUETA_ESTADO,
   OPCIONES_ESTADO_FILTRO,
   PARAM_FILTRO,
   hayFiltros,
   hrefConFiltros,
   leerFiltros,
-  BOTON_PRIMARIO,
-  BOTON_SECUNDARIO,
 } from "@/lib/jornada-types";
 import { formatearDuracion, formatearFechaCorta, rangoHorario } from "@/lib/jornada";
 import {
@@ -35,7 +31,9 @@ import {
   IconoDocumento,
   IconoMas,
 } from "@/components/admin/iconos";
-import { TotalesDesglose } from "@/components/jornadas/Desglose";
+import { ChipEstado, TotalesDesglose } from "@/components/jornadas/Desglose";
+import { botonChico, botonPrimario, botonSecundario } from "@/components/admin/clases";
+import { CHIP_NEUTRO } from "@/components/admin/clases";
 
 export const dynamic = "force-dynamic";
 
@@ -111,9 +109,9 @@ export default async function JornadasPage({
       <form
         method="get"
         action="/admin/jornadas"
-        className="mb-5 rounded-fino border border-acero-200 bg-blanco p-5"
+        className="mb-5 rounded-tarjeta bg-blanco p-5 shadow-tarjeta"
       >
-        <h2 className="font-titulo text-lg font-semibold uppercase tracking-wide text-azul-950">
+        <h2 className="text-lg font-semibold tracking-titulo text-azul-950">
           Filtrar
         </h2>
         <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -157,12 +155,12 @@ export default async function JornadasPage({
           />
         </div>
 
-        <div className="mt-4 flex flex-wrap items-center gap-3 border-t border-acero-200 pt-4">
-          <button type="submit" className={BOTON_PRIMARIO}>
+        <div className="mt-4 flex flex-wrap items-center gap-3 border-t border-separador pt-4">
+          <button type="submit" className={botonPrimario}>
             Aplicar filtros
           </button>
           {conFiltros && (
-            <Link prefetch={false} href="/admin/jornadas" className={BOTON_SECUNDARIO}>
+            <Link prefetch={false} href="/admin/jornadas" className={botonSecundario}>
               Quitar filtros
             </Link>
           )}
@@ -171,7 +169,7 @@ export default async function JornadasPage({
               href={`/admin/jornadas/exportar${
                 base.includes("?") ? base.slice(base.indexOf("?")) : ""
               }`}
-              className={`${BOTON_SECUNDARIO} ml-auto`}
+              className={`${botonSecundario} ml-auto`}
             >
               <IconoDocumento className="h-4 w-4" />
               Exportar a CSV ({jornadas.length})
@@ -202,7 +200,7 @@ export default async function JornadasPage({
           }
           action={
             conFiltros ? (
-              <Link prefetch={false} href="/admin/jornadas" className={BOTON_SECUNDARIO}>
+              <Link prefetch={false} href="/admin/jornadas" className={botonSecundario}>
                 Quitar filtros
               </Link>
             ) : (
@@ -221,20 +219,18 @@ export default async function JornadasPage({
               return (
                 <li
                   key={j.id}
-                  className={`flex flex-wrap items-start gap-4 rounded-fino border bg-blanco p-4 ${
-                    j.status === "pendiente" ? "border-azul-300" : "border-acero-200"
+                  className={`flex flex-wrap items-start gap-4 rounded-tarjeta bg-blanco p-4 shadow-tarjeta ${
+                    j.status === "pendiente" ? "ring-1 ring-azul-300" : ""
                   }`}
                 >
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <h2 className="font-titulo text-lg font-semibold uppercase tracking-wide text-azul-950">
+                      <h2 className="text-lg font-semibold tracking-titulo text-azul-950">
                         {j.empleadoNombre}
                       </h2>
-                      <Insignia className={CLASES_ESTADO[j.status]}>
-                        {ETIQUETA_ESTADO[j.status]}
-                      </Insignia>
+                      <ChipEstado estado={j.status} />
                       {resuelto?.congelado && (
-                        <Insignia>Cálculo congelado</Insignia>
+                        <Insignia className={CHIP_NEUTRO}>Cálculo congelado</Insignia>
                       )}
                     </div>
 
@@ -267,7 +263,7 @@ export default async function JornadasPage({
                   <Link
                     prefetch={false}
                     href={`/admin/jornadas/${j.id}`}
-                    className="inline-flex items-center gap-1.5 rounded-fino bg-azul-700 px-3 py-2 text-xs font-semibold text-blanco transition-colors hover:bg-azul-800"
+                    className={`${botonPrimario} ${botonChico}`}
                   >
                     {j.status === "pendiente" ? "Revisar" : "Abrir ficha"}
                   </Link>
@@ -287,8 +283,8 @@ export default async function JornadasPage({
       )}
 
       {/* ---------------- Horarios mensuales ---------------- */}
-      <div className="mt-8 rounded-fino border border-acero-200 bg-blanco p-5">
-        <h2 className="font-titulo text-xl font-semibold uppercase tracking-wide text-azul-950">
+      <div className="mt-8 rounded-tarjeta bg-blanco p-5 shadow-tarjeta">
+        <h2 className="text-xl font-semibold tracking-titulo text-azul-950">
           Horarios mensuales
         </h2>
         <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-acero-600">
@@ -299,7 +295,7 @@ export default async function JornadasPage({
         <Link
           prefetch={false}
           href="/admin/jornadas/horarios"
-          className={`${BOTON_SECUNDARIO} mt-4`}
+          className={`${botonSecundario} mt-4`}
         >
           <IconoCalendario className="h-4 w-4" />
           Administrar horarios

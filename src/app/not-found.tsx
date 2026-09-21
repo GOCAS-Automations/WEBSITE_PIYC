@@ -34,16 +34,16 @@ export default async function NoEncontrada() {
     <>
       <Encabezado />
 
-      <main id="contenido" className="fondo-plano flex-1 border-b border-acero-200">
-        <Contenedor className="flex min-h-[60vh] flex-col justify-center py-20 lg:py-24">
-          <div className="max-w-2xl">
-            <p className="font-titulo text-[6rem] font-semibold leading-none tracking-[-0.02em] text-azul-200 sm:text-[8rem]">
+      <main id="contenido" className="fondo-plano flex-1">
+        <Contenedor className="flex min-h-[70vh] flex-col justify-center pb-20 pt-[calc(var(--alto-nav)+3rem)] lg:pb-24">
+          <div className="max-w-2xl rounded-lienzo bg-blanco p-8 shadow-elevada sm:p-12">
+            <p className="text-[4.5rem] font-bold leading-none tracking-[-0.04em] text-azul-200 sm:text-[6rem]">
               404
             </p>
             <TituloSeccion as="h1" className="mt-4">
               {ajustes?.title ?? "Esta página no existe"}
             </TituloSeccion>
-            <p className="mt-6 max-w-[60ch] text-base leading-relaxed text-acero-600 sm:text-[1.0625rem]">
+            <p className="mt-6 max-w-[60ch] text-[1.0625rem] leading-[1.65] text-acero-600">
               {ajustes?.body ??
                 "El enlace puede estar mal escrito o la página pudo haber cambiado de dirección."}
             </p>

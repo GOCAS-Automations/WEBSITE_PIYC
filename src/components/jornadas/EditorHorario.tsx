@@ -39,9 +39,14 @@ import { festivosDelMes } from "@/lib/jornada-festivos";
 import { formatearDuracion } from "@/lib/jornada";
 import { idleState, type ActionState } from "@/lib/admin-types";
 import {
+  ayudaCampo,
+  banner,
+  botonChico,
   botonPrimario,
   botonSecundario,
+  etiquetaCampo,
   inputClass,
+  interruptorRiel,
 } from "@/components/admin/ui-base";
 import { IconoCheck, IconoInfo } from "@/components/admin/iconos";
 
@@ -176,14 +181,14 @@ export function EditorHorario({
       <input type="hidden" name="mes" value={mes} />
 
       {/* ---------------- Plantilla semanal ---------------- */}
-      <div className="overflow-x-auto rounded-fino border border-acero-200 bg-blanco">
+      <div className="overflow-x-auto rounded-tarjeta bg-blanco shadow-tarjeta">
         <table className="w-full min-w-[44rem] border-collapse text-sm">
           <caption className="sr-only">
             Plantilla semanal del mes: para cada día, si se trabaja, la hora de
             entrada y de salida, las horas de almuerzo y el total de jornada.
           </caption>
           <thead>
-            <tr className="border-b border-acero-200 bg-acero-50 text-left">
+            <tr className="border-b border-separador bg-lienzo-alto text-left">
               <th scope="col" className="px-4 py-3 font-semibold text-azul-950">
                 Día
               </th>
@@ -213,8 +218,8 @@ export function EditorHorario({
               return (
                 <tr
                   key={clave}
-                  className={`border-b border-acero-200 last:border-0 ${
-                    laboral ? "" : "bg-acero-50"
+                  className={`border-b border-separador last:border-0 ${
+                    laboral ? "" : "bg-lienzo-alto"
                   }`}
                 >
                   {/* Valores que viajan al servidor */}
@@ -246,7 +251,7 @@ export function EditorHorario({
                         checked={laboral}
                         onChange={(e) => alternarLaboral(clave, e.target.checked)}
                         aria-label={`${DIA_LABELS[clave]}: día laboral`}
-                        className="peer relative h-6 w-11 shrink-0 cursor-pointer appearance-none rounded-full bg-acero-300 outline-none transition-colors before:absolute before:left-0.5 before:top-0.5 before:h-5 before:w-5 before:rounded-full before:bg-blanco before:transition-transform before:content-[''] checked:bg-verde-500 checked:before:translate-x-5 focus-visible:ring-2 focus-visible:ring-azul-700/40 focus-visible:ring-offset-2"
+                        className={interruptorRiel}
                       />
                       <span className="text-xs font-semibold text-acero-600 peer-checked:hidden">
                         No laboral
@@ -264,7 +269,7 @@ export function EditorHorario({
                       disabled={!laboral}
                       onChange={(e) => actualizar(clave, { inicio: e.target.value })}
                       aria-label={`${DIA_LABELS[clave]}: hora de entrada`}
-                      className={`${inputClass} ${laboral ? "" : "cursor-not-allowed bg-acero-100"}`}
+                      className={`${inputClass} ${laboral ? "" : "cursor-not-allowed bg-relleno text-acero-500"}`}
                     />
                   </td>
 
@@ -275,7 +280,7 @@ export function EditorHorario({
                       disabled={!laboral}
                       onChange={(e) => actualizar(clave, { fin: e.target.value })}
                       aria-label={`${DIA_LABELS[clave]}: hora de salida`}
-                      className={`${inputClass} ${laboral ? "" : "cursor-not-allowed bg-acero-100"}`}
+                      className={`${inputClass} ${laboral ? "" : "cursor-not-allowed bg-relleno text-acero-500"}`}
                     />
                   </td>
 
@@ -291,16 +296,16 @@ export function EditorHorario({
                         actualizar(clave, { almuerzoHoras: Number(e.target.value) || 0 })
                       }
                       aria-label={`${DIA_LABELS[clave]}: horas de almuerzo`}
-                      className={`${inputClass} ${laboral ? "" : "cursor-not-allowed bg-acero-100"}`}
+                      className={`${inputClass} ${laboral ? "" : "cursor-not-allowed bg-relleno text-acero-500"}`}
                     />
                   </td>
 
                   <td className="px-4 py-3 text-right">
                     <span
-                      className={`inline-flex min-w-[5.5rem] justify-end rounded-fino px-3 py-1.5 text-sm font-semibold tabular-nums ${
+                      className={`inline-flex min-w-[5.5rem] justify-end rounded-capsula px-3 py-1.5 text-sm font-semibold tabular-nums ${
                         laboral
-                          ? "bg-azul-50 text-azul-800"
-                          : "bg-acero-100 text-acero-700"
+                          ? "bg-azul-100 text-azul-800"
+                          : "bg-relleno text-acero-600"
                       }`}
                       title={laboral ? formatearDuracion(minutos) : "Día no laboral"}
                     >
@@ -312,7 +317,7 @@ export function EditorHorario({
             })}
           </tbody>
           <tfoot>
-            <tr className="border-t border-acero-300 bg-acero-50">
+            <tr className="border-t border-separador bg-lienzo-alto">
               <th scope="row" colSpan={5} className="px-4 py-4 text-left font-semibold text-azul-950">
                 Total de horas semanales
                 <span className="ml-2 font-normal text-acero-600">
@@ -321,7 +326,7 @@ export function EditorHorario({
                 </span>
               </th>
               <td className="px-4 py-4 text-right">
-                <span className="inline-flex min-w-[5.5rem] justify-end rounded-fino bg-azul-700 px-3 py-2 text-base font-semibold tabular-nums text-blanco">
+                <span className="inline-flex min-w-[5.5rem] justify-end rounded-capsula bg-azul-700 px-3.5 py-2 text-base font-semibold tabular-nums text-blanco shadow-sutil">
                   {formatearHorasDecimales(totalSemanal)}
                 </span>
               </td>
@@ -335,7 +340,7 @@ export function EditorHorario({
         <button
           type="button"
           onClick={igualarDiasLaborales}
-          className={`${botonSecundario} px-3 py-2 text-xs`}
+          className={`${botonSecundario} ${botonChico}`}
         >
           Igualar todos los días laborales
         </button>
@@ -343,7 +348,7 @@ export function EditorHorario({
           <button
             type="button"
             onClick={copiarMesAnterior}
-            className={`${botonSecundario} px-3 py-2 text-xs`}
+            className={`${botonSecundario} ${botonChico}`}
           >
             Copiar el horario de {etiquetaMesAnterior}
           </button>
@@ -351,7 +356,7 @@ export function EditorHorario({
         <button
           type="button"
           onClick={restablecer}
-          className={`${botonSecundario} px-3 py-2 text-xs`}
+          className={`${botonSecundario} ${botonChico}`}
         >
           Restablecer al horario predeterminado
         </button>
@@ -369,9 +374,9 @@ export function EditorHorario({
       </p>
 
       {/* ---------------- Calendario del mes ---------------- */}
-      <div className="rounded-fino border border-acero-200 bg-blanco p-4">
-        <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-acero-200 pb-3">
-          <h3 className="font-titulo text-lg font-semibold uppercase tracking-wide text-azul-950">
+      <div className="rounded-tarjeta bg-blanco p-4 shadow-tarjeta">
+        <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-separador pb-3">
+          <h3 className="text-lg font-semibold tracking-titulo text-azul-950">
             {etiqueta}, día por día
           </h3>
           <p className="text-sm text-acero-600">
@@ -382,11 +387,11 @@ export function EditorHorario({
           </p>
         </div>
 
-        <div className="mt-3 grid grid-cols-7 gap-1 text-center">
+        <div className="mt-3 grid grid-cols-7 gap-1.5 text-center">
           {DIAS_ORDEN.map((clave) => (
             <span
               key={clave}
-              className="pb-1 text-[11px] font-semibold uppercase tracking-wider text-acero-600"
+              className="pb-1 text-[11px] font-semibold uppercase tracking-ancho text-acero-500"
             >
               {DIA_CORTO[clave]}
             </span>
@@ -407,12 +412,12 @@ export function EditorHorario({
                     ? `${d.dia}: laboral, ${formatearHorasDecimales(d.minutos)}`
                     : `${d.dia}: no laboral`
               }
-              className={`rounded-fino border px-1 py-1.5 text-xs font-semibold tabular-nums ${
+              className={`flex h-11 items-center justify-center rounded-control text-[13px] font-semibold tabular-nums transition-colors sm:h-14 ${
                 d.festivo
-                  ? "border-verde-300 bg-verde-100 text-verde-700"
+                  ? "bg-verde-100 text-verde-700 ring-1 ring-verde-300"
                   : d.laboral
-                    ? "border-azul-300 bg-azul-50 text-azul-800"
-                    : "border-acero-200 bg-acero-50 text-acero-600"
+                    ? "bg-azul-100 text-azul-800"
+                    : "bg-relleno text-acero-500"
               }`}
             >
               {d.dia}
@@ -422,21 +427,21 @@ export function EditorHorario({
 
         <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-acero-600">
           <span className="inline-flex items-center gap-1.5">
-            <span className="inline-block h-3 w-3 rounded-fino border border-azul-300 bg-azul-50" />
+            <span className="inline-block h-3.5 w-3.5 rounded-chip bg-azul-100" />
             Laboral
           </span>
           <span className="inline-flex items-center gap-1.5">
-            <span className="inline-block h-3 w-3 rounded-fino border border-acero-200 bg-acero-50" />
+            <span className="inline-block h-3.5 w-3.5 rounded-chip bg-relleno" />
             No laboral
           </span>
           <span className="inline-flex items-center gap-1.5">
-            <span className="inline-block h-3 w-3 rounded-fino border border-verde-300 bg-verde-100" />
+            <span className="inline-block h-3.5 w-3.5 rounded-chip bg-verde-100 ring-1 ring-verde-300" />
             Festivo
           </span>
         </div>
 
         {festivos.length > 0 && (
-          <ul className="mt-3 space-y-1 border-t border-acero-200 pt-3 text-sm text-acero-700">
+          <ul className="mt-3 space-y-1 border-t border-separador pt-3 text-sm text-acero-700">
             {festivos.map((f) => (
               <li key={f.fecha}>
                 <strong className="text-azul-950">{f.dia}</strong> — {f.nombre}
@@ -456,7 +461,7 @@ export function EditorHorario({
       <div>
         <label
           htmlFor="horario-notas"
-          className="mb-1.5 block text-sm font-semibold text-azul-950"
+          className={etiquetaCampo}
         >
           Nota del mes (opcional)
         </label>
@@ -468,7 +473,7 @@ export function EditorHorario({
           placeholder="Ej.: la última semana se sale a las 4:00 p. m. por inventario."
           className={`${inputClass} resize-y`}
         />
-        <span className="mt-1 block text-xs leading-relaxed text-acero-600">
+        <span className={ayudaCampo}>
           Queda guardada junto al horario, para recordar por qué cambió.
         </span>
       </div>
@@ -476,7 +481,7 @@ export function EditorHorario({
       {aviso && (
         <p
           role="status"
-          className="rounded-fino border border-azul-300 bg-azul-50 px-4 py-3 text-sm leading-relaxed text-azul-900"
+          className="rounded-tarjeta bg-azul-50 px-4 py-3.5 text-sm leading-relaxed text-azul-900"
         >
           {aviso}
         </p>
@@ -485,17 +490,13 @@ export function EditorHorario({
       {state.status !== "idle" && state.message && (
         <p
           role="status"
-          className={`rounded-fino border px-4 py-3 text-sm leading-relaxed ${
-            exito
-              ? "border-verde-300 bg-verde-100 text-verde-700"
-              : "border-error-300 bg-error-50 text-error-700"
-          }`}
+          className={banner(exito)}
         >
           {state.message}
         </p>
       )}
 
-      <div className="flex flex-wrap items-center gap-3 border-t border-acero-200 pt-5">
+      <div className="flex flex-wrap items-center gap-3 border-t border-separador pt-5">
         <button type="submit" disabled={pending} className={botonPrimario}>
           {pending ? (
             "Guardando…"

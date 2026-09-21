@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import { esImagenOptimizable } from "@/lib/imagenes";
 import { subirImagenAlBucket } from "./subir-imagen";
-import { inputClass } from "./ui-base";
+import { botonChico, botonPeligro, botonSecundario, inputClass } from "./ui-base";
 import { IconoFoto, IconoMas, IconoPapelera, IconoSubir } from "./iconos";
 import type { CarpetaImagen } from "@/lib/admin-types";
 import type { ImagenContenido } from "@/lib/content-types";
@@ -54,11 +54,11 @@ export function CampoGaleria({
   return (
     <div>
       <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-        <span className="text-sm font-semibold text-azul-950">{label}</span>
+        <span className="text-[15px] font-semibold text-azul-950">{label}</span>
         <button
           type="button"
           onClick={() => setFilas((prev) => [...prev, nuevaFila()])}
-          className="inline-flex items-center gap-1.5 rounded-fino border border-acero-300 bg-blanco px-3 py-1.5 text-xs font-semibold text-acero-700 transition-colors hover:border-azul-700 hover:text-azul-700"
+          className={`${botonSecundario} ${botonChico}`}
         >
           <IconoMas className="h-3.5 w-3.5" />
           Agregar foto
@@ -68,7 +68,7 @@ export function CampoGaleria({
       {hint && <p className="mb-3 text-xs leading-relaxed text-acero-600">{hint}</p>}
 
       {filas.length === 0 ? (
-        <p className="rounded-fino border border-dashed border-acero-300 bg-acero-50 px-4 py-6 text-center text-sm text-acero-600">
+        <p className="rounded-tarjeta bg-relleno px-4 py-6 text-center text-sm text-acero-600">
           Sin fotos en la galería. Con «Agregar foto» se añade la primera; si la
           dejas vacía, el sitio simplemente no pinta la galería.
         </p>
@@ -77,7 +77,7 @@ export function CampoGaleria({
           {filas.map((fila, indice) => (
             <li
               key={fila.key}
-              className="rounded-fino border border-acero-200 bg-acero-50 p-3"
+              className="rounded-control bg-lienzo-alto p-3 ring-1 ring-separador"
             >
               <FilaGaleria
                 indice={indice}
@@ -134,7 +134,7 @@ function FilaGaleria({
 
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
-      <div className="flex h-20 w-28 shrink-0 items-center justify-center overflow-hidden rounded-fino border border-acero-200 bg-blanco">
+      <div className="flex h-20 w-28 shrink-0 items-center justify-center overflow-hidden rounded-control bg-blanco ring-1 ring-separador">
         {fila.src ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={fila.src} alt="" className="h-full w-full object-contain" />
@@ -170,7 +170,7 @@ function FilaGaleria({
             type="button"
             onClick={() => fileRef.current?.click()}
             disabled={subiendo}
-            className="inline-flex items-center gap-1.5 rounded-fino border border-acero-300 bg-blanco px-3 py-1.5 text-xs font-semibold text-acero-700 transition-colors hover:border-azul-700 hover:text-azul-700 disabled:opacity-60"
+            className={`${botonSecundario} ${botonChico}`}
           >
             <IconoSubir className="h-3.5 w-3.5" />
             {subiendo ? "Subiendo…" : "Subir"}
@@ -178,7 +178,7 @@ function FilaGaleria({
           <button
             type="button"
             onClick={onQuitar}
-            className="inline-flex items-center gap-1.5 rounded-fino border border-acero-300 bg-blanco px-3 py-1.5 text-xs font-semibold text-acero-600 transition-colors hover:border-error-300 hover:text-error-500"
+            className={botonPeligro}
           >
             <IconoPapelera className="h-3.5 w-3.5" />
             Quitar
@@ -197,7 +197,7 @@ function FilaGaleria({
         />
 
         {enlaceNoPermitido && (
-          <p className="rounded-fino border border-azul-300 bg-azul-50 px-2.5 py-1.5 text-xs leading-relaxed text-azul-900">
+          <p className="rounded-control bg-azul-50 px-3 py-2 text-xs leading-relaxed text-azul-900">
             Este enlace no es del almacenamiento del sitio ni de Cloudinary: es
             probable que la foto no llegue a verse.
           </p>

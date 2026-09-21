@@ -14,7 +14,6 @@ import {
   normalizarMes,
   resumenHorario,
 } from "@/lib/horarios";
-import { BOTON_SECUNDARIO } from "@/lib/jornada-types";
 import {
   AyudaSeccion,
   CabeceraPanel,
@@ -24,6 +23,7 @@ import {
 } from "@/components/admin/ui";
 import { EditorHorario } from "@/components/jornadas/EditorHorario";
 import { guardarHorarioMensual } from "./actions";
+import { botonSecundario, CHIP_NEUTRO, CHIP_VERDE } from "@/components/admin/clases";
 
 export const dynamic = "force-dynamic";
 
@@ -90,16 +90,16 @@ export default async function HorariosPage({
       {/* ---------------- Navegación de meses ---------------- */}
       <nav
         aria-label="Mes del horario"
-        className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-fino border border-acero-200 bg-blanco p-4"
+        className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-tarjeta bg-blanco p-4 shadow-tarjeta"
       >
-        <Link prefetch={false} href={href(anterior)} className={BOTON_SECUNDARIO}>
+        <Link prefetch={false} href={href(anterior)} className={botonSecundario}>
           <span aria-hidden="true">←</span>
           {etiquetaMes(anterior.anio, anterior.mes)}
         </Link>
-        <p className="font-titulo text-xl font-semibold uppercase tracking-wide text-azul-950">
+        <p className="text-xl font-semibold tracking-titulo text-azul-950">
           {etiquetaMes(actual.anio, actual.mes)}
         </p>
-        <Link prefetch={false} href={href(siguiente)} className={BOTON_SECUNDARIO}>
+        <Link prefetch={false} href={href(siguiente)} className={botonSecundario}>
           {etiquetaMes(siguiente.anio, siguiente.mes)}
           <span aria-hidden="true">→</span>
         </Link>
@@ -135,11 +135,11 @@ export default async function HorariosPage({
           description="Define qué cuenta como jornada ordinaria: lo que exceda se calcula como hora extra."
           action={
             guardado ? (
-              <Insignia className="border-verde-300 bg-verde-100 text-verde-700">
+              <Insignia className={CHIP_VERDE}>
                 Guardado
               </Insignia>
             ) : (
-              <Insignia>Sin guardar</Insignia>
+              <Insignia className={CHIP_NEUTRO}>Sin guardar</Insignia>
             )
           }
         />
@@ -170,10 +170,10 @@ export default async function HorariosPage({
                   <Link
                     prefetch={false}
                     href={href(m)}
-                    className={`inline-flex rounded-fino border px-3 py-1.5 text-sm font-semibold transition-colors ${
+                    className={`inline-flex rounded-capsula px-3.5 py-1.5 text-sm font-semibold transition duration-200 ease-ios active:scale-[0.97] ${
                       esActual
-                        ? "border-azul-700 bg-azul-700 text-blanco"
-                        : "border-acero-300 bg-blanco text-acero-700 hover:border-azul-700 hover:text-azul-700"
+                        ? "bg-azul-700 text-blanco shadow-sutil"
+                        : "bg-relleno-medio text-azul-800 hover:bg-azul-100"
                     }`}
                   >
                     {etiquetaMes(m.anio, m.mes)}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { inputClass } from "./ui-base";
+import { botonChico, botonSecundario, inputClass } from "./ui-base";
 import { IconoMas, IconoPapelera } from "./iconos";
 
 /**
@@ -58,14 +58,14 @@ export function CampoParejas({
   return (
     <div>
       <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-        <span className="text-sm font-semibold text-azul-950">{label}</span>
+        <span className="text-[15px] font-semibold text-azul-950">{label}</span>
         <button
           type="button"
           onClick={() => {
             setFilas((prev) => [...prev, { a: "", b: "", key: siguiente }]);
             setSiguiente((n) => n + 1);
           }}
-          className="inline-flex items-center gap-1.5 rounded-fino border border-acero-300 bg-blanco px-3 py-1.5 text-xs font-semibold text-acero-700 transition-colors hover:border-azul-700 hover:text-azul-700"
+          className={`${botonSecundario} ${botonChico}`}
         >
           <IconoMas className="h-3.5 w-3.5" />
           {textoAgregar}
@@ -75,7 +75,7 @@ export function CampoParejas({
       {hint && <p className="mb-3 text-xs leading-relaxed text-acero-600">{hint}</p>}
 
       {filas.length === 0 ? (
-        <p className="rounded-fino border border-dashed border-acero-300 bg-acero-50 px-4 py-5 text-center text-sm text-acero-600">
+        <p className="rounded-tarjeta bg-relleno px-4 py-6 text-center text-sm text-acero-600">
           Sin elementos. Una lista vacía se respeta: el sitio no pinta esa parte.
         </p>
       ) : (
@@ -83,7 +83,7 @@ export function CampoParejas({
           {filas.map((fila, indice) => (
             <li
               key={fila.key}
-              className="rounded-fino border border-acero-200 bg-acero-50 p-3"
+              className="rounded-control bg-lienzo-alto p-3 ring-1 ring-separador"
             >
               <div className="flex items-start gap-2">
                 <span
@@ -130,7 +130,7 @@ export function CampoParejas({
                     setFilas((prev) => prev.filter((f) => f.key !== fila.key))
                   }
                   aria-label={`Quitar el elemento ${indice + 1}`}
-                  className="mt-0.5 shrink-0 rounded-fino border border-acero-300 bg-blanco p-2 text-acero-600 transition-colors hover:border-error-300 hover:text-error-500"
+                  className="mt-0.5 shrink-0 rounded-control bg-relleno p-2 text-acero-600 transition duration-200 ease-ios hover:bg-error-50 hover:text-error-500"
                 >
                   <IconoPapelera className="h-4 w-4" />
                 </button>

@@ -22,7 +22,8 @@ export function IconoFlecha(props: PropsIcono) {
       fill="none"
       stroke="currentColor"
       strokeWidth={2}
-      strokeLinecap="square"
+      strokeLinecap="round"
+      strokeLinejoin="round"
       {...base}
       {...props}
     >
@@ -33,7 +34,7 @@ export function IconoFlecha(props: PropsIcono) {
 
 export function IconoInstagram(props: PropsIcono) {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} {...base} {...props}>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" {...base} {...props}>
       <rect x="3" y="3" width="18" height="18" rx="5" />
       <circle cx="12" cy="12" r="4.2" />
       <circle cx="17.4" cy="6.6" r="1" fill="currentColor" stroke="none" />
@@ -43,7 +44,7 @@ export function IconoInstagram(props: PropsIcono) {
 
 export function IconoUbicacion(props: PropsIcono) {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} {...base} {...props}>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" {...base} {...props}>
       <path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z" />
       <circle cx="12" cy="9.5" r="2.5" />
     </svg>
@@ -57,7 +58,8 @@ export function IconoMenu(props: PropsIcono) {
       fill="none"
       stroke="currentColor"
       strokeWidth={2}
-      strokeLinecap="square"
+      strokeLinecap="round"
+      strokeLinejoin="round"
       {...base}
       {...props}
     >
@@ -73,7 +75,8 @@ export function IconoCerrar(props: PropsIcono) {
       fill="none"
       stroke="currentColor"
       strokeWidth={2}
-      strokeLinecap="square"
+      strokeLinecap="round"
+      strokeLinejoin="round"
       {...base}
       {...props}
     >

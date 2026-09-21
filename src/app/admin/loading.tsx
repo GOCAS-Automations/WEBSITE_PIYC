@@ -40,29 +40,26 @@ export default function AdminLoading() {
         Cargando la sección del panel…
       </p>
       <div className="animate-pulse" aria-hidden="true">
-        {/* Cabecera: volver + título + descripción */}
+        {/* Cabecera: volver + título grande + descripción */}
         <div className="mb-7">
-          <div className="h-9 w-44 rounded-fino bg-blanco" />
-          <div className="mt-5 h-9 w-72 rounded-fino bg-blanco" />
-          <div className="mt-3 h-4 w-full max-w-2xl rounded-fino bg-blanco/70" />
-          <div className="mt-2 h-4 w-2/3 max-w-md rounded-fino bg-blanco/70" />
+          <div className="h-9 w-44 rounded-capsula bg-blanco" />
+          <div className="mt-5 h-10 w-72 rounded-chip bg-blanco" />
+          <div className="mt-3 h-4 w-full max-w-2xl rounded-capsula bg-blanco/70" />
+          <div className="mt-2 h-4 w-2/3 max-w-md rounded-capsula bg-blanco/70" />
         </div>
 
         <div className="space-y-6">
           {[0, 1].map((i) => (
-            <div
-              key={i}
-              className="rounded-fino border border-acero-200 bg-blanco p-5 sm:p-6"
-            >
-              <div className="h-5 w-52 rounded-fino bg-acero-100" />
-              <div className="mt-3 h-3.5 w-full max-w-lg rounded-fino bg-acero-100" />
+            <div key={i} className="rounded-tarjeta bg-blanco p-5 shadow-tarjeta sm:p-6">
+              <div className="h-5 w-52 rounded-capsula bg-relleno-medio" />
+              <div className="mt-3 h-3.5 w-full max-w-lg rounded-capsula bg-relleno" />
               <div className="mt-6 grid gap-4 sm:grid-cols-2">
-                <div className="h-11 rounded-fino bg-acero-100" />
-                <div className="h-11 rounded-fino bg-acero-100" />
-                <div className="h-11 rounded-fino bg-acero-100" />
-                <div className="h-11 rounded-fino bg-acero-100" />
+                <div className="h-12 rounded-campo bg-relleno" />
+                <div className="h-12 rounded-campo bg-relleno" />
+                <div className="h-12 rounded-campo bg-relleno" />
+                <div className="h-12 rounded-campo bg-relleno" />
               </div>
-              <div className="mt-6 h-10 w-44 rounded-fino bg-acero-100" />
+              <div className="mt-6 h-11 w-44 rounded-capsula bg-relleno-medio" />
             </div>
           ))}
         </div>

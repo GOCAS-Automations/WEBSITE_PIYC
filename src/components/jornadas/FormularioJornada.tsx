@@ -31,7 +31,14 @@ import {
 } from "@/lib/jornada";
 import type { MapaHorarios } from "@/lib/horarios";
 import { LIMITES_JORNADA, type JornadaRecord } from "@/lib/jornada-types";
-import { botonPrimario, botonSecundario, inputClass } from "@/components/admin/ui-base";
+import {
+  ayudaCampo,
+  banner,
+  botonPrimario,
+  botonSecundario,
+  etiquetaCampo,
+  inputClass,
+} from "@/components/admin/ui-base";
 import { IconoCheck, IconoInfo } from "@/components/admin/iconos";
 import { Desglose } from "./Desglose";
 
@@ -120,7 +127,7 @@ export function FormularioJornada({
         <div>
           <label
             htmlFor="jornada-empleado"
-            className="mb-1.5 block text-sm font-semibold text-azul-950"
+            className={etiquetaCampo}
           >
             ¿De quién es esta jornada? <span className="text-azul-700">*</span>
           </label>
@@ -139,7 +146,7 @@ export function FormularioJornada({
               </option>
             ))}
           </select>
-          <span className="mt-1 block text-xs leading-relaxed text-acero-600">
+          <span className={ayudaCampo}>
             Para quien no registra desde su celular. La jornada queda a su
             nombre y aparece en su portal.
           </span>
@@ -150,7 +157,7 @@ export function FormularioJornada({
         <div>
           <label
             htmlFor="jornada-fecha"
-            className="mb-1.5 block text-sm font-semibold text-azul-950"
+            className={etiquetaCampo}
           >
             Fecha del día laboral <span className="text-azul-700">*</span>
           </label>
@@ -164,7 +171,7 @@ export function FormularioJornada({
             onChange={(e) => setWorkDate(e.target.value)}
             className={inputClass}
           />
-          <span className="mt-1 block text-xs leading-relaxed text-acero-600">
+          <span className={ayudaCampo}>
             El día en que <strong>empezaste</strong> el turno.
           </span>
         </div>
@@ -172,7 +179,7 @@ export function FormularioJornada({
         <div>
           <label
             htmlFor="jornada-orden"
-            className="mb-1.5 block text-sm font-semibold text-azul-950"
+            className={etiquetaCampo}
           >
             Orden de trabajo (opcional)
           </label>
@@ -185,7 +192,7 @@ export function FormularioJornada({
             placeholder="Ej.: OT-1042"
             className={inputClass}
           />
-          <span className="mt-1 block text-xs leading-relaxed text-acero-600">
+          <span className={ayudaCampo}>
             Tal como aparece en la orden que te asignaron. Si la labor no tenía
             orden, déjalo vacío.
           </span>
@@ -194,7 +201,7 @@ export function FormularioJornada({
         <div>
           <label
             htmlFor="jornada-inicio"
-            className="mb-1.5 block text-sm font-semibold text-azul-950"
+            className={etiquetaCampo}
           >
             Hora de inicio <span className="text-azul-700">*</span>
           </label>
@@ -213,7 +220,7 @@ export function FormularioJornada({
         <div>
           <label
             htmlFor="jornada-fin"
-            className="mb-1.5 block text-sm font-semibold text-azul-950"
+            className={etiquetaCampo}
           >
             Hora de finalización <span className="text-azul-700">*</span>
           </label>
@@ -231,7 +238,7 @@ export function FormularioJornada({
       </div>
 
       {/* Cruce de medianoche */}
-      <div className="rounded-fino border border-acero-200 bg-acero-50 p-4">
+      <div className="rounded-control bg-lienzo-alto p-4 ring-1 ring-separador">
         <label className="flex cursor-pointer items-start gap-3">
           <input type="hidden" name="next_day" value="false" />
           <input
@@ -243,7 +250,7 @@ export function FormularioJornada({
             className="mt-0.5 h-5 w-5 shrink-0 cursor-pointer accent-azul-700"
           />
           <span className="min-w-0">
-            <span className="block text-sm font-semibold text-azul-950">
+            <span className={etiquetaCampo}>
               Terminé al día siguiente
             </span>
             <span className="mt-0.5 block text-xs leading-relaxed text-acero-600">
@@ -268,7 +275,7 @@ export function FormularioJornada({
       <div>
         <label
           htmlFor="jornada-descripcion"
-          className="mb-1.5 block text-sm font-semibold text-azul-950"
+          className={etiquetaCampo}
         >
           Descripción de la labor <span className="text-azul-700">*</span>
         </label>
@@ -283,7 +290,7 @@ export function FormularioJornada({
           placeholder="Ej.: mantenimiento preventivo del tablero de control de la línea 2."
           className={`${inputClass} resize-y`}
         />
-        <span className="mt-1 block text-xs leading-relaxed text-acero-600">
+        <span className={ayudaCampo}>
           Con una o dos frases claras es suficiente.
         </span>
       </div>
@@ -291,7 +298,7 @@ export function FormularioJornada({
       <div>
         <label
           htmlFor="jornada-observaciones"
-          className="mb-1.5 block text-sm font-semibold text-azul-950"
+          className={etiquetaCampo}
         >
           Observaciones (opcional)
         </label>
@@ -308,7 +315,7 @@ export function FormularioJornada({
 
       {/* Vista previa del cálculo */}
       {previa && (
-        <div className="rounded-fino border border-azul-300 bg-azul-50 p-4">
+        <div className="rounded-tarjeta bg-azul-50 p-4">
           <p className="mb-1 flex items-center gap-1.5 text-sm font-semibold text-azul-950">
             <IconoInfo className="h-4 w-4 text-azul-700" />
             Así quedarían estas horas
@@ -327,17 +334,13 @@ export function FormularioJornada({
         <p
           role={exito ? "status" : "alert"}
           aria-live={exito ? "polite" : "assertive"}
-          className={`rounded-fino border px-4 py-3 text-sm leading-relaxed ${
-            exito
-              ? "border-verde-300 bg-verde-100 text-verde-700"
-              : "border-error-300 bg-error-50 text-error-700"
-          }`}
+          className={banner(exito)}
         >
           {state.message}
         </p>
       )}
 
-      <div className="flex flex-wrap items-center gap-3 border-t border-acero-200 pt-5">
+      <div className="flex flex-wrap items-center gap-3 border-t border-separador pt-5">
         <button type="submit" disabled={pending} className={botonPrimario}>
           {pending ? (
             "Guardando…"

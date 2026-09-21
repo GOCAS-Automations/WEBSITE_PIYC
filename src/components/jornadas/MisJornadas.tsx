@@ -28,7 +28,6 @@ import {
 } from "@/lib/jornada";
 import { etiquetaMes, type MapaHorarios } from "@/lib/horarios";
 import {
-  CLASES_ESTADO,
   ETIQUETA_ESTADO,
   ESTADOS_JORNADA,
   type EstadoJornada,
@@ -36,15 +35,19 @@ import {
 } from "@/lib/jornada-types";
 import { idleState, type ActionState } from "@/lib/admin-types";
 import {
-  Insignia,
+  ControlSegmentado,
   Paginacion,
+  botonChico,
   botonPeligro,
+  botonPeligroFuerte,
   botonSecundario,
+  etiquetaCampo,
   inputClass,
+  tarjetaClase,
   usePaginaLocal,
 } from "@/components/admin/ui-base";
 import { IconoLapiz, IconoPapelera } from "@/components/admin/iconos";
-import { Desglose } from "./Desglose";
+import { ChipEstado, Desglose } from "./Desglose";
 import { FormularioJornada } from "./FormularioJornada";
 
 export function MisJornadas({
@@ -113,8 +116,8 @@ export function MisJornadas({
 
   if (jornadas.length === 0) {
     return (
-      <div className="rounded-fino border border-dashed border-acero-300 bg-acero-50 p-8 text-center">
-        <p className="font-titulo text-lg font-semibold uppercase tracking-wide text-azul-950">
+      <div className="rounded-tarjeta bg-relleno px-6 py-10 text-center">
+        <p className="text-lg font-semibold tracking-titulo text-azul-950">
           Todavía no has registrado ninguna jornada
         </p>
         <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-acero-600">
@@ -127,13 +130,11 @@ export function MisJornadas({
 
   return (
     <div className="space-y-4">
-      {/* Filtros */}
-      <div className="grid gap-3 sm:grid-cols-2">
+      {/* Filtros: el mes en un desplegable (son muchos) y el estado en un
+          control segmentado, que son cuatro opciones y se ven todas a la vez. */}
+      <div className="space-y-3">
         <div>
-          <label
-            htmlFor="mis-jornadas-mes"
-            className="mb-1.5 block text-sm font-semibold text-azul-950"
-          >
+          <label htmlFor="mis-jornadas-mes" className={etiquetaCampo}>
             Mes
           </label>
           <select
@@ -151,38 +152,32 @@ export function MisJornadas({
           </select>
         </div>
         <div>
-          <label
-            htmlFor="mis-jornadas-estado"
-            className="mb-1.5 block text-sm font-semibold text-azul-950"
-          >
-            Estado
-          </label>
-          <select
-            id="mis-jornadas-estado"
-            value={estado}
-            onChange={(e) => setEstado(e.target.value as EstadoJornada | "")}
-            className={inputClass}
-          >
-            <option value="">Todos los estados</option>
-            {ESTADOS_JORNADA.map((e) => (
-              <option key={e} value={e}>
-                {ETIQUETA_ESTADO[e]}
-              </option>
-            ))}
-          </select>
+          <span className={etiquetaCampo}>Estado</span>
+          <ControlSegmentado
+            etiqueta="Filtrar por estado"
+            valor={estado}
+            onCambiar={setEstado}
+            opciones={[
+              { value: "" as EstadoJornada | "", label: "Todas" },
+              ...ESTADOS_JORNADA.map((e) => ({
+                value: e as EstadoJornada | "",
+                label: ETIQUETA_ESTADO[e],
+              })),
+            ]}
+          />
         </div>
       </div>
 
-      {/* Totales del periodo. Regla 9: sin jornadas no se pinta. */}
+      {/* Totales del periodo, como un widget. Regla 9: sin jornadas no se pinta. */}
       {totales.jornadas > 0 && (
-        <div className="rounded-fino border border-azul-300 bg-azul-50 p-4">
-          <p className="text-xs font-semibold uppercase tracking-wider text-azul-700">
+        <div className="rounded-tarjeta bg-azul-700 p-5 shadow-tarjeta">
+          <p className="text-[11px] font-semibold uppercase tracking-ancho text-azul-200">
             {mes === "" ? "Todo el historial" : "Periodo seleccionado"}
           </p>
-          <p className="mt-1 font-titulo text-3xl font-semibold leading-none tabular-nums text-azul-700">
+          <p className="mt-1.5 text-[2.25rem] font-semibold leading-none tracking-display tabular-nums text-blanco">
             {formatearDuracion(totales.minutosTrabajados)}
           </p>
-          <p className="mt-1.5 text-sm text-azul-900">
+          <p className="mt-2 text-sm text-azul-100">
             trabajadas en {totales.jornadas}{" "}
             {totales.jornadas === 1 ? "jornada" : "jornadas"}
             {totales.extras > 0 && (
@@ -200,7 +195,7 @@ export function MisJornadas({
       )}
 
       {filtradas.length === 0 ? (
-        <p className="rounded-fino border border-dashed border-acero-300 bg-acero-50 px-4 py-6 text-center text-sm text-acero-600">
+        <p className="rounded-tarjeta bg-relleno px-4 py-8 text-center text-sm text-acero-600">
           Ninguna jornada coincide con ese filtro.
         </p>
       ) : (
@@ -212,19 +207,14 @@ export function MisJornadas({
               const enEdicion = editando === j.id;
 
               return (
-                <li
-                  key={j.id}
-                  className="rounded-fino border border-acero-200 bg-blanco p-4"
-                >
+                <li key={j.id} className={`${tarjetaClase} p-4 sm:p-5`}>
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-2">
-                        <h3 className="font-titulo text-lg font-semibold uppercase tracking-wide text-azul-950">
+                        <h3 className="text-[17px] font-semibold tracking-titulo text-azul-950">
                           {formatearFechaLarga(j.work_date)}
                         </h3>
-                        <Insignia className={CLASES_ESTADO[j.status]}>
-                          {ETIQUETA_ESTADO[j.status]}
-                        </Insignia>
+                        <ChipEstado estado={j.status} />
                       </div>
                       <p className="mt-1 text-sm text-acero-700">
                         {rangoHorario(j.start_at, j.end_at)}
@@ -247,7 +237,7 @@ export function MisJornadas({
                         <button
                           type="button"
                           onClick={() => setEditando(j.id)}
-                          className={`${botonSecundario} px-3 py-2 text-xs`}
+                          className={`${botonSecundario} ${botonChico}`}
                         >
                           <IconoLapiz className="h-3.5 w-3.5" />
                           Editar
@@ -269,7 +259,7 @@ export function MisJornadas({
 
                   {/* Nota de revisión: lo primero que hay que ver si la devolvieron. */}
                   {j.status === "rechazada" && (
-                    <div className="mt-3 rounded-fino border border-error-300 bg-error-50 px-3.5 py-3">
+                    <div className="mt-3 rounded-control bg-error-50 px-4 py-3">
                       <p className="text-sm font-semibold text-error-700">
                         Esta jornada te la devolvieron para corregirla
                       </p>
@@ -283,7 +273,7 @@ export function MisJornadas({
                     </div>
                   )}
                   {j.status === "aprobada" && j.review_note && (
-                    <p className="mt-3 rounded-fino border border-verde-300 bg-verde-100 px-3.5 py-2.5 text-sm leading-relaxed text-verde-700">
+                    <p className="mt-3 rounded-control bg-verde-100 px-4 py-3 text-sm leading-relaxed text-verde-700">
                       <span className="font-semibold">Nota de quien revisó:</span>{" "}
                       {j.review_note}
                     </p>
@@ -311,7 +301,7 @@ export function MisJornadas({
 
                   {/* Edición en el sitio */}
                   {enEdicion && (
-                    <div className="mt-4 border-t border-acero-200 pt-4">
+                    <div className="mt-4 border-t border-separador pt-4">
                       <p className="mb-3 text-sm font-semibold text-azul-950">
                         Editando esta jornada
                       </p>
@@ -369,7 +359,7 @@ function BotonEliminarPropia({
         <button
           type="button"
           onClick={() => setConfirmando(true)}
-          className={`${botonPeligro} px-3 py-2`}
+          className={botonPeligro}
         >
           <IconoPapelera className="h-3.5 w-3.5" />
           Eliminar
@@ -403,7 +393,7 @@ function BotonEliminarPropia({
       <button
         type="submit"
         disabled={pending}
-        className="inline-flex items-center gap-1.5 rounded-fino bg-error-500 px-3 py-2 text-xs font-semibold text-blanco transition-colors hover:bg-error-700 disabled:opacity-60"
+        className={`${botonPeligroFuerte} ${botonChico}`}
       >
         <IconoPapelera className="h-3.5 w-3.5" />
         {pending ? "Eliminando…" : "Sí, eliminar"}
@@ -411,7 +401,7 @@ function BotonEliminarPropia({
       <button
         type="button"
         onClick={() => setConfirmando(false)}
-        className={`${botonSecundario} px-3 py-2 text-xs`}
+        className={`${botonSecundario} ${botonChico}`}
       >
         No
       </button>

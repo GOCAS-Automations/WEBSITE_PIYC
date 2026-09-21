@@ -216,15 +216,16 @@ export type CorreoContacto = {
 };
 
 /**
- * Horario de atención. **Solo se pinta si está presente.** Sin horario
- * confirmado por Jorge no se inventa ni se escribe en el JSON-LD.
+ * Horario de atención. **Solo se pinta si está presente.** El horario vigente
+ * (lunes a viernes de 8:00 a. m. a 5:00 p. m.) salió de la ficha de Google del
+ * negocio; cualquier otro dato se confirma antes de escribirlo.
  */
 export type HorarioContacto = {
   /** Texto legible: «Lunes a viernes, 8:00 a. m. – 5:00 p. m.». */
   label?: string;
   /**
-   * Formato schema.org `openingHours`, por si algún día se confirma:
-   * `["Mo-Fr 08:00-17:00"]`. Ausente = no se emite en el JSON-LD.
+   * Formato schema.org `openingHours`: `["Mo-Fr 08:00-17:00"]`. Ausente = no se
+   * emite en el JSON-LD. Tiene que decir lo mismo que `label`.
    */
   schema?: string[];
 };
@@ -340,9 +341,11 @@ export type AjustesHome = {
 /* --- 5.3 `nosotros` — página /nosotros -------------------------------- */
 
 /**
- * ⚠ `mision` y `vision` se guardan **tal como los rotuló PIYC** (plan §4.3:
- * parecen intercambiados; no se corrigen por cuenta propia). El panel edita
- * cada campo por su rótulo; el sitio los pinta con ese mismo rótulo.
+ * ⚠ `mision` y `vision` quedaron **intercambiadas respecto al documento
+ * original de PIYC** (decisión de Cesar, 21-sep-2026): el texto que ese
+ * documento rotulaba «Visión» describe lo que la empresa hace hoy, y el
+ * rotulado «Misión» describe a dónde quiere llegar. El panel edita cada campo
+ * por su rótulo; el sitio los pinta con ese mismo rótulo.
  */
 export type AjustesNosotros = {
   hero?: {

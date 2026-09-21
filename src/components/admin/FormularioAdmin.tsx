@@ -4,7 +4,16 @@ import Link from "next/link";
 import { useActionState, useState, type ReactNode } from "react";
 import { idleState, type ActionState } from "@/lib/admin-types";
 import { IconoCheck, IconoPapelera } from "./iconos";
-import { botonPrimario, botonPeligro } from "./ui-base";
+import {
+  banner,
+  botonChico,
+  botonPeligro,
+  botonPeligroFuerte,
+  botonPrimario,
+  botonSecundario,
+  etiquetaCampo,
+  inputClass,
+} from "./ui-base";
 
 /* ------------------------------------------------------------------ */
 /* Formulario genérico del panel                                       */
@@ -49,19 +58,12 @@ export function FormularioAdmin({
       {children}
 
       {state.status !== "idle" && state.message && (
-        <p
-          role="status"
-          className={`rounded-fino border px-4 py-3 text-sm leading-relaxed ${
-            state.status === "success"
-              ? "border-verde-300 bg-verde-100 text-verde-700"
-              : "border-error-300 bg-error-50 text-error-700"
-          }`}
-        >
+        <p role="status" className={banner(state.status === "success")}>
           {state.message}
         </p>
       )}
 
-      <div className="flex flex-wrap items-center gap-3 border-t border-acero-200 pt-5">
+      <div className="flex flex-wrap items-center gap-3 border-t border-separador pt-5">
         <button type="submit" disabled={pending} className={botonPrimario}>
           {pending ? (
             "Guardando…"
@@ -74,12 +76,7 @@ export function FormularioAdmin({
         </button>
 
         {backHref && (
-          <Link
-            prefetch={false}
-            href={backHref}
-            className="inline-flex items-center gap-1.5 rounded-fino border border-acero-300 bg-blanco px-4 py-2.5 text-sm font-semibold text-acero-700 transition-colors hover:border-azul-700 hover:text-azul-700"
-          >
-            <span aria-hidden="true">←</span>
+          <Link prefetch={false} href={backHref} className={botonSecundario}>
             {backLabel ?? "Cancelar"}
           </Link>
         )}
@@ -174,10 +171,7 @@ export function BotonAccion({
       <button
         type="submit"
         disabled={pending}
-        className={
-          className ??
-          "inline-flex items-center gap-1.5 rounded-fino border border-acero-300 bg-blanco px-3 py-2 text-xs font-semibold text-acero-700 transition-colors hover:border-azul-700 hover:text-azul-700 disabled:opacity-60"
-        }
+        className={className ?? `${botonSecundario} ${botonChico}`}
       >
         {icon}
         {pending ? pendingLabel : label}
@@ -238,10 +232,7 @@ export function EliminarConfirmando({
     >
       <input type="hidden" name="id" value={id} />
       <div>
-        <label
-          htmlFor="confirmar-usuario"
-          className="mb-1.5 block text-sm font-semibold text-azul-950"
-        >
+        <label htmlFor="confirmar-usuario" className={etiquetaCampo}>
           Escribe <span className="font-mono text-error-500">{usuario}</span> para
           confirmar
         </label>
@@ -252,13 +243,13 @@ export function EliminarConfirmando({
           autoComplete="off"
           value={escrito}
           onChange={(e) => setEscrito(e.target.value)}
-          className="w-full max-w-xs rounded-fino border border-acero-300 bg-blanco px-3 py-2.5 text-sm text-azul-950 focus:border-error-500 focus:outline-none focus:ring-2 focus:ring-error-500/25"
+          className={`${inputClass} max-w-xs focus:border-error-500 focus:ring-error-500/20`}
         />
       </div>
       <button
         type="submit"
         disabled={pending || !coincide}
-        className="inline-flex items-center gap-1.5 rounded-fino bg-error-500 px-4 py-2.5 text-sm font-semibold text-blanco transition-colors hover:bg-error-700 disabled:pointer-events-none disabled:opacity-40"
+        className={botonPeligroFuerte}
       >
         <IconoPapelera className="h-4 w-4" />
         {pending ? "Eliminando…" : "Eliminar definitivamente"}

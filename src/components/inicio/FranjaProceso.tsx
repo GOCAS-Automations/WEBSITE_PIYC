@@ -16,11 +16,8 @@ export function FranjaProceso({ proceso }: { proceso: AjustesHome["proceso"] }) 
   if (pasos.length === 0) return null;
 
   return (
-    <section
-      aria-labelledby="titulo-proceso"
-      className="fondo-plano border-y border-acero-200"
-    >
-      <Contenedor className="py-14 lg:py-18">
+    <section aria-labelledby="titulo-proceso" className="bg-lienzo">
+      <Contenedor className="py-16 lg:py-20">
         <div className="max-w-3xl">
           {proceso?.eyebrow ? <Rotulo>{proceso.eyebrow}</Rotulo> : null}
           <TituloSeccion id="titulo-proceso" className="mt-5">
@@ -29,31 +26,28 @@ export function FranjaProceso({ proceso }: { proceso: AjustesHome["proceso"] }) 
           {proceso?.intro ? <EntradaSeccion className="mt-5">{proceso.intro}</EntradaSeccion> : null}
         </div>
 
-        <ol className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-5 lg:gap-6">
+        <ol className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-5 lg:gap-5">
           {pasos.map((paso, indice) => (
-            <li key={paso.titulo} className="relative">
-              {/* Filete de conexión: solo entre nodos, nunca después del último. */}
+            <li
+              key={paso.titulo}
+              className="relative rounded-tarjeta bg-blanco p-5 shadow-tarjeta lg:p-6"
+            >
+              {/* Conector entre pasos: solo entre tarjetas, nunca tras la última. */}
               {indice < pasos.length - 1 ? (
                 <span
                   aria-hidden="true"
-                  className="absolute left-4 top-11 hidden h-px w-[calc(100%-1rem)] bg-acero-300 lg:block"
+                  className="absolute right-0 top-9 hidden h-px w-5 translate-x-full bg-acero-300 lg:block"
                 />
               ) : null}
 
-              <div className="relative flex items-center gap-3">
-                <span className="flex size-8 shrink-0 items-center justify-center border border-azul-700 bg-blanco font-titulo text-sm font-semibold tabular-nums text-azul-700">
-                  {indice + 1}
-                </span>
-                <span
-                  aria-hidden="true"
-                  className="h-px flex-1 bg-acero-300 lg:hidden"
-                />
-              </div>
+              <span className="inline-flex size-9 items-center justify-center rounded-capsula bg-azul-700 text-[14px] font-semibold tabular-nums text-blanco">
+                {indice + 1}
+              </span>
 
-              <h3 className="mt-4 text-xl font-semibold leading-tight text-azul-950">
+              <h3 className="mt-4 text-[1.0625rem] font-semibold leading-snug text-azul-950">
                 {paso.titulo}
               </h3>
-              <p className="mt-2 text-[15px] leading-relaxed text-acero-600">
+              <p className="mt-2 text-[14px] leading-relaxed text-acero-600">
                 {paso.descripcion}
               </p>
             </li>

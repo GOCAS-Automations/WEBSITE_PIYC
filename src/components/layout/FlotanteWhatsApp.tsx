@@ -94,10 +94,10 @@ export function FlotanteWhatsApp({ href }: { href: string }) {
         rel="noopener noreferrer"
         data-whatsapp-flotante=""
         inert={!visible}
-        className={`fixed bottom-4 right-4 z-30 inline-flex h-14 items-center gap-3 rounded-fino bg-verde-500 px-4 font-semibold text-azul-950 transition-[opacity,transform] duration-200 hover:bg-verde-400 sm:bottom-6 sm:right-6 ${
+        className={`fixed bottom-4 right-4 z-30 inline-flex h-14 items-center gap-3 rounded-capsula bg-verde-500 px-4 font-semibold text-azul-950 shadow-flotante transition-[opacity,transform] duration-300 ease-ios hover:bg-verde-400 active:scale-95 sm:bottom-6 sm:right-6 ${
           visible
-            ? "translate-y-0 opacity-100"
-            : "pointer-events-none translate-y-2 opacity-0"
+            ? "translate-y-0 scale-100 opacity-100"
+            : "pointer-events-none translate-y-3 scale-95 opacity-0"
         }`}
       >
         <IconoWhatsApp className="size-7 shrink-0" />

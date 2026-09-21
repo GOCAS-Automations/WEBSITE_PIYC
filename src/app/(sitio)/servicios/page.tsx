@@ -106,8 +106,8 @@ export default async function HubDeServicios() {
         migas={MIGAS}
       />
 
-      <section aria-labelledby="titulo-lineas" className="bg-blanco">
-        <Contenedor className="py-14 lg:py-18">
+      <section aria-labelledby="titulo-lineas" className="bg-lienzo">
+        <Contenedor className="py-16 lg:py-20">
           <h2 id="titulo-lineas" className="sr-only">
             Líneas de servicio
           </h2>
@@ -125,12 +125,12 @@ export default async function HubDeServicios() {
                   key={linea.id}
                   id={linea.id}
                   aria-labelledby={`${linea.id}-titulo`}
-                  className="scroll-mt-28"
+                  className="scroll-mt-[calc(var(--alto-nav)+1.5rem)]"
                 >
-                  <div className="flex flex-col gap-3 border-b-2 border-azul-700 pb-4 sm:flex-row sm:items-end sm:justify-between sm:gap-8">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between sm:gap-8">
                     <h3
                       id={`${linea.id}-titulo`}
-                      className="font-titulo text-[1.75rem] font-semibold leading-tight text-azul-950 sm:text-[2rem]"
+                      className="text-[1.625rem] font-semibold leading-tight text-azul-950 sm:text-[1.875rem]"
                     >
                       {linea.titulo}
                     </h3>
@@ -139,7 +139,7 @@ export default async function HubDeServicios() {
                     </p>
                   </div>
 
-                  <div className="mt-px border border-t-0 border-acero-200">
+                  <div className="mt-6">
                     <RejillaDeServicios
                       servicios={delGrupo}
                       columnas={columnasParaCantidad(delGrupo.length)}

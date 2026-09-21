@@ -14,11 +14,7 @@ import {
   obtenerDesglose,
   rangoHorario,
 } from "@/lib/jornada";
-import {
-  CLASES_ESTADO,
-  ETIQUETA_ESTADO,
-  EXPLICACION_ESTADO,
-} from "@/lib/jornada-types";
+import { EXPLICACION_ESTADO } from "@/lib/jornada-types";
 import {
   AyudaSeccion,
   CabeceraPanel,
@@ -26,7 +22,7 @@ import {
   Tarjeta,
   TituloTarjeta,
 } from "@/components/admin/ui";
-import { Desglose } from "@/components/jornadas/Desglose";
+import { ChipEstado, Desglose } from "@/components/jornadas/Desglose";
 import { AccionesRevision } from "@/components/jornadas/AccionesRevision";
 import { FormularioJornada } from "@/components/jornadas/FormularioJornada";
 import {
@@ -36,6 +32,7 @@ import {
   reabrirJornada,
   rechazarJornada,
 } from "../actions";
+import { CHIP_NEUTRO } from "@/components/admin/clases";
 
 export const dynamic = "force-dynamic";
 
@@ -93,11 +90,11 @@ export default async function JornadaDetallePage({
         <div className="space-y-5">
           {/* ---------------- Datos del turno ---------------- */}
           <Tarjeta>
-            <div className="mb-4 flex flex-wrap items-center gap-2 border-b border-acero-200 pb-4">
-              <Insignia className={CLASES_ESTADO[jornada.status]}>
-                {ETIQUETA_ESTADO[jornada.status]}
-              </Insignia>
-              {resuelto.congelado && <Insignia>Cálculo congelado</Insignia>}
+            <div className="mb-4 flex flex-wrap items-center gap-2 border-b border-separador pb-4">
+              <ChipEstado estado={jornada.status} />
+              {resuelto.congelado && (
+                <Insignia className={CHIP_NEUTRO}>Cálculo congelado</Insignia>
+              )}
               <span className="text-sm text-acero-600">
                 {EXPLICACION_ESTADO[jornada.status]}
               </span>
@@ -105,7 +102,7 @@ export default async function JornadaDetallePage({
 
             <dl className="grid gap-x-6 gap-y-3 sm:grid-cols-2">
               <div>
-                <dt className="text-xs font-semibold uppercase tracking-wider text-acero-500">
+                <dt className="text-xs font-semibold uppercase tracking-ancho text-acero-500">
                   Persona
                 </dt>
                 <dd className="mt-0.5 text-sm text-azul-950">
@@ -116,7 +113,7 @@ export default async function JornadaDetallePage({
                 </dd>
               </div>
               <div>
-                <dt className="text-xs font-semibold uppercase tracking-wider text-acero-500">
+                <dt className="text-xs font-semibold uppercase tracking-ancho text-acero-500">
                   Día laboral
                 </dt>
                 <dd className="mt-0.5 text-sm text-azul-950">
@@ -124,7 +121,7 @@ export default async function JornadaDetallePage({
                 </dd>
               </div>
               <div>
-                <dt className="text-xs font-semibold uppercase tracking-wider text-acero-500">
+                <dt className="text-xs font-semibold uppercase tracking-ancho text-acero-500">
                   Horario del turno
                 </dt>
                 <dd className="mt-0.5 text-sm text-azul-950">
@@ -135,7 +132,7 @@ export default async function JornadaDetallePage({
                 </dd>
               </div>
               <div>
-                <dt className="text-xs font-semibold uppercase tracking-wider text-acero-500">
+                <dt className="text-xs font-semibold uppercase tracking-ancho text-acero-500">
                   Orden de trabajo
                 </dt>
                 <dd className="mt-0.5 text-sm text-azul-950">
@@ -145,7 +142,7 @@ export default async function JornadaDetallePage({
                 </dd>
               </div>
               <div className="sm:col-span-2">
-                <dt className="text-xs font-semibold uppercase tracking-wider text-acero-500">
+                <dt className="text-xs font-semibold uppercase tracking-ancho text-acero-500">
                   Labor realizada
                 </dt>
                 <dd className="mt-0.5 text-sm leading-relaxed text-azul-950">
@@ -154,7 +151,7 @@ export default async function JornadaDetallePage({
               </div>
               {jornada.observations && (
                 <div className="sm:col-span-2">
-                  <dt className="text-xs font-semibold uppercase tracking-wider text-acero-500">
+                  <dt className="text-xs font-semibold uppercase tracking-ancho text-acero-500">
                     Observaciones
                   </dt>
                   <dd className="mt-0.5 text-sm leading-relaxed text-acero-700">
@@ -164,7 +161,7 @@ export default async function JornadaDetallePage({
               )}
             </dl>
 
-            <p className="mt-4 border-t border-acero-200 pt-3 text-xs text-acero-500">
+            <p className="mt-4 border-t border-separador pt-3 text-xs text-acero-500">
               Registrada el {formatearFechaNumerica(fechaColombia(jornada.created_at))}
               {jornada.reviewed_at && (
                 <>
@@ -209,7 +206,7 @@ export default async function JornadaDetallePage({
             />
 
             {contexto && (
-              <dl className="mt-4 grid gap-x-6 gap-y-2 border-t border-acero-200 pt-4 text-sm sm:grid-cols-2">
+              <dl className="mt-4 grid gap-x-6 gap-y-2 border-t border-separador pt-4 text-sm sm:grid-cols-2">
                 <div className="flex items-baseline justify-between gap-3">
                   <dt className="text-acero-600">Horario aplicado</dt>
                   <dd className="text-right font-semibold text-azul-950">

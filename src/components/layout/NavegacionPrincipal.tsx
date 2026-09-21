@@ -1,8 +1,27 @@
 "use client";
 
+/**
+ * NAVEGACIÓN PRINCIPAL — CÁPSULA FLOTANTE
+ * =======================================
+ * Sistema v3: el encabezado dejó de ser un rectángulo a todo el ancho pegado
+ * al borde. Ahora es una cápsula translúcida centrada, con margen respecto a
+ * la ventana y sombra suave, que se compacta levemente al bajar. El contenido
+ * pasa por debajo y se ve desenfocado a través del material.
+ *
+ * La barra de datos que había encima (dirección, teléfono, correo, Instagram)
+ * se eliminó: esos datos ya viven en el pie y en `/contacto`.
+ *
+ * En móvil la cápsula lleva logo + botón de menú, y el menú abre como **hoja**
+ * translúcida bajo la cápsula: foco atrapado, Esc, `aria-expanded` y bloqueo
+ * del scroll del documento mientras está abierta.
+ *
+ * El logo llega como `children` desde el Server Component (`Encabezado`), que
+ * es quien puede usar `next/image` con los datos del sitio.
+ */
+
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { navegacionPrincipal } from "@/data/navegacion";
 import { IconoCerrar, IconoMenu, IconoWhatsApp } from "@/components/ui/iconos";
 
@@ -10,6 +29,9 @@ function esActivo(pathname: string, href: string) {
   if (href === "/") return pathname === "/";
   return pathname === href || pathname.startsWith(`${href}/`);
 }
+
+/** A partir de cuántos píxeles de scroll la cápsula se compacta. */
+const UMBRAL_COMPACTA = 24;
 
 /**
  * El teléfono y el correo llegan por props desde el servidor
@@ -20,116 +42,189 @@ export function NavegacionPrincipal({
   hrefWhatsApp,
   telefono,
   correo,
+  children,
 }: {
   hrefWhatsApp: string;
   telefono?: string;
   correo?: string;
+  /** El logo, renderizado en el servidor. */
+  children: ReactNode;
 }) {
   const pathname = usePathname();
   const [abierto, setAbierto] = useState(false);
+  const [compacta, setCompacta] = useState(false);
   const botonRef = useRef<HTMLButtonElement>(null);
+  const hojaRef = useRef<HTMLDivElement>(null);
 
+  // Compactación al bajar.
+  useEffect(() => {
+    const alDesplazar = () => setCompacta(window.scrollY > UMBRAL_COMPACTA);
+    window.addEventListener("scroll", alDesplazar, { passive: true });
+    alDesplazar();
+    return () => window.removeEventListener("scroll", alDesplazar);
+  }, []);
+
+  // (La hoja se cierra en el `onClick` de cada enlace; no hace falta un efecto
+  // sobre `pathname`, que además dispararía un render en cascada.)
+
+  // Esc, foco atrapado, bloqueo de scroll y cierre al pasar a escritorio.
   useEffect(() => {
     if (!abierto) return;
+
+    const hoja = hojaRef.current;
+    const enfocables = () =>
+      Array.from(
+        hoja?.querySelectorAll<HTMLElement>('a[href], button:not([disabled])') ?? [],
+      ).filter((elemento) => elemento.offsetParent !== null);
+
+    enfocables()[0]?.focus();
 
     const alTeclear = (evento: KeyboardEvent) => {
       if (evento.key === "Escape") {
         setAbierto(false);
         botonRef.current?.focus();
+        return;
+      }
+      if (evento.key !== "Tab") return;
+
+      // El foco circula entre la hoja y el botón que la abrió.
+      const lista = [...enfocables(), botonRef.current].filter(
+        (elemento): elemento is HTMLElement => elemento !== null,
+      );
+      if (lista.length === 0) return;
+      const primero = lista[0];
+      const ultimo = lista[lista.length - 1];
+      const activo = document.activeElement;
+
+      if (evento.shiftKey && activo === primero) {
+        evento.preventDefault();
+        ultimo.focus();
+      } else if (!evento.shiftKey && activo === ultimo) {
+        evento.preventDefault();
+        primero.focus();
       }
     };
+
     // Si la ventana pasa a escritorio con el menú abierto, se cierra.
     const escritorio = window.matchMedia("(min-width: 64rem)");
     const alCambiar = (evento: MediaQueryListEvent) => {
       if (evento.matches) setAbierto(false);
     };
 
+    const overflowPrevio = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
     document.addEventListener("keydown", alTeclear);
     escritorio.addEventListener("change", alCambiar);
     return () => {
+      document.body.style.overflow = overflowPrevio;
       document.removeEventListener("keydown", alTeclear);
       escritorio.removeEventListener("change", alCambiar);
     };
   }, [abierto]);
 
   return (
-    <>
-      <nav aria-label="Principal" className="ml-auto hidden self-stretch lg:block">
-        <ul className="flex h-full items-stretch">
-          {navegacionPrincipal.map((enlace) => {
-            const activo = esActivo(pathname, enlace.href);
-            return (
-              <li key={enlace.href} className="flex">
-                <Link
-                  href={enlace.href}
-                  aria-current={activo ? "page" : undefined}
-                  className="relative flex items-center px-4 text-[15px] font-medium text-acero-700 transition-colors after:absolute after:inset-x-4 after:bottom-[-1px] after:h-[3px] after:scale-x-0 after:bg-azul-700 after:transition-transform hover:text-azul-700 aria-[current=page]:text-azul-950 aria-[current=page]:after:scale-x-100"
-                >
-                  {enlace.etiqueta}
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
-      </nav>
-
-      <div className="flex items-center gap-2 lg:ml-2">
-        <a
-          href={hrefWhatsApp}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex h-11 items-center gap-2 rounded-fino border border-verde-600 px-3 text-sm font-semibold text-verde-700 transition-colors hover:bg-verde-100 sm:px-4"
+    <header className="pointer-events-none fixed inset-x-0 top-0 z-50">
+      <div className="mx-auto flex w-full max-w-nav flex-col items-stretch px-3 pt-3 sm:px-5 sm:pt-4 lg:items-center">
+        {/* Cápsula: a todo el ancho en móvil, ajustada al contenido en
+            escritorio, que es lo que la hace leerse como una píldora flotante
+            y no como una barra. */}
+        <div
+          data-compacta={compacta ? "si" : "no"}
+          className="material pointer-events-auto flex h-16 items-center gap-2 rounded-capsula pl-4 pr-2 shadow-flotante ring-1 ring-separador transition-[height,box-shadow] duration-300 ease-ios data-[compacta=si]:h-14 data-[compacta=si]:shadow-elevada sm:pl-5 sm:pr-2.5 lg:gap-5"
         >
-          <IconoWhatsApp className="size-5" />
-          <span className="sr-only sm:not-sr-only">WhatsApp</span>
-        </a>
+          <Link
+            href="/"
+            className="flex shrink-0 items-center transition-transform duration-300 ease-ios"
+            aria-label="PIYC — ir al inicio"
+          >
+            {children}
+          </Link>
 
-        <button
-          ref={botonRef}
-          type="button"
-          aria-expanded={abierto}
-          aria-controls="menu-movil"
-          onClick={() => setAbierto((valor) => !valor)}
-          className="inline-flex size-11 items-center justify-center rounded-fino border border-acero-200 text-azul-950 transition-colors hover:border-azul-950 lg:hidden"
-        >
-          <span className="sr-only">{abierto ? "Cerrar menú" : "Abrir menú"}</span>
-          {abierto ? <IconoCerrar className="size-5" /> : <IconoMenu className="size-5" />}
-        </button>
-      </div>
+          <nav aria-label="Principal" className="hidden lg:block">
+            <ul className="flex items-center gap-0.5">
+              {navegacionPrincipal.map((enlace) => {
+                const activo = esActivo(pathname, enlace.href);
+                return (
+                  <li key={enlace.href}>
+                    <Link
+                      href={enlace.href}
+                      aria-current={activo ? "page" : undefined}
+                      className="pulsable inline-flex h-9 items-center rounded-capsula px-3.5 text-[15px] font-medium text-acero-600 hover:bg-relleno hover:text-azul-700 aria-[current=page]:bg-relleno-medio aria-[current=page]:text-azul-800"
+                    >
+                      {enlace.etiqueta}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </nav>
 
-      <div
-        id="menu-movil"
-        hidden={!abierto}
-        className="absolute inset-x-0 top-full max-h-[calc(100dvh-4rem)] overflow-y-auto border-b border-acero-200 bg-blanco lg:hidden"
-      >
-        <nav aria-label="Principal (móvil)" className="px-4 pb-6 pt-2">
-          <ul>
-            {navegacionPrincipal.map((enlace, indice) => {
-              const activo = esActivo(pathname, enlace.href);
-              return (
-                <li key={enlace.href} className="border-b border-acero-100">
-                  <Link
-                    href={enlace.href}
-                    aria-current={activo ? "page" : undefined}
-                    onClick={() => setAbierto(false)}
-                    className="flex items-baseline gap-4 py-3.5 font-titulo text-2xl font-semibold text-azul-950 aria-[current=page]:text-azul-700"
-                  >
-                    <span aria-hidden="true" className="w-7 font-sans text-xs font-semibold tabular-nums text-azul-600">
-                      {String(indice + 1).padStart(2, "0")}
-                    </span>
-                    {enlace.etiqueta}
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-          {telefono || correo ? (
-            <p className="mt-5 text-sm text-acero-600">
-              {[telefono, correo].filter(Boolean).join(" · ")}
-            </p>
-          ) : null}
-        </nav>
+          <div className="ml-auto flex items-center gap-2 lg:ml-0">
+            <a
+              href={hrefWhatsApp}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="pulsable inline-flex h-10 items-center gap-2 rounded-capsula bg-verde-500 px-3 text-sm font-semibold text-azul-950 hover:bg-verde-400 sm:px-4"
+            >
+              <IconoWhatsApp className="size-4.5" />
+              <span className="sr-only sm:not-sr-only">WhatsApp</span>
+            </a>
+
+            <button
+              ref={botonRef}
+              type="button"
+              aria-expanded={abierto}
+              aria-controls="menu-movil"
+              onClick={() => setAbierto((valor) => !valor)}
+              className="pulsable inline-flex size-10 items-center justify-center rounded-capsula bg-relleno text-azul-900 hover:bg-relleno-medio lg:hidden"
+            >
+              <span className="sr-only">{abierto ? "Cerrar menú" : "Abrir menú"}</span>
+              {abierto ? <IconoCerrar className="size-5" /> : <IconoMenu className="size-5" />}
+            </button>
+          </div>
+        </div>
+
+        {/* Hoja del menú móvil */}
+        {abierto ? (
+          <div
+            ref={hojaRef}
+            id="menu-movil"
+            className="material-fuerte pointer-events-auto mt-2 max-h-[calc(100dvh-7rem)] w-full animate-hoja overflow-y-auto rounded-panel p-3 shadow-elevada ring-1 ring-separador lg:hidden"
+          >
+            <nav aria-label="Principal (móvil)">
+              <ul className="space-y-1">
+                {navegacionPrincipal.map((enlace) => {
+                  const activo = esActivo(pathname, enlace.href);
+                  return (
+                    <li key={enlace.href}>
+                      <Link
+                        href={enlace.href}
+                        aria-current={activo ? "page" : undefined}
+                        onClick={() => setAbierto(false)}
+                        className="pulsable flex items-center justify-between rounded-control px-4 py-3.5 text-[17px] font-medium text-azul-950 hover:bg-relleno aria-[current=page]:bg-relleno-medio aria-[current=page]:text-azul-700"
+                      >
+                        {enlace.etiqueta}
+                        {activo ? (
+                          <span
+                            aria-hidden="true"
+                            className="size-2 rounded-capsula bg-verde-500"
+                          />
+                        ) : null}
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </nav>
+            {telefono || correo ? (
+              <p className="mt-2 rounded-control bg-relleno px-4 py-3 text-[13px] leading-snug text-acero-600">
+                {[telefono, correo].filter(Boolean).join(" · ")}
+              </p>
+            ) : null}
+          </div>
+        ) : null}
       </div>
-    </>
+    </header>
   );
 }
