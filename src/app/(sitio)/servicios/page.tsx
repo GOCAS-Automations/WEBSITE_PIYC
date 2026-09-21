@@ -157,8 +157,8 @@ export default async function HubDeServicios() {
       <Faq preguntas={faq} />
 
       <FranjaCta
-        titulo="¿No está seguro de qué servicio necesita?"
-        texto="Descríbanos el problema —el proceso, el equipo o la falla— y le decimos por dónde se aborda antes de cotizar nada."
+        titulo={ajustes?.cta?.title ?? "¿No está seguro de qué servicio necesita?"}
+        texto={ajustes?.cta?.body}
         hrefWhatsApp={hrefWhatsApp}
       />
     </main>

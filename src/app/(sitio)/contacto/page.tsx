@@ -237,10 +237,12 @@ export default async function Contacto() {
               <TituloSeccion className="mt-5 !text-[1.75rem] sm:!text-[2rem]">
                 Cuéntenos qué necesita
               </TituloSeccion>
-              <p className="mt-4 max-w-[60ch] text-[15px] leading-relaxed text-acero-600">
-                Al enviar, se abre WhatsApp con el mensaje ya escrito para que solo tenga que
-                darle enviar. No enviamos correos automáticos.
-              </p>
+              {ajustes?.introFormulario !== "" ? (
+                <p className="mt-4 max-w-[60ch] text-[15px] leading-relaxed text-acero-600">
+                  {ajustes?.introFormulario ??
+                    "Al enviar, se abre WhatsApp con el mensaje ya escrito para que solo tenga que darle enviar. No enviamos correos automáticos."}
+                </p>
+              ) : null}
 
               <div className="mt-8">
                 <FormularioContacto

@@ -59,6 +59,7 @@ export default async function Nosotros() {
   const hrefWhatsApp = enlaceWhatsAppDe(contacto, MENSAJES_WHATSAPP.general);
   const quienesSomos = nosotros.quienesSomos;
   const galeria = nosotros.galeria ?? [];
+  const bloqueGaleria = nosotros.bloqueGaleria;
 
   return (
     <main id="contenido">
@@ -77,7 +78,9 @@ export default async function Nosotros() {
           <Contenedor className="py-14 lg:py-18">
             <div className="grid gap-10 lg:grid-cols-12 lg:items-start lg:gap-12">
               <div className="lg:col-span-7">
-                <Rotulo>La empresa</Rotulo>
+                {quienesSomos.eyebrow !== "" ? (
+                  <Rotulo>{quienesSomos.eyebrow ?? "La empresa"}</Rotulo>
+                ) : null}
                 <TituloSeccion id="titulo-quienes-somos" className="mt-5">
                   {quienesSomos.title ?? "Quiénes somos"}
                 </TituloSeccion>
@@ -157,7 +160,7 @@ export default async function Nosotros() {
 
       <Valores
         valores={valores}
-        rotulo="Cómo trabajamos"
+        rotulo={nosotros.valores?.eyebrow ?? "Cómo trabajamos"}
         titulo={nosotros.valores?.title ?? "Nuestros valores"}
         intro={nosotros.valores?.intro}
       />
@@ -166,9 +169,11 @@ export default async function Nosotros() {
       {galeria.length > 0 ? (
         <section aria-labelledby="titulo-galeria" className="bg-blanco">
           <Contenedor className="py-14 lg:py-18">
-            <Rotulo>En obra</Rotulo>
+            {bloqueGaleria?.eyebrow !== "" ? (
+              <Rotulo>{bloqueGaleria?.eyebrow ?? "En obra"}</Rotulo>
+            ) : null}
             <TituloSeccion id="titulo-galeria" className="mt-5">
-              Nuestro trabajo
+              {bloqueGaleria?.title ?? "Nuestro trabajo"}
             </TituloSeccion>
             <Galeria
               imagenes={galeria}
@@ -181,8 +186,8 @@ export default async function Nosotros() {
       ) : null}
 
       <FranjaCta
-        titulo="¿Quiere trabajar con nosotros?"
-        texto="Cuéntenos qué necesita su planta y con qué restricciones trabaja. Revisamos el alcance antes de proponer cualquier cosa."
+        titulo={nosotros.cta?.title ?? "¿Quiere trabajar con nosotros?"}
+        texto={nosotros.cta?.body}
         hrefWhatsApp={hrefWhatsApp}
       />
     </main>

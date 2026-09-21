@@ -13,6 +13,7 @@ import {
   enParrafos,
   galeriaCompleta,
   getContacto,
+  getPaginas,
   getProyectosDeServicio,
   getServicio,
   getServicios,
@@ -74,10 +75,11 @@ export default async function PaginaDeServicio({
   const servicio = await getServicio(slug);
   if (!servicio) notFound();
 
-  const [contacto, todos, relacionados] = await Promise.all([
+  const [contacto, todos, relacionados, paginas] = await Promise.all([
     getContacto(),
     getServicios(),
     getProyectosDeServicio(slug),
+    getPaginas(),
   ]);
 
   const hrefWhatsApp = enlaceWhatsAppDe(
@@ -230,7 +232,10 @@ export default async function PaginaDeServicio({
 
       <FranjaCta
         titulo={`¿Necesita ${servicio.navTitle.toLowerCase()}?`}
-        texto="Escríbanos con los datos del equipo o del proceso y le decimos qué información hace falta para cotizar."
+        texto={
+          paginas.servicioDetalle?.ctaTexto ??
+          "Escríbanos con los datos del equipo o del proceso y le decimos qué información hace falta para cotizar."
+        }
         hrefWhatsApp={hrefWhatsApp}
         etiquetaWhatsApp="Consultar por WhatsApp"
       />

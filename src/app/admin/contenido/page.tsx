@@ -74,10 +74,10 @@ export default async function ContenidoPage() {
     },
     {
       href: "/admin/contenido/paginas",
-      label: "Cabeceras de páginas",
+      label: "Textos de las páginas",
       icon: IconoDocumento,
       description:
-        "Los títulos, las bajadas y las fotos de cabecera de Servicios, Proyectos y Contacto, y el texto de la página «no encontrada».",
+        "Las cabeceras, las franjas de cierre, las preguntas frecuentes y los textos del formulario de Servicios, Proyectos y Contacto, más los que se repiten en cada ficha y la página «no encontrada».",
     },
     {
       href: "/admin/contenido/ajustes",

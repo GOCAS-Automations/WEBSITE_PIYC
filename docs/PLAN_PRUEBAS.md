@@ -214,15 +214,26 @@ service-role, nunca un borrado por rango).
 
 Cosas detectadas que no se arreglaron en esta pasada, con el motivo:
 
-1. **Autoaprobación en la base de datos.** La acción del panel ya impide que un
-   manager apruebe su propia jornada, pero la RLS de `0002_jornadas.sql` sigue
-   permitiéndolo a quien llame la API REST con la clave anónima y una sesión de
-   coordinador. Cerrarlo del todo pide un trigger o una condición
-   `employee_id <> auth.uid()` en la política — es decir, una migración nueva.
-2. **`guardarJornadaComoManager` inserta con la clave service-role**, saltándose
-   la RLS. Hoy no es explotable (va detrás de `getManagerOrNull()` y valida que
-   la cuenta destino exista y esté activa), pero lo correcto es una política
-   `jornadas_insert_manager` y volver al cliente de sesión. También es migración.
+1. ~~**Autoaprobación en la base de datos.**~~ **RESUELTO** con
+   `0004_jornadas_revision.sql` (21-sep-2026). El trigger
+   `jornadas_proteger_revision` rechaza cualquier UPDATE con sesión que cambie
+   `status`, `review_note`, `reviewed_by`, `reviewed_at` o el congelado de una
+   jornada cuyo `employee_id` sea el de quien la hace — da igual el rol. Se
+   eligió trigger y no política porque `with check` no distingue columnas: un
+   manager sí puede corregir el texto o las horas de su propia jornada, lo que
+   no puede es revisarla. La service-role (sin `auth.uid()`) queda fuera, para
+   que el servidor siga pudiendo hacer tareas administrativas. Probado en una
+   transacción revertida: el coordinador no aprueba la suya (error 42501) pero
+   sí la del empleado, y el empleado tampoco se aprueba la suya estando
+   pendiente.
+2. ~~**`guardarJornadaComoManager` inserta con la clave service-role.**~~
+   **RESUELTO** con `0004_jornadas_revision.sql` (21-sep-2026). La política
+   `jornadas_insert_manager` deja a un manager insertar jornadas de otra cuenta
+   **activa** (helper `private.perfil_activo()`), siempre en `pendiente`, sin
+   revisor y sin desglose; la acción del panel volvió al cliente de sesión y ya
+   no importa `getServiceRoleSupabase`. Probado: alta a cuenta activa sí, a
+   cuenta desactivada no, con estado `aprobada` no, y el empleado sigue
+   insertando solo lo suyo.
 3. **Sin barrera de compilación `server-only`.** El guard de `admin.ts` es de
    ejecución: si mañana alguien importa ese módulo desde un componente de
    cliente, el error sale en el navegador y no en el build. Se cierra con
@@ -252,7 +263,7 @@ Cosas detectadas que no se arreglaron en esta pasada, con el motivo:
    `/admin/jornadas/horarios` se corta a mitad de columna. Las dos se usan, pero
    piden un desvanecido en el borde o media columna asomando. Es diseño, no
    arreglo de una línea.
-9. **No todo el texto del sitio es editable desde el panel** (criterio de §13).
+9. ~~**No todo el texto del sitio es editable desde el panel**~~ — **RESUELTO el 21-sep-2026**: esos textos pasaron a `site_settings` con campo en el panel (pantalla «Textos de las páginas» e Inicio/Nosotros). Descripción original:
    Quedan en código los rótulos e intros de las secciones «Servicios» y «Casos
    de éxito» del inicio (`src/app/(sitio)/page.tsx`), la intro de los valores,
    la nota del formulario de `/contacto` y la línea «Este caso combinó varios

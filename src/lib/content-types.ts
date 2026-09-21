@@ -268,6 +268,20 @@ export type AjustesContact = {
 
 /* --- 5.2 `home` — página de inicio ------------------------------------ */
 
+/**
+ * Encabezado de una franja de la portada: rótulo pequeño, título, párrafo de
+ * entrada y el texto del enlace que lleva al listado completo. La dirección de
+ * ese enlace NO se edita (siempre es `/servicios` o `/proyectos`): lo que
+ * cambia es cómo se llama.
+ */
+export type EncabezadoFranja = {
+  eyebrow?: string;
+  title?: string;
+  intro?: string;
+  /** Texto del enlace «ver todos». Vacío = no se pinta el enlace. */
+  ctaEtiqueta?: string;
+};
+
 export type AjustesHome = {
   hero?: {
     /** Línea corta sobre el título («Cali, Valle del Cauca»). */
@@ -285,6 +299,8 @@ export type AjustesHome = {
     /** Párrafos separados por línea en blanco. */
     body?: string;
     image?: ImagenContenido;
+    /** Texto del enlace a `/nosotros`. Vacío = no se pinta. */
+    ctaEtiqueta?: string;
   };
   /** Franja del proceso de trabajo: diagnóstico → … → soporte. */
   proceso?: {
@@ -293,6 +309,13 @@ export type AjustesHome = {
     intro?: string;
     pasos?: { titulo: string; descripcion: string }[];
   };
+  /** Rótulo, título, intro y enlace de la franja de servicios de la portada. */
+  seccionServicios?: EncabezadoFranja;
+  /** Lo mismo para la franja de casos de éxito. */
+  seccionProyectos?: EncabezadoFranja;
+  /** Rótulo, título e intro del bloque de valores **en la portada**. Los de
+   *  `/nosotros` viven en `AjustesNosotros.valores`: son dos textos distintos. */
+  seccionValores?: { eyebrow?: string; title?: string; intro?: string };
   /** Slugs destacados. Vacío = no se pinta la sección; ausente = respaldo. */
   serviciosDestacados?: string[];
   proyectosDestacados?: string[];
@@ -302,6 +325,15 @@ export type AjustesHome = {
     body?: string;
     ctaPrimario?: EnlaceContenido;
     ctaSecundario?: EnlaceContenido;
+    /**
+     * Frase pequeña bajo el cierre, con un enlace en medio. Se parte en tres
+     * para poder editarla sin escribir HTML: `texto` + enlace + `textoFinal`.
+     */
+    nota?: {
+      texto?: string;
+      enlace?: EnlaceContenido;
+      textoFinal?: string;
+    };
   };
 };
 
@@ -321,16 +353,22 @@ export type AjustesNosotros = {
   };
   /** «Quiénes somos»: párrafos separados por línea en blanco. */
   quienesSomos?: {
+    /** Rótulo pequeño sobre el título del bloque. */
+    eyebrow?: string;
     title?: string;
     body?: string;
     image?: ImagenContenido;
   };
   mision?: { title?: string; body?: string };
   vision?: { title?: string; body?: string };
-  /** Título e introducción del bloque de valores (los valores van en `site_values`). */
-  valores?: { title?: string; intro?: string };
+  /** Rótulo, título e introducción del bloque de valores (los valores van en `site_values`). */
+  valores?: { eyebrow?: string; title?: string; intro?: string };
   /** Galería de la página. Vacía = no se pinta. */
   galeria?: ImagenContenido[];
+  /** Rótulo y título del bloque de galería (las fotos van en `galeria`). */
+  bloqueGaleria?: { eyebrow?: string; title?: string };
+  /** Franja de cierre de `/nosotros`. */
+  cta?: { title?: string; body?: string };
 };
 
 /* --- 5.4 `paginas` — cabeceras y bloques sueltos por ruta -------------- */
@@ -348,20 +386,38 @@ export type PreguntaFrecuente = {
   respuesta: string;
 };
 
+/** Franja de cierre de una página interna. Los botones son siempre los mismos. */
+export type CierrePagina = { title?: string; body?: string };
+
 export type AjustesPaginas = {
   servicios?: CabeceraPagina & {
     /** Párrafo de entrada del hub, bajo el `<h1>`. */
     intro?: string;
     /** FAQ del hub de servicios. Vacía = no se pinta. */
     faq?: PreguntaFrecuente[];
+    cta?: CierrePagina;
   };
-  proyectos?: CabeceraPagina & { intro?: string };
+  proyectos?: CabeceraPagina & { intro?: string; cta?: CierrePagina };
   contacto?: CabeceraPagina & {
     intro?: string;
-    /** Texto bajo el formulario: qué pasa al enviar (se abre WhatsApp). */
+    /** Párrafo sobre el formulario: qué pasa al enviarlo. */
+    introFormulario?: string;
+    /** Texto bajo el formulario: qué se hace con los datos. */
     notaFormulario?: string;
     faq?: PreguntaFrecuente[];
   };
+  /**
+   * Textos de la plantilla `/proyectos/[slug]`. No son de un caso concreto:
+   * se repiten en todos, por eso no viven en `site_projects`.
+   */
+  proyectoDetalle?: {
+    /** Frase bajo la ficha cuando el caso tiene servicios asociados. */
+    notaServicios?: string;
+    cta?: CierrePagina;
+  };
+  /** Texto de la franja de cierre de `/servicios/[slug]`. El título lo arma
+   *  el sitio con el nombre del servicio. */
+  servicioDetalle?: { ctaTexto?: string };
   /** Página 404. */
   noEncontrada?: { title?: string; body?: string };
 };

@@ -12,7 +12,7 @@ El panel y el portal se abren desde la misma dirección: **piycsas.com/mi-cuenta
 
 <!-- captura: pantalla de inicio de sesión en /mi-cuenta -->
 
-Si tu cuenta tiene acceso al panel (administrador o coordinador), al entrar verás una pantalla que te invita a **ir al panel**. Si además quieres usar tu propio portal —por ejemplo para registrar tu jornada—, entra a `/mi-cuenta?portal=1` o usa el botón **Mi cuenta** que aparece arriba del panel.
+Si tu cuenta tiene acceso al panel (administrador o coordinador), al entrar verás una pantalla intermedia que dice «Abriendo el panel…» y que te lleva sola al panel en un par de segundos; si no, tiene el botón **Ir al panel**. Esa misma pantalla trae el botón **Ver mi portal**, por si lo que quieres es registrar tu jornada. También puedes entrar a `/mi-cuenta?portal=1` directamente, o usar el botón **Mi cuenta** que aparece arriba del panel.
 
 ### Cambiar la contraseña
 
@@ -39,21 +39,31 @@ Un administrador o un coordinador que abre su propia ficha en Equipo puede cambi
 
 ## 3. Editar el sitio
 
-Todo lo que se ve en piycsas.com se administra desde **Contenido del sitio**, la segunda entrada del menú del panel. Ahí encuentras siete pantallas: **Página de inicio**, **Página Nosotros**, **Servicios**, **Proyectos**, **Valores corporativos**, **Cabeceras de páginas** y **Datos de contacto y buscadores**.
+Todo lo que se ve en piycsas.com se administra desde **Contenido del sitio**, la segunda entrada del menú del panel. Ahí encuentras siete pantallas de edición —**Página de inicio**, **Página Nosotros**, **Servicios**, **Proyectos**, **Valores corporativos**, **Textos de las páginas** y **Datos de contacto y buscadores**— y una octava tarjeta, **Mensajes de contacto**, que es la bandeja de quienes escriben desde el sitio (ver el punto 5).
 
-<!-- captura: menú "Contenido del sitio" con las siete tarjetas -->
+<!-- captura: menú "Contenido del sitio" con las tarjetas -->
+
+**Todo el texto que se ve en el sitio se edita desde aquí.** No queda ninguna frase escrita «por dentro»: los rótulos pequeños, los títulos de cada franja, los párrafos de entrada, los textos de los botones y las frases de cierre tienen su campo en alguna de estas pantallas.
 
 **Importante sobre guardar:** en la mayoría de estas pantallas, cada tarjeta (cada bloque de texto) se guarda con **su propio botón**. Si escribes en un bloque y cambias de pantalla sin pulsar «Guardar» en ese bloque, lo que escribiste se pierde. En las pantallas de un solo formulario (como la ficha de un servicio o un proyecto) hay un único botón al final.
 
-Los cambios que guardes **no se ven de inmediato** en el sitio público: el sistema se actualiza solo cada cierto tiempo, así que puede tardar hasta **cinco minutos** en reflejarse.
+Al guardar, el sitio público se refresca solo: casi siempre el cambio se ve al recargar la página. Si no aparece, dale unos minutos —el sitio se regenera como máximo cada **cinco minutos**— y vuelve a mirar.
 
 ### Página de inicio
 
-Se edita en bloques: **Primera pantalla** (línea pequeña, titular, frase de apoyo y los dos botones), **Qué hace PIYC**, **Cómo trabajamos** (con sus pasos), **Qué se destaca en la portada** (qué servicios y proyectos se muestran) y **Franja de cierre**.
+Se edita en bloques, en el mismo orden en que se ven en la portada:
+
+- **Primera pantalla**: línea pequeña, titular, frase de apoyo y los dos botones.
+- **Qué hace PIYC**: línea pequeña, título, texto, foto y el texto del enlace que lleva a Nosotros.
+- **Franja de servicios** y **Franja de casos de éxito**: la línea pequeña, el título, el párrafo de entrada y el texto del enlace «ver todos» de cada una. El enlace siempre lleva a Servicios o a Proyectos; lo que se cambia aquí es cómo se llama. Si lo dejas vacío, el enlace no aparece.
+- **Cómo trabajamos**: la franja del proceso, con sus pasos.
+- **Entradilla de los valores en la portada**: la línea pequeña, el título y la frase que presentan los cuatro valores en el inicio. Ojo: son textos distintos de los de la página Nosotros, aunque los valores sean los mismos.
+- **Qué se destaca en la portada**: qué servicios y qué proyectos se muestran, escritos por su dirección (slug). Una lista vacía apaga esa franja.
+- **Franja de cierre**: título, texto, los dos botones y la frase pequeña de abajo. Esa frase lleva un enlace en la mitad, así que se escribe en tres partes (lo de antes, el texto del enlace y lo de después); si dejas las tres vacías, no aparece.
 
 ### Página Nosotros
 
-Bloques: **Cabecera de la página**, **Quiénes somos**, **Misión y visión**, **Entradilla de los valores** y una **Galería** de fotos.
+Bloques: **Cabecera de la página**, **Quiénes somos** (con su línea pequeña), **Misión y visión**, **Entradilla de los valores** (línea pequeña, título y frase), **Galería** (su línea pequeña, su título y las fotos) y **Franja de cierre**.
 
 <!-- captura: pantalla de edición de la página Nosotros -->
 
@@ -70,9 +80,16 @@ El interruptor **¿Se muestra en el sitio?** es lo que decide si algo ya está l
 
 Cada valor tiene nombre, ícono, qué significa, orden y si se muestra o no en el sitio.
 
-### Cabeceras de páginas
+### Textos de las páginas
 
-Los títulos, bajadas, párrafo de entrada y foto de cabecera de Servicios, Proyectos y Contacto, más el texto de la página «no encontrada» (cuando alguien entra a un enlace que no existe).
+Todo lo que no es una ficha de servicio ni de proyecto, agrupado por página:
+
+- **Cabecera** de Servicios, Proyectos y Contacto: línea pequeña, título, frase de apoyo, párrafo de entrada y foto.
+- **Franja de cierre** de Servicios y de Proyectos: el título y el texto (los dos botones son siempre los mismos).
+- **Preguntas frecuentes** de Servicios y de Contacto: se agregan y se borran una por una. Se pintan como acordeón al final de la página y Google las puede mostrar en los resultados, así que no prometas plazos, precios ni garantías que PIYC no haya confirmado. Si borras todas, el bloque desaparece.
+- **Textos del formulario** de Contacto: el párrafo que va encima (qué pasa al enviar) y la nota de abajo (qué se hace con los datos).
+- **Textos que se repiten en todas las fichas**: la frase que aparece bajo los datos de un caso cuando tiene servicios asociados, el cierre de la ficha de un caso y el texto del cierre de la ficha de un servicio. No son de una ficha concreta —salen igual en todas—, por eso se editan aquí y no dentro de cada una.
+- **Página «no encontrada»**: lo que ve alguien que entra a un enlace que ya no existe.
 
 ### Datos de contacto y buscadores
 
@@ -105,11 +122,11 @@ En cuanto hay una foto cargada, el campo de **descripción de la imagen** se vue
 
 El sitio solo puede mostrar fotos que estén en su propio almacenamiento o en Cloudinary. Si pegas la dirección de una imagen de un sitio distinto, el panel te avisa que **probablemente no se vaya a ver** en la página publicada. En ese caso sube el archivo con el botón de arriba, o publica la foto en Cloudinary (gratuito) y pega esa dirección.
 
-## 5. Mensajes del formulario de contacto
+## 5. Mensajes de contacto
 
 El formulario de contacto del sitio **no manda correos**. Cuando alguien lo llena, dos cosas pasan al mismo tiempo:
 
-1. El sistema guarda una copia del contacto (nombre, empresa, teléfono, correo si lo dejó, y el mensaje) en la pantalla **Mensajes de contacto**, dentro de Contenido del sitio.
+1. El sistema guarda una copia del contacto (nombre, empresa, teléfono, correo si lo dejó, el servicio que marcó y el mensaje) en la pantalla **Mensajes de contacto**, que se abre desde la tarjeta del mismo nombre en Contenido del sitio o desde el Dashboard.
 2. Se abre WhatsApp en el navegador de la persona, con el mensaje ya escrito, listo para que solo tenga que pulsar enviar.
 
 Muchas personas cierran WhatsApp sin pulsar enviar — por eso existe esta pantalla: el contacto queda registrado igual, con su teléfono, aunque el WhatsApp nunca haya llegado.
@@ -126,17 +143,19 @@ Solo administradores y coordinadores ven esta sección.
 
 1. Entra a **Equipo** y pulsa **Nueva cuenta**.
 2. Completa nombre completo, cargo, cédula, teléfono y correo de contacto (estos últimos son opcionales, para ubicar a la persona).
-3. Define el **usuario** con el que va a entrar y el **rol**.
-4. Al guardar, el sistema genera una **contraseña inicial**. Se muestra **una sola vez** en pantalla: cópiala antes de cerrarla, porque no se guarda en ningún lado y, si se pierde, hay que restablecerla.
+3. Define el **usuario** con el que va a entrar y el **rol**. El usuario se propone solo a partir del nombre; puedes cambiarlo.
+4. La **contraseña inicial** puedes dejarla en blanco —el sistema genera una— o escribirla tú (mínimo 10 caracteres). En los dos casos se muestra **una sola vez** al guardar: usa el botón **Copiar usuario y contraseña** antes de salir de esa pantalla, porque no se guarda en ningún lado y, si se pierde, hay que restablecerla.
 
 <!-- captura: pantalla de nueva cuenta con el usuario y la contraseña generados -->
 
 ### Desactivar una cuenta ≠ eliminarla
 
-- **Desactivar** deja a la persona sin poder entrar desde ese momento, pero conserva su ficha y su historial de jornadas. Es lo correcto cuando alguien sale de la empresa.
-- **Eliminar** borra la cuenta y también sus jornadas registradas, de forma permanente. Se usa solo para cuentas de prueba o creadas por error.
+- **Desactivar** es el interruptor **¿La cuenta está activa?** dentro de la ficha de la persona. Deja a la persona sin poder entrar desde ese momento, pero conserva su ficha y su historial de jornadas. Es lo correcto cuando alguien sale de la empresa.
+- **Eliminar** borra la cuenta y también sus jornadas registradas, de forma permanente. Se usa solo para cuentas de prueba o creadas por error. Lleva **doble confirmación**: primero hay que escribir el usuario exacto de la persona en el campo que aparece, y después aceptar el aviso del navegador.
 
 Cada persona debe tener su propia cuenta: compartir una entre varios hace que las jornadas dejen de decir quién trabajó realmente.
+
+Si abres tu **propia** ficha, puedes cambiar tus datos pero no tu rol ni tu estado, y tu contraseña la cambias desde Mi cuenta, no desde ahí.
 
 ### Restablecer la contraseña de otra persona
 
@@ -150,7 +169,7 @@ Cada persona debe tener su propia cuenta: compartir una entre varios hace que la
 Desde tu portal (`/mi-cuenta`) puedes registrar tus horas trabajadas, pensado para hacerse desde el celular en obra.
 
 1. Al terminar el turno, entra a tu portal.
-2. En **Registrar jornada**, escribe la fecha del día en que **empezaste** el turno, la hora de inicio y la hora de finalización.
+2. En **Registrar jornada**, llena **Fecha del día laboral** —el día en que **empezaste** el turno—, **Hora de inicio** y **Hora de finalización**.
 3. Si el turno pasó de la medianoche (por ejemplo, empezaste a las 10:00 p. m. y terminaste a las 2:00 a. m.), marca la casilla **Terminé al día siguiente**. Si no la marcas pero la hora de fin es menor que la de inicio, el sistema entiende igual que cruzó la medianoche y te lo avisa en pantalla.
 4. Escribe la orden de trabajo si la tuviste (opcional), la descripción de la labor y, si quieres, observaciones.
 5. Revisa la **vista previa** de cómo quedarían repartidas tus horas: se recalcula sola mientras escribes. No es definitiva — las cifras finales las fija tu coordinador al aprobar.
@@ -183,6 +202,9 @@ Persona, estado (todos, pendiente, aprobada o rechazada), fecha desde, fecha has
 Abre la ficha de una jornada pendiente («Revisar») para ver el detalle completo: persona, día, horario, orden de trabajo, labor realizada, observaciones y el desglose de horas.
 
 1. **Aprobar jornada**: acepta el registro tal como está. Al aprobarla, su desglose de horas queda **congelado**: aunque después se corrija el horario del mes, esta jornada ya no cambia.
+
+   **Nadie puede aprobar su propia jornada**, ni siquiera un administrador: si registras tus horas, la revisión se la pide al otro coordinador o al administrador. El sistema lo impide y lo dice en pantalla.
+
 2. **Rechazar con una nota**: si algo está mal, escribe el motivo (es obligatorio) y pulsa **Rechazar y devolver**. La jornada vuelve al portal del empleado con tu nota, para que la corrija y la registre de nuevo.
 
 **Rechazar no es eliminar.** El registro se conserva siempre; rechazar solo lo devuelve con una explicación. Eliminar sí borra la jornada de forma permanente.
@@ -191,8 +213,8 @@ Una jornada ya revisada (aprobada o rechazada) se puede **volver a dejar pendien
 
 ### Eliminar (doble confirmación)
 
-1. En la ficha de la jornada, pulsa **Quiero eliminarla**.
-2. Confirma en el aviso del navegador. Solo entonces se borra.
+1. En la ficha de la jornada, pulsa **Quiero eliminarla**: aparece el botón rojo de verdad.
+2. Púlsalo y confirma en el aviso del navegador. Solo entonces se borra.
 
 El registro desaparece para todos, también del portal de la persona, y **no se puede deshacer**. Se usa solo para registros de prueba o duplicados; para pedir una corrección, se rechaza.
 
@@ -249,7 +271,10 @@ Al final del archivo hay una **fila de totales** con la suma de todas las jornad
 ## 11. Preguntas frecuentes
 
 **Guardé un cambio en el sitio y no lo veo todavía.**
-Es normal: el sitio se actualiza solo cada cierto tiempo, hasta cinco minutos. Si pasado ese tiempo sigue sin verse, revisa que hayas pulsado «Guardar» en el bloque correcto (cada tarjeta tiene su propio botón).
+Recarga la página del sitio: lo normal es que ya esté. Si no, espera unos minutos (el sitio se regenera como máximo cada cinco) y revisa que hayas pulsado «Guardar» en el bloque correcto: cada tarjeta tiene su propio botón y guarda solo lo suyo.
+
+**Quiero cambiar una frase del sitio y no encuentro dónde.**
+Todas las frases están en alguna pantalla de **Contenido del sitio**. Si es de la portada, en Página de inicio; si es de Servicios, Proyectos o Contacto, en **Textos de las páginas**; si sale igual en todas las fichas de caso o de servicio, está en esa misma pantalla, en el último bloque. Los datos de contacto —dirección, teléfonos, correo— van en Datos de contacto y buscadores.
 
 **No puedo crear una cuenta nueva en Equipo.**
 Puede que falte una configuración del servidor. Avisa a soporte (GOCAS): sin ella se pueden ver y editar cuentas existentes, pero no crear otras nuevas ni restablecer contraseñas.

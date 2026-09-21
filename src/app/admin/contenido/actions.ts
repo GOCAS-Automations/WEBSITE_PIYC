@@ -429,6 +429,55 @@ export async function guardarInicioIntro(
       title: text(formData, "title"),
       body: text(formData, "body"),
       image: imagenDeFormulario(formData, "cover", "cover_alt"),
+      ctaEtiqueta: text(formData, "cta_etiqueta"),
+    },
+  }));
+  if (estado.status === "success") revalidarSitio("/");
+  return estado;
+}
+
+/**
+ * Encabezado de una de las dos franjas de listado de la portada (servicios y
+ * casos de éxito): rótulo, título, párrafo de entrada y texto del enlace.
+ *
+ * La franja se llama por su clave en un campo oculto, validada contra la lista:
+ * sin eso, un formulario manipulado escribiría cualquier clave del JSON.
+ */
+const FRANJAS_INICIO = ["seccionServicios", "seccionProyectos"] as const;
+type FranjaInicio = (typeof FRANJAS_INICIO)[number];
+
+export async function guardarInicioFranja(
+  _prev: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  const franja = text(formData, "franja") as FranjaInicio;
+  if (!(FRANJAS_INICIO as readonly string[]).includes(franja))
+    return fail("Esa franja de la portada no existe.");
+
+  const estado = await actualizarAjuste<AjustesHome>("home", (home) => ({
+    ...home,
+    [franja]: {
+      eyebrow: text(formData, "eyebrow"),
+      title: text(formData, "title"),
+      intro: text(formData, "intro"),
+      ctaEtiqueta: text(formData, "cta_etiqueta"),
+    },
+  }));
+  if (estado.status === "success") revalidarSitio("/");
+  return estado;
+}
+
+/** Rótulo, título e introducción del bloque de valores **de la portada**. */
+export async function guardarInicioValores(
+  _prev: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  const estado = await actualizarAjuste<AjustesHome>("home", (home) => ({
+    ...home,
+    seccionValores: {
+      eyebrow: text(formData, "eyebrow"),
+      title: text(formData, "title"),
+      intro: text(formData, "intro"),
     },
   }));
   if (estado.status === "success") revalidarSitio("/");
@@ -492,6 +541,14 @@ export async function guardarInicioCierre(
         etiqueta: text(formData, "cta2_etiqueta"),
         href: text(formData, "cta2_href"),
       },
+      nota: {
+        texto: text(formData, "nota_texto"),
+        enlace: {
+          etiqueta: text(formData, "nota_enlace_etiqueta"),
+          href: text(formData, "nota_enlace_href"),
+        },
+        textoFinal: text(formData, "nota_texto_final"),
+      },
     },
   }));
   if (estado.status === "success") revalidarSitio("/");
@@ -524,6 +581,7 @@ export async function guardarNosotrosQuienes(
   const estado = await actualizarAjuste<AjustesNosotros>("nosotros", (n) => ({
     ...n,
     quienesSomos: {
+      eyebrow: text(formData, "eyebrow"),
       title: text(formData, "title"),
       body: text(formData, "body"),
       image: imagenDeFormulario(formData, "cover", "cover_alt"),
@@ -565,9 +623,26 @@ export async function guardarNosotrosValores(
 ): Promise<ActionState> {
   const estado = await actualizarAjuste<AjustesNosotros>("nosotros", (n) => ({
     ...n,
-    valores: { title: text(formData, "title"), intro: text(formData, "intro") },
+    valores: {
+      eyebrow: text(formData, "eyebrow"),
+      title: text(formData, "title"),
+      intro: text(formData, "intro"),
+    },
   }));
   if (estado.status === "success") revalidarSitio("/nosotros", "/");
+  return estado;
+}
+
+/** Franja de cierre de `/nosotros`. */
+export async function guardarNosotrosCierre(
+  _prev: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  const estado = await actualizarAjuste<AjustesNosotros>("nosotros", (n) => ({
+    ...n,
+    cta: { title: text(formData, "title"), body: text(formData, "body") },
+  }));
+  if (estado.status === "success") revalidarSitio("/nosotros");
   return estado;
 }
 
@@ -584,12 +659,16 @@ export async function guardarNosotrosGaleria(
   const estado = await actualizarAjuste<AjustesNosotros>("nosotros", (n) => ({
     ...n,
     galeria,
+    bloqueGaleria: {
+      eyebrow: text(formData, "galeria_eyebrow"),
+      title: text(formData, "galeria_title"),
+    },
   }));
   if (estado.status === "success") revalidarSitio("/nosotros");
   return estado;
 }
 
-/* --- Cabeceras de páginas ----------------------------------------- */
+/* --- Textos de las páginas internas -------------------------------- */
 
 const PAGINAS_CON_CABECERA = ["servicios", "proyectos", "contacto"] as const;
 type PaginaConCabecera = (typeof PAGINAS_CON_CABECERA)[number];
@@ -621,6 +700,106 @@ export async function guardarCabeceraPagina(
 
   if (estado.status === "success") {
     revalidarSitio(`/${pagina}`);
+  }
+  return estado;
+}
+
+/**
+ * Franja de cierre de `/servicios` o `/proyectos` (el título y el párrafo; los
+ * dos botones son siempre los mismos y no se editan).
+ */
+const PAGINAS_CON_CIERRE = ["servicios", "proyectos"] as const;
+type PaginaConCierre = (typeof PAGINAS_CON_CIERRE)[number];
+
+export async function guardarCierrePagina(
+  _prev: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  const pagina = text(formData, "pagina") as PaginaConCierre;
+  if (!(PAGINAS_CON_CIERRE as readonly string[]).includes(pagina))
+    return fail("Esa página no existe.");
+
+  const estado = await actualizarAjuste<AjustesPaginas>("paginas", (p) => ({
+    ...p,
+    [pagina]: {
+      ...(p[pagina] ?? {}),
+      cta: { title: text(formData, "title"), body: text(formData, "body") },
+    },
+  }));
+  if (estado.status === "success") revalidarSitio(`/${pagina}`);
+  return estado;
+}
+
+/** Los dos párrafos que acompañan al formulario de `/contacto`. */
+export async function guardarTextosFormulario(
+  _prev: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  const estado = await actualizarAjuste<AjustesPaginas>("paginas", (p) => ({
+    ...p,
+    contacto: {
+      ...(p.contacto ?? {}),
+      introFormulario: text(formData, "intro_formulario"),
+      notaFormulario: text(formData, "nota_formulario"),
+    },
+  }));
+  if (estado.status === "success") revalidarSitio("/contacto");
+  return estado;
+}
+
+/**
+ * Preguntas frecuentes de `/servicios` o `/contacto`.
+ *
+ * Una lista vacía es una decisión válida («no quiero preguntas en esta
+ * página») y se respeta: el bloque simplemente no se pinta, y tampoco se emite
+ * el `FAQPage` en los datos estructurados.
+ */
+const PAGINAS_CON_FAQ = ["servicios", "contacto"] as const;
+type PaginaConFaq = (typeof PAGINAS_CON_FAQ)[number];
+
+export async function guardarFaqPagina(
+  _prev: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  const pagina = text(formData, "pagina") as PaginaConFaq;
+  if (!(PAGINAS_CON_FAQ as readonly string[]).includes(pagina))
+    return fail("Esa página no existe.");
+
+  const faq = paresDeListas(formData, "pregunta", "respuesta").map(({ a, b }) => ({
+    pregunta: a,
+    respuesta: b,
+  }));
+
+  const estado = await actualizarAjuste<AjustesPaginas>("paginas", (p) => ({
+    ...p,
+    [pagina]: { ...(p[pagina] ?? {}), faq },
+  }));
+  if (estado.status === "success") revalidarSitio(`/${pagina}`);
+  return estado;
+}
+
+/**
+ * Textos que se repiten en TODAS las fichas de caso y de servicio. No son de
+ * un caso concreto, por eso no están en su ficha sino aquí.
+ */
+export async function guardarPlantillasDeFicha(
+  _prev: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  const estado = await actualizarAjuste<AjustesPaginas>("paginas", (p) => ({
+    ...p,
+    proyectoDetalle: {
+      notaServicios: text(formData, "nota_servicios"),
+      cta: {
+        title: text(formData, "proyecto_cta_title"),
+        body: text(formData, "proyecto_cta_body"),
+      },
+    },
+    servicioDetalle: { ctaTexto: text(formData, "servicio_cta_body") },
+  }));
+  if (estado.status === "success") {
+    revalidatePath("/proyectos/[slug]", "page");
+    revalidatePath("/servicios/[slug]", "page");
   }
   return estado;
 }

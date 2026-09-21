@@ -43,3 +43,16 @@ El proyecto de Supabase de PIYC es propio (creado por Cesar con los accesos que 
 - `jornada_config`: recargo dominical 0,90 (Ley 2466/2025, desde jul-2026) — confirmar con PIYC o su contador.
 **Tropiezos:** el BMP del logo mide 250×121 px, no se vectoriza limpio. Edge headless no baja de ~500 px de ancho: capturas móviles por CDP con `puppeteer-core` fuera del repo.
 **Siguiente:** visto bueno de la paleta → día 2 (PPTX de casos de éxito, fotos a WebP, `CONTENIDO.md`, semillas). Pendientes con Jorge: logo vectorial, misión/visión, textos de telemetría/telecontrol/aplicaciones, catálogo de fotos, reglas de jornada, cuentas iniciales, agrupación de servicios en 4 líneas. `site_url` de Auth a `https://piycsas.com` al apuntar el dominio.
+
+## 2026-09-20/21 · Construcción completa: sitio, panel, jornadas, marca y QA
+
+**Hecho:** paleta v2 derivada solo del logo (azul domina, verde acento, sin naranja). Seis casos de éxito extraídos del PPTX con 28 fotos WebP en el bucket. Sitio público completo (7 rutas, ISR, formulario → `site_mensajes` + `wa.me`, SEO, JSON-LD). Panel: ingreso por usuario, 3 roles, CRUD de contenido, equipo, mensajes. Jornadas: registro, aprobación, horarios mensuales, CSV; 23 pruebas unitarias (`npm test`). Documento de identidad de marca en `docs/marca/` (18 hojas, HTML + PDF). `docs/ADMIN.md` verificado contra el código, `docs/PLAN_PRUEBAS.md` con Lighthouse (accesibilidad 100, SEO 100, rendimiento móvil 90–98).
+**Decisiones:**
+- Alcance reiterado por Cesar: solo landing, panel de contenido y jornadas. Nada de nómina, volante, calendario ni métricas de GPI.
+- Migración **0004** (cuarta, fuera del plan de tres) por seguridad: nadie se revisa su propia jornada (trigger) y el manager inserta a nombre de cuentas activas con su sesión (sin service-role).
+- El recargo dominical/festivo sale de la ley por fecha (0,80 → 0,90 el 1-jul-2026 → 1,00 el 1-jul-2027), no del ajuste. Festivos generados por función (19 en 2026 y 2027).
+- Sitio en trato de **usted**. Los textos sembrados viven en `site_settings`: corregir solo el código no basta.
+- Heros de página tipográficos: la foto más grande del PPTX mide 1229 px; no se estiran a pantalla completa.
+- La sal del `ip_hash` del formulario es `CONTACT_IP_SALT` (ya no cae a la service-role): crearla en Vercel.
+**Tropiezos:** en Tailwind v4 `utilities` va después de `components`: un `display:none` en `components` no le gana a `inline-flex`. `x-forwarded-for` se lee del último elemento o de `x-vercel-forwarded-for`, nunca del primero. El primer `<form>` del panel es «Cerrar sesión» (ojo en pruebas automatizadas).
+**Siguiente:** bajar las 40 fotos originales del Drive (faltan fotos de refrigeración, cuartos fríos y aires; ninguna actual sirve de cabecera ancha). Respuestas de Jorge (lista en `docs/PLAN_PRUEBAS.md` y `docs/CONTENIDO.md` §6). Antes de entregar: borrar `coordinador.prueba` y `empleado.prueba`, variables en Vercel + deploy, `site_url` de Auth, dominio sin tocar MX/SPF, Search Console.

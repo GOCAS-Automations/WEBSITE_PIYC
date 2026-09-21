@@ -14,6 +14,7 @@ import { FormularioAdmin } from "@/components/admin/FormularioAdmin";
 import { CampoImagen } from "@/components/admin/CampoImagen";
 import { CampoGaleria } from "@/components/admin/CampoGaleria";
 import {
+  guardarNosotrosCierre,
   guardarNosotrosGaleria,
   guardarNosotrosHero,
   guardarNosotrosMisionVision,
@@ -96,6 +97,13 @@ export default async function NosotrosPage() {
           />
           <FormularioAdmin action={guardarNosotrosQuienes}>
             <div className="space-y-4">
+              <Campo
+                label="Línea pequeña de arriba"
+                name="eyebrow"
+                scope="quienes"
+                defaultValue={nosotros.quienesSomos?.eyebrow}
+                placeholder="La empresa"
+              />
               <Campo
                 label="Título del bloque"
                 name="title"
@@ -186,17 +194,26 @@ export default async function NosotrosPage() {
           <FormularioAdmin action={guardarNosotrosValores}>
             <div className="grid gap-4 sm:grid-cols-2">
               <Campo
+                label="Línea pequeña de arriba"
+                name="eyebrow"
+                scope="valores"
+                defaultValue={nosotros.valores?.eyebrow}
+                placeholder="Cómo trabajamos"
+              />
+              <Campo
                 label="Título"
                 name="title"
                 scope="valores"
                 defaultValue={nosotros.valores?.title}
                 placeholder="En qué creemos"
               />
-              <Campo
+              <AreaTexto
                 label="Frase de presentación"
                 name="intro"
                 scope="valores"
+                rows={2}
                 defaultValue={nosotros.valores?.intro}
+                className="sm:col-span-2"
               />
             </div>
           </FormularioAdmin>
@@ -208,12 +225,55 @@ export default async function NosotrosPage() {
             description="Fotos del equipo, del taller o de los montajes."
           />
           <FormularioAdmin action={guardarNosotrosGaleria}>
-            <CampoGaleria
-              label="Fotos de la página Nosotros"
-              folder="nosotros"
-              defaultValue={nosotros.galeria}
-              hint="Fotos reales, no de banco de imágenes: se nota, y lo que vende es que se vea el trabajo de PIYC. Si la dejas vacía, el sitio no pinta la galería."
-            />
+            <div className="space-y-4">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Campo
+                  label="Línea pequeña de arriba"
+                  name="galeria_eyebrow"
+                  scope="galeria"
+                  defaultValue={nosotros.bloqueGaleria?.eyebrow}
+                  placeholder="En obra"
+                />
+                <Campo
+                  label="Título del bloque"
+                  name="galeria_title"
+                  scope="galeria"
+                  defaultValue={nosotros.bloqueGaleria?.title}
+                  placeholder="Nuestro trabajo"
+                />
+              </div>
+              <CampoGaleria
+                label="Fotos de la página Nosotros"
+                folder="nosotros"
+                defaultValue={nosotros.galeria}
+                hint="Fotos reales, no de banco de imágenes: se nota, y lo que vende es que se vea el trabajo de PIYC. Si la dejas vacía, el sitio no pinta la galería."
+              />
+            </div>
+          </FormularioAdmin>
+        </Tarjeta>
+
+        <Tarjeta>
+          <TituloTarjeta
+            title="Franja de cierre"
+            description="La última llamada a la acción, al final de la página Nosotros."
+          />
+          <FormularioAdmin action={guardarNosotrosCierre}>
+            <div className="space-y-4">
+              <Campo
+                label="Título"
+                name="title"
+                scope="cierre-nosotros"
+                defaultValue={nosotros.cta?.title}
+                placeholder="¿Quiere trabajar con nosotros?"
+              />
+              <AreaTexto
+                label="Texto"
+                name="body"
+                scope="cierre-nosotros"
+                rows={2}
+                defaultValue={nosotros.cta?.body}
+              />
+            </div>
           </FormularioAdmin>
         </Tarjeta>
       </div>

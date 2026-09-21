@@ -5,8 +5,10 @@
  * =======================================================
  * Aprobar, rechazar, reabrir, eliminar y registrar una jornada a nombre de otra
  * persona. Todo exige rol de **manager** (admin | coordinador) con la cuenta
- * activa: se comprueba aquí, en el servidor, además de las políticas RLS de la
- * migración 0002.
+ * activa: se comprueba aquí, en el servidor, además de las políticas RLS de las
+ * migraciones 0002 y 0004. Desde la 0004 la base también impide que alguien
+ * revise su propia jornada (trigger `jornadas_proteger_revision`) y deja que un
+ * manager registre jornadas ajenas con su propia sesión, sin clave de servicio.
  *
  * EL DESGLOSE SE CONGELA AL APROBAR
  * ---------------------------------
@@ -39,16 +41,8 @@ import {
   MAX_MINUTOS_TURNO,
 } from "@/lib/jornada";
 import { LIMITES_JORNADA } from "@/lib/jornada-types";
-import { getServiceRoleSupabase } from "@/lib/supabase/admin";
 import type { Json } from "@/lib/supabase/database.types";
-import {
-  fail,
-  ok,
-  text,
-  textOrNull,
-  SIN_PERMISO,
-  SIN_SERVICE_ROLE,
-} from "@/lib/admin/formulario";
+import { fail, ok, text, textOrNull, SIN_PERMISO } from "@/lib/admin/formulario";
 import type { ActionState } from "@/lib/admin-types";
 
 /**
@@ -439,17 +433,12 @@ export async function guardarJornadaComoManager(
   }
 
   /* --- Insertar a nombre de OTRA persona ---------------------------
-     La única política de INSERT de la migración 0002 (`jornadas_insert_propia`)
-     exige `employee_id = auth.uid()`: con el cliente de sesión, un manager no
-     puede crear una jornada ajena. Se usa la clave de servicio, que es de
-     servidor y nunca llega al navegador, después de haber exigido el rol arriba
-     y de haber comprobado que la cuenta destino existe y está activa.
-     PENDIENTE DE DECIDIR CON CESAR: una política `jornadas_insert_manager` en
-     la base dejaría hacerlo con el cliente de sesión y sin clave de servicio. */
-  const servicio = getServiceRoleSupabase();
-  if (!servicio) return SIN_SERVICE_ROLE;
-
-  const { error } = await servicio
+     Va con el cliente de SESIÓN, no con la clave de servicio: la política
+     `jornadas_insert_manager` de la migración 0004 lo permite y repite en la
+     base lo que ya se validó arriba (rol de manager, cuenta destino activa,
+     estado 'pendiente' y sin desglose). Las comprobaciones de este archivo se
+     quedan porque dan el mensaje en español; la RLS es la red de abajo. */
+  const { error } = await session.supabase
     .from("jornadas")
     .insert({ ...payload, status: "pendiente" });
 

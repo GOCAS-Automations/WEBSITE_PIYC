@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { requireContentEditor } from "@/lib/supabase/auth";
 import { getAjustes, listProyectos, listServicios } from "@/lib/admin/lecturas";
 import {
@@ -16,12 +17,41 @@ import { CampoParejas } from "@/components/admin/CampoParejas";
 import {
   guardarInicioCierre,
   guardarInicioDestacados,
+  guardarInicioFranja,
   guardarInicioHero,
   guardarInicioIntro,
   guardarInicioProceso,
+  guardarInicioValores,
 } from "../actions";
 
 export const dynamic = "force-dynamic";
+
+/**
+ * Las dos franjas de listado de la portada. El encabezado de cada una (rótulo,
+ * título, entrada y texto del enlace) se guarda con la misma acción; la clave
+ * viaja en un campo oculto y la acción la valida.
+ */
+const FRANJAS = [
+  {
+    clave: "seccionServicios",
+    titulo: "Franja de servicios",
+    descripcion:
+      "Los textos que encabezan la franja de servicios de la portada. Cuáles se muestran se decide más abajo, en «Qué se destaca en la portada».",
+    ruta: "/servicios",
+    placeholderEyebrow: "Portafolio",
+    placeholderTitulo: "Servicios",
+    placeholderEnlace: "Ver los nueve servicios",
+  },
+  {
+    clave: "seccionProyectos",
+    titulo: "Franja de casos de éxito",
+    descripcion: "Los textos que encabezan la franja de proyectos de la portada.",
+    ruta: "/proyectos",
+    placeholderEyebrow: "Casos de éxito",
+    placeholderTitulo: "Proyectos entregados y funcionando",
+    placeholderEnlace: "Ver todos los proyectos",
+  },
+] as const;
 
 /**
  * PÁGINA DE INICIO
@@ -151,6 +181,15 @@ export default async function InicioPage() {
                 hint="Separa los párrafos dejando una línea en blanco entre ellos."
                 className="sm:col-span-2"
               />
+              <Campo
+                label="Texto del enlace a Nosotros"
+                name="cta_etiqueta"
+                scope="intro"
+                defaultValue={home.intro?.ctaEtiqueta}
+                placeholder="Conocer a PIYC"
+                hint="Si lo dejas vacío, el enlace no se pinta."
+                className="sm:col-span-2"
+              />
               <div className="sm:col-span-2">
                 <CampoImagen
                   label="Foto del bloque"
@@ -165,6 +204,52 @@ export default async function InicioPage() {
             </div>
           </FormularioAdmin>
         </Tarjeta>
+
+        {/* --- Encabezados de las dos franjas de listado ------------- */}
+        {FRANJAS.map((franja) => {
+          const datos = home[franja.clave];
+          return (
+            <Tarjeta key={franja.clave}>
+              <TituloTarjeta title={franja.titulo} description={franja.descripcion} />
+              <FormularioAdmin action={guardarInicioFranja}>
+                <input type="hidden" name="franja" value={franja.clave} />
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <Campo
+                    label="Línea pequeña de arriba"
+                    name="eyebrow"
+                    scope={franja.clave}
+                    defaultValue={datos?.eyebrow}
+                    placeholder={franja.placeholderEyebrow}
+                  />
+                  <Campo
+                    label="Título"
+                    name="title"
+                    scope={franja.clave}
+                    defaultValue={datos?.title}
+                    placeholder={franja.placeholderTitulo}
+                  />
+                  <AreaTexto
+                    label="Párrafo de entrada"
+                    name="intro"
+                    scope={franja.clave}
+                    rows={2}
+                    defaultValue={datos?.intro}
+                    className="sm:col-span-2"
+                  />
+                  <Campo
+                    label="Texto del enlace «ver todos»"
+                    name="cta_etiqueta"
+                    scope={franja.clave}
+                    defaultValue={datos?.ctaEtiqueta}
+                    placeholder={franja.placeholderEnlace}
+                    hint={`Siempre lleva a ${franja.ruta}. Si lo dejas vacío, el enlace no se pinta.`}
+                    className="sm:col-span-2"
+                  />
+                </div>
+              </FormularioAdmin>
+            </Tarjeta>
+          );
+        })}
 
         {/* --- Proceso ---------------------------------------------- */}
         <Tarjeta>
@@ -209,6 +294,51 @@ export default async function InicioPage() {
                   b: p.descripcion,
                 }))}
                 hint="Entre tres y cinco. Cada paso: un título de dos o tres palabras y una frase de qué pasa ahí."
+              />
+            </div>
+          </FormularioAdmin>
+        </Tarjeta>
+
+        {/* --- Entradilla de los valores en la portada --------------- */}
+        <Tarjeta>
+          <TituloTarjeta
+            title="Entradilla de los valores en la portada"
+            description="El rótulo, el título y la frase que presentan los cuatro valores en el inicio. Son textos distintos de los de la página Nosotros."
+          />
+          <AyudaSeccion className="mb-5">
+            Los valores en sí —nombre, descripción e icono— se editan en{" "}
+            <Link
+              prefetch={false}
+              href="/admin/contenido/valores"
+              className="font-semibold text-azul-700 underline"
+            >
+              Valores corporativos
+            </Link>
+            , y se usan tanto aquí como en Nosotros.
+          </AyudaSeccion>
+          <FormularioAdmin action={guardarInicioValores}>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Campo
+                label="Línea pequeña de arriba"
+                name="eyebrow"
+                scope="valores-inicio"
+                defaultValue={home.seccionValores?.eyebrow}
+                placeholder="Lo que sostiene el trabajo"
+              />
+              <Campo
+                label="Título"
+                name="title"
+                scope="valores-inicio"
+                defaultValue={home.seccionValores?.title}
+                placeholder="Nuestros valores"
+              />
+              <AreaTexto
+                label="Frase de presentación"
+                name="intro"
+                scope="valores-inicio"
+                rows={2}
+                defaultValue={home.seccionValores?.intro}
+                className="sm:col-span-2"
               />
             </div>
           </FormularioAdmin>
@@ -311,6 +441,41 @@ export default async function InicioPage() {
                 name="cta2_href"
                 scope="cierre"
                 defaultValue={home.cta?.ctaSecundario?.href}
+              />
+
+              <AyudaSeccion className="sm:col-span-2">
+                La frase pequeña que va debajo del título lleva un enlace en la
+                mitad. Se escribe en tres partes: lo que va antes del enlace, el
+                texto del enlace y lo que va después. Deja las tres vacías para
+                que no aparezca.
+              </AyudaSeccion>
+              <Campo
+                label="Frase pequeña — antes del enlace"
+                name="nota_texto"
+                scope="cierre"
+                defaultValue={home.cta?.nota?.texto}
+                placeholder="También puede"
+              />
+              <Campo
+                label="Frase pequeña — texto del enlace"
+                name="nota_enlace_etiqueta"
+                scope="cierre"
+                defaultValue={home.cta?.nota?.enlace?.etiqueta}
+                placeholder="revisar el portafolio de servicios"
+              />
+              <Campo
+                label="Frase pequeña — a dónde lleva el enlace"
+                name="nota_enlace_href"
+                scope="cierre"
+                defaultValue={home.cta?.nota?.enlace?.href}
+                placeholder="/servicios"
+              />
+              <Campo
+                label="Frase pequeña — después del enlace"
+                name="nota_texto_final"
+                scope="cierre"
+                defaultValue={home.cta?.nota?.textoFinal}
+                placeholder="antes de escribirnos."
               />
             </div>
           </FormularioAdmin>

@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import { requireContentEditor } from "@/lib/supabase/auth";
 import { getAjustes } from "@/lib/admin/lecturas";
 import {
@@ -11,13 +12,22 @@ import {
 } from "@/components/admin/ui";
 import { FormularioAdmin } from "@/components/admin/FormularioAdmin";
 import { CampoImagen } from "@/components/admin/CampoImagen";
-import { guardarCabeceraPagina, guardarPaginaNoEncontrada } from "../actions";
-import type { CabeceraPagina } from "@/lib/content-types";
+import { CampoParejas } from "@/components/admin/CampoParejas";
+import {
+  guardarCabeceraPagina,
+  guardarCierrePagina,
+  guardarFaqPagina,
+  guardarPaginaNoEncontrada,
+  guardarPlantillasDeFicha,
+  guardarTextosFormulario,
+} from "../actions";
+import type { CabeceraPagina, CierrePagina, PreguntaFrecuente } from "@/lib/content-types";
 
 export const dynamic = "force-dynamic";
 
 type Bloque = {
   clave: "servicios" | "proyectos" | "contacto";
+  nombre: string;
   titulo: string;
   descripcion: string;
   ruta: string;
@@ -26,18 +36,21 @@ type Bloque = {
 const BLOQUES: Bloque[] = [
   {
     clave: "servicios",
+    nombre: "Servicios",
     titulo: "Cabecera de Servicios",
     descripcion: "Lo que abre la página /servicios, encima del listado.",
     ruta: "/servicios",
   },
   {
     clave: "proyectos",
+    nombre: "Proyectos",
     titulo: "Cabecera de Proyectos",
     descripcion: "Lo que abre la página /proyectos, encima de los casos de éxito.",
     ruta: "/proyectos",
   },
   {
     clave: "contacto",
+    nombre: "Contacto",
     titulo: "Cabecera de Contacto",
     descripcion: "Lo que abre la página /contacto, encima de los datos y del formulario.",
     ruta: "/contacto",
@@ -58,14 +71,14 @@ export default async function PaginasPage() {
   return (
     <>
       <CabeceraPanel
-        title="Cabeceras de páginas"
-        description="Los títulos, las bajadas y las fotos con las que abren Servicios, Proyectos y Contacto."
+        title="Textos de las páginas"
+        description="Los textos de Servicios, Proyectos y Contacto: cabecera, franja de cierre, preguntas frecuentes y formulario. Y los que se repiten en todas las fichas."
         backHref="/admin/contenido"
         backLabel="Volver a Contenido"
         breadcrumb={[
           { label: "Panel", href: "/admin" },
           { label: "Contenido del sitio", href: "/admin/contenido" },
-          { label: "Cabeceras de páginas" },
+          { label: "Textos de las páginas" },
         ]}
       />
 
@@ -80,11 +93,17 @@ export default async function PaginasPage() {
 
       <div className="space-y-6">
         {BLOQUES.map((bloque) => {
+          // Las tres páginas comparten cabecera; cada una añade lo suyo
+          // (cierre, FAQ, textos del formulario). El molde común evita tener
+          // que discriminar la unión en cada campo.
           const datos = (paginas[bloque.clave] ?? {}) as CabeceraPagina & {
             intro?: string;
+            cta?: CierrePagina;
+            faq?: PreguntaFrecuente[];
           };
           return (
-            <Tarjeta key={bloque.clave}>
+            <Fragment key={bloque.clave}>
+            <Tarjeta>
               <TituloTarjeta title={bloque.titulo} description={bloque.descripcion} />
               <FormularioAdmin action={guardarCabeceraPagina}>
                 <input type="hidden" name="pagina" value={bloque.clave} />
@@ -132,8 +151,143 @@ export default async function PaginasPage() {
                 </div>
               </FormularioAdmin>
             </Tarjeta>
+
+            {/* Franja de cierre: solo Servicios y Proyectos la tienen
+                editable. La de Contacto no existe (ahí manda el formulario). */}
+            {bloque.clave !== "contacto" ? (
+              <Tarjeta>
+                <TituloTarjeta
+                  title={`Franja de cierre de ${bloque.nombre}`}
+                  description="La última llamada a la acción, al final de la página. Los dos botones son siempre los mismos."
+                />
+                <FormularioAdmin action={guardarCierrePagina}>
+                  <input type="hidden" name="pagina" value={bloque.clave} />
+                  <div className="space-y-4">
+                    <Campo
+                      label="Título"
+                      name="title"
+                      scope={`cierre-${bloque.clave}`}
+                      defaultValue={datos.cta?.title}
+                    />
+                    <AreaTexto
+                      label="Texto"
+                      name="body"
+                      scope={`cierre-${bloque.clave}`}
+                      rows={2}
+                      defaultValue={datos.cta?.body}
+                    />
+                  </div>
+                </FormularioAdmin>
+              </Tarjeta>
+            ) : null}
+
+            {/* Los dos párrafos que acompañan al formulario de contacto. */}
+            {bloque.clave === "contacto" ? (
+              <Tarjeta>
+                <TituloTarjeta
+                  title="Textos del formulario"
+                  description="Los dos párrafos que rodean el formulario de contacto."
+                />
+                <FormularioAdmin action={guardarTextosFormulario}>
+                  <div className="space-y-4">
+                    <AreaTexto
+                      label="Párrafo de arriba del formulario"
+                      name="intro_formulario"
+                      scope="formulario"
+                      rows={2}
+                      defaultValue={paginas.contacto?.introFormulario}
+                      hint="Qué pasa al enviar. El sitio no manda correos: abre WhatsApp con el mensaje ya escrito."
+                    />
+                    <AreaTexto
+                      label="Nota de abajo del formulario"
+                      name="nota_formulario"
+                      scope="formulario"
+                      rows={2}
+                      defaultValue={paginas.contacto?.notaFormulario}
+                      hint="Qué se hace con los datos de quien escribe. Déjala vacía si no quieres nota."
+                    />
+                  </div>
+                </FormularioAdmin>
+              </Tarjeta>
+            ) : null}
+
+            {/* Preguntas frecuentes: Servicios y Contacto. */}
+            {bloque.clave !== "proyectos" ? (
+              <Tarjeta>
+                <TituloTarjeta
+                  title={`Preguntas frecuentes de ${bloque.nombre}`}
+                  description="Se pintan como acordeón al final de la página y Google las puede mostrar en los resultados."
+                />
+                <AyudaSeccion className="mb-5">
+                  No prometas plazos, precios ni garantías que PIYC no haya
+                  confirmado: estas respuestas son públicas. Si borras todas, el
+                  bloque desaparece de la página.
+                </AyudaSeccion>
+                <FormularioAdmin action={guardarFaqPagina}>
+                  <input type="hidden" name="pagina" value={bloque.clave} />
+                  <CampoParejas
+                    label="Preguntas"
+                    nameA="pregunta"
+                    nameB="respuesta"
+                    etiquetaA="Pregunta"
+                    etiquetaB="Respuesta"
+                    filasB={3}
+                    placeholderA="¿Atienden fuera de Cali?"
+                    placeholderB="La base está en Cali, Valle del Cauca. Para otras ciudades, escríbanos con el alcance."
+                    textoAgregar="Agregar pregunta"
+                    defaultValue={(datos.faq ?? []).map((item) => ({
+                      a: item.pregunta,
+                      b: item.respuesta,
+                    }))}
+                  />
+                </FormularioAdmin>
+              </Tarjeta>
+            ) : null}
+            </Fragment>
           );
         })}
+
+        <Tarjeta>
+          <TituloTarjeta
+            title="Textos que se repiten en todas las fichas"
+            description="Las páginas de cada servicio y de cada caso de éxito comparten estos textos. No pertenecen a una ficha concreta, por eso se editan aquí."
+          />
+          <FormularioAdmin action={guardarPlantillasDeFicha}>
+            <div className="space-y-4">
+              <AreaTexto
+                label="Ficha de un caso — frase bajo los datos del proyecto"
+                name="nota_servicios"
+                scope="ficha"
+                rows={2}
+                defaultValue={paginas.proyectoDetalle?.notaServicios}
+                hint="Solo aparece cuando el caso tiene servicios asociados."
+              />
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Campo
+                  label="Ficha de un caso — título del cierre"
+                  name="proyecto_cta_title"
+                  scope="ficha"
+                  defaultValue={paginas.proyectoDetalle?.cta?.title}
+                />
+                <AreaTexto
+                  label="Ficha de un caso — texto del cierre"
+                  name="proyecto_cta_body"
+                  scope="ficha"
+                  rows={2}
+                  defaultValue={paginas.proyectoDetalle?.cta?.body}
+                />
+              </div>
+              <AreaTexto
+                label="Ficha de un servicio — texto del cierre"
+                name="servicio_cta_body"
+                scope="ficha"
+                rows={2}
+                defaultValue={paginas.servicioDetalle?.ctaTexto}
+                hint="El título lo arma el sitio con el nombre del servicio («¿Necesita telemetría?»)."
+              />
+            </div>
+          </FormularioAdmin>
+        </Tarjeta>
 
         <Tarjeta>
           <TituloTarjeta

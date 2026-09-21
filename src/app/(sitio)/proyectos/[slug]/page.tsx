@@ -14,6 +14,7 @@ import {
   enParrafos,
   galeriaCompleta,
   getContacto,
+  getPaginas,
   getProyecto,
   getProyectos,
   getServiciosPorSlug,
@@ -70,10 +71,18 @@ export default async function PaginaDeProyecto({
   const proyecto = await getProyecto(slug);
   if (!proyecto) notFound();
 
-  const [contacto, vecinos] = await Promise.all([
+  const [contacto, vecinos, paginas] = await Promise.all([
     getContacto(),
     getVecinosDeProyecto(slug),
+    getPaginas(),
   ]);
+
+  // Textos de la plantilla (iguales en todos los casos), editables desde el
+  // panel en «Textos de las páginas».
+  const plantilla = paginas.proyectoDetalle;
+  const notaServicios =
+    plantilla?.notaServicios ??
+    "Este caso combinó varios servicios de PIYC. Abajo puede ver cada uno.";
 
   // La relación caso → servicio vive en el respaldo estático: `site_projects`
   // no tiene columna para ella (`docs/CONTENIDO.md` §7).
@@ -139,10 +148,8 @@ export default async function PaginaDeProyecto({
                 ]}
               />
 
-              {serviciosDelCaso.length > 0 ? (
-                <p className="mt-4 text-[13px] leading-snug text-acero-600">
-                  Este caso combinó varios servicios de PIYC. Abajo puede ver cada uno.
-                </p>
+              {serviciosDelCaso.length > 0 && notaServicios ? (
+                <p className="mt-4 text-[13px] leading-snug text-acero-600">{notaServicios}</p>
               ) : null}
             </div>
           </div>
@@ -237,8 +244,8 @@ export default async function PaginaDeProyecto({
       ) : null}
 
       <FranjaCta
-        titulo="¿Quiere un resultado parecido en su planta?"
-        texto="Escríbanos con los datos de su proceso y revisamos si se puede abordar de la misma forma."
+        titulo={plantilla?.cta?.title ?? "¿Quiere un resultado parecido en su planta?"}
+        texto={plantilla?.cta?.body}
         hrefWhatsApp={hrefWhatsApp}
         hrefSecundario="/proyectos"
         etiquetaSecundaria="Ver los demás casos"

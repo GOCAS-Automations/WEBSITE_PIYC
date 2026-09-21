@@ -74,8 +74,8 @@ export default async function ListadoDeProyectos() {
       </section>
 
       <FranjaCta
-        titulo="¿Tiene un proyecto parecido?"
-        texto="Cuéntenos qué proceso quiere intervenir y con qué restricciones trabaja su planta."
+        titulo={ajustes?.cta?.title ?? "¿Tiene un proyecto parecido?"}
+        texto={ajustes?.cta?.body}
         hrefWhatsApp={hrefWhatsApp}
       />
     </main>

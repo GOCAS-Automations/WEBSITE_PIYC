@@ -86,6 +86,7 @@ export const homeEstatico: AjustesHome = {
       width: 658,
       height: 493,
     },
+    ctaEtiqueta: "Conocer a PIYC",
   },
   proceso: {
     eyebrow: "Cómo trabajamos",
@@ -120,6 +121,26 @@ export const homeEstatico: AjustesHome = {
       },
     ],
   },
+  seccionServicios: {
+    eyebrow: "Portafolio",
+    title: "Servicios",
+    intro:
+      "Nueve servicios para el ciclo completo: diseñar la instalación, armarla, ponerla a producir y sostenerla después.",
+    ctaEtiqueta: "Ver los nueve servicios",
+  },
+  seccionProyectos: {
+    eyebrow: "Casos de éxito",
+    title: "Proyectos entregados y funcionando",
+    intro:
+      "Automatizaciones y sistemas de control ejecutados en plantas de producción del Valle del Cauca.",
+    ctaEtiqueta: "Ver todos los proyectos",
+  },
+  seccionValores: {
+    eyebrow: "Lo que sostiene el trabajo",
+    title: "Nuestros valores",
+    intro:
+      "Cuatro criterios que se notan en cómo se cotiza, cómo se ejecuta y qué se entrega al final del proyecto.",
+  },
   serviciosDestacados: [
     "automatizacion-procesos-industriales",
     "tableros-de-control",
@@ -136,6 +157,11 @@ export const homeEstatico: AjustesHome = {
     body: "Cuéntenos qué necesita y con qué restricciones trabaja su planta. Respondemos por WhatsApp y, si hace falta, vamos a verlo en sitio.",
     ctaPrimario: { etiqueta: "Escríbanos por WhatsApp", href: "whatsapp" },
     ctaSecundario: { etiqueta: "Ir al formulario de contacto", href: "/contacto" },
+    nota: {
+      texto: "También puede",
+      enlace: { etiqueta: "revisar el portafolio de servicios", href: "/servicios" },
+      textoFinal: "antes de escribirnos.",
+    },
   },
 };
 
@@ -157,6 +183,7 @@ export const nosotrosEstatico: AjustesNosotros = {
     },
   },
   quienesSomos: {
+    eyebrow: "La empresa",
     title: "Quiénes somos",
     // Texto de PIYC (documento «4. QUIÉNES SOMOS», versión pulida).
     body: "Somos una empresa integrada por ingenieros altamente calificados, especializados en el desarrollo de proyectos de ingeniería, montaje y mantenimiento de equipos eléctricos y electrónicos. Nos dedicamos a la automatización de equipos, así como a la ejecución de obras eléctricas y electrónicas. Nuestro enfoque abarca desde la automatización y el control hasta el desarrollo de equipos de óptima calidad.\n\nOfrecemos servicios de alta calidad para dar soluciones asertivas, reduciendo el riesgo y dando la seguridad de que nuestra propuesta es la mejor, brindando tranquilidad y respaldo a cada cliente en su proceso de producción.",
@@ -177,9 +204,18 @@ export const nosotrosEstatico: AjustesNosotros = {
     body: "Proveer soluciones innovadoras en el desarrollo, el mantenimiento y el control de proyectos de ingeniería, adaptándonos a las necesidades específicas de cada cliente, con estándares de alta calidad y una cultura de mejora continua.",
   },
   valores: {
+    eyebrow: "Cómo trabajamos",
     title: "Nuestros valores",
     intro:
       "Cuatro criterios que se notan en cómo se cotiza, cómo se ejecuta y qué se entrega al final del proyecto.",
+  },
+  bloqueGaleria: {
+    eyebrow: "En obra",
+    title: "Nuestro trabajo",
+  },
+  cta: {
+    title: "¿Quiere trabajar con nosotros?",
+    body: "Cuéntenos qué necesita su planta y con qué restricciones trabaja. Revisamos el alcance antes de proponer cualquier cosa.",
   },
   galeria: [
     {
@@ -250,6 +286,10 @@ export const paginasEstatico: AjustesPaginas = {
           "La base está en Cali, Valle del Cauca, y desde ahí se atienden proyectos en la región. Para trabajos fuera de la ciudad, escríbanos y lo revisamos según el alcance.",
       },
     ],
+    cta: {
+      title: "¿No está seguro de qué servicio necesita?",
+      body: "Descríbanos el problema —el proceso, el equipo o la falla— y le decimos por dónde se aborda antes de cotizar nada.",
+    },
   },
   proyectos: {
     eyebrow: "Casos de éxito",
@@ -264,12 +304,18 @@ export const paginasEstatico: AjustesPaginas = {
       width: 658,
       height: 493,
     },
+    cta: {
+      title: "¿Tiene un proyecto parecido?",
+      body: "Cuéntenos qué proceso quiere intervenir y con qué restricciones trabaja su planta.",
+    },
   },
   contacto: {
     eyebrow: "Contacto",
     title: "Cuéntenos qué necesita su planta",
     subtitle:
       "Escríbanos por WhatsApp o déjenos los datos del proyecto en el formulario. Respondemos con las preguntas técnicas que hagan falta antes de proponer nada.",
+    introFormulario:
+      "Al enviar, se abre WhatsApp con el mensaje ya escrito para que solo tenga que darle enviar. No enviamos correos automáticos.",
     notaFormulario:
       "Los datos que escriba aquí se usan únicamente para responder su solicitud. No compartimos su información con terceros ni lo suscribimos a ningún boletín.",
     // FAQ redactada por el equipo de la web. Sin tiempos de respuesta, precios
@@ -296,6 +342,17 @@ export const paginasEstatico: AjustesPaginas = {
           "Sí. El botón verde del sitio abre una conversación con el número principal, y en esta página están los dos números disponibles. El formulario existe para que el mensaje llegue con los datos completos desde el primer envío.",
       },
     ],
+  },
+  proyectoDetalle: {
+    notaServicios: "Este caso combinó varios servicios de PIYC. Abajo puede ver cada uno.",
+    cta: {
+      title: "¿Quiere un resultado parecido en su planta?",
+      body: "Escríbanos con los datos de su proceso y revisamos si se puede abordar de la misma forma.",
+    },
+  },
+  servicioDetalle: {
+    ctaTexto:
+      "Escríbanos con los datos del equipo o del proceso y le decimos qué información hace falta para cotizar.",
   },
   noEncontrada: {
     title: "Esta página no existe",

@@ -76,6 +76,14 @@ export default async function Inicio() {
     : proyectos.slice(0, 3);
 
   const intro = home.intro;
+  // Rótulos, títulos e introducciones de las franjas: todos salen de
+  // `site_settings.home`. Si el panel los deja vacíos, no se pintan, y el
+  // título visible se reemplaza por uno solo para lectores de pantalla, para
+  // que la sección no quede sin nombre.
+  const seccionServicios = home.seccionServicios;
+  const seccionProyectos = home.seccionProyectos;
+  const seccionValores = home.seccionValores;
+  const notaCierre = home.cta?.nota;
 
   return (
     <main id="contenido">
@@ -97,9 +105,11 @@ export default async function Inicio() {
                   {intro.title ?? "Qué hacemos"}
                 </TituloSeccion>
                 <Parrafos textos={enParrafos(intro.body)} className="mt-6" />
-                <EnlaceConFlecha href="/nosotros" className="mt-7">
-                  Conocer a PIYC
-                </EnlaceConFlecha>
+                {intro.ctaEtiqueta !== "" ? (
+                  <EnlaceConFlecha href="/nosotros" className="mt-7">
+                    {intro.ctaEtiqueta ?? "Conocer a PIYC"}
+                  </EnlaceConFlecha>
+                ) : null}
               </div>
 
               {intro.image ? (
@@ -126,18 +136,25 @@ export default async function Inicio() {
           <Contenedor className="py-14 lg:py-18">
             <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
               <div className="max-w-2xl">
-                <Rotulo>Portafolio</Rotulo>
-                <TituloSeccion id="titulo-servicios" className="mt-5">
-                  Servicios
-                </TituloSeccion>
-                <EntradaSeccion className="mt-5">
-                  Nueve servicios para el ciclo completo: diseñar la instalación, armarla, ponerla
-                  a producir y sostenerla después.
-                </EntradaSeccion>
+                {seccionServicios?.eyebrow ? <Rotulo>{seccionServicios.eyebrow}</Rotulo> : null}
+                {seccionServicios?.title ? (
+                  <TituloSeccion id="titulo-servicios" className="mt-5">
+                    {seccionServicios.title}
+                  </TituloSeccion>
+                ) : (
+                  <h2 id="titulo-servicios" className="sr-only">
+                    Servicios destacados
+                  </h2>
+                )}
+                {seccionServicios?.intro ? (
+                  <EntradaSeccion className="mt-5">{seccionServicios.intro}</EntradaSeccion>
+                ) : null}
               </div>
-              <EnlaceConFlecha href="/servicios" className="shrink-0">
-                Ver los nueve servicios
-              </EnlaceConFlecha>
+              {seccionServicios?.ctaEtiqueta !== "" ? (
+                <EnlaceConFlecha href="/servicios" className="shrink-0">
+                  {seccionServicios?.ctaEtiqueta ?? "Ver los nueve servicios"}
+                </EnlaceConFlecha>
+              ) : null}
             </div>
 
             <div className="mt-10 border border-acero-200">
@@ -153,18 +170,25 @@ export default async function Inicio() {
           <Contenedor className="py-14 lg:py-18">
             <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
               <div className="max-w-2xl">
-                <Rotulo>Casos de éxito</Rotulo>
-                <TituloSeccion id="titulo-casos" className="mt-5">
-                  Proyectos entregados y funcionando
-                </TituloSeccion>
-                <EntradaSeccion className="mt-5">
-                  Automatizaciones y sistemas de control ejecutados en plantas de producción del
-                  Valle del Cauca.
-                </EntradaSeccion>
+                {seccionProyectos?.eyebrow ? <Rotulo>{seccionProyectos.eyebrow}</Rotulo> : null}
+                {seccionProyectos?.title ? (
+                  <TituloSeccion id="titulo-casos" className="mt-5">
+                    {seccionProyectos.title}
+                  </TituloSeccion>
+                ) : (
+                  <h2 id="titulo-casos" className="sr-only">
+                    Casos de éxito
+                  </h2>
+                )}
+                {seccionProyectos?.intro ? (
+                  <EntradaSeccion className="mt-5">{seccionProyectos.intro}</EntradaSeccion>
+                ) : null}
               </div>
-              <EnlaceConFlecha href="/proyectos" className="shrink-0">
-                Ver todos los proyectos
-              </EnlaceConFlecha>
+              {seccionProyectos?.ctaEtiqueta !== "" ? (
+                <EnlaceConFlecha href="/proyectos" className="shrink-0">
+                  {seccionProyectos?.ctaEtiqueta ?? "Ver todos los proyectos"}
+                </EnlaceConFlecha>
+              ) : null}
             </div>
 
             <div className="mt-10">
@@ -178,9 +202,9 @@ export default async function Inicio() {
 
       <Valores
         valores={valores}
-        rotulo="Lo que sostiene el trabajo"
-        titulo="Nuestros valores"
-        intro="Cuatro criterios que se notan en cómo se cotiza, cómo se ejecuta y qué se entrega al final del proyecto."
+        rotulo={seccionValores?.eyebrow}
+        titulo={seccionValores?.title}
+        intro={seccionValores?.intro}
       />
 
       <FranjaCta
@@ -191,13 +215,22 @@ export default async function Inicio() {
         hrefSecundario={home.cta?.ctaSecundario?.href ?? "/contacto"}
         etiquetaSecundaria={home.cta?.ctaSecundario?.etiqueta ?? "Ir al formulario de contacto"}
       >
-        <p className="mt-6 text-sm text-acero-300">
-          También puede{" "}
-          <Link href="/servicios" className="font-medium text-azul-300 underline-offset-2 hover:text-blanco hover:underline">
-            revisar el portafolio de servicios
-          </Link>{" "}
-          antes de escribirnos.
-        </p>
+        {/* Nota del cierre: se edita en tres piezas (texto · enlace · texto)
+            para que el panel no tenga que escribir HTML. */}
+        {notaCierre?.texto || notaCierre?.enlace?.etiqueta || notaCierre?.textoFinal ? (
+          <p className="mt-6 text-sm text-acero-300">
+            {notaCierre.texto ? `${notaCierre.texto} ` : null}
+            {notaCierre.enlace?.etiqueta ? (
+              <Link
+                href={notaCierre.enlace.href || "/servicios"}
+                className="font-medium text-azul-300 underline-offset-2 hover:text-blanco hover:underline"
+              >
+                {notaCierre.enlace.etiqueta}
+              </Link>
+            ) : null}
+            {notaCierre.textoFinal ? ` ${notaCierre.textoFinal}` : null}
+          </p>
+        ) : null}
       </FranjaCta>
     </main>
   );

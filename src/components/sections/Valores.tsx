@@ -30,10 +30,18 @@ export function Valores({
     <section id={id} aria-labelledby={`${id}-titulo`} className="sobre-oscuro bg-azul-950">
       <Contenedor className="py-14 lg:py-18">
         <div className="max-w-3xl">
-          <Rotulo tono="oscuro">{rotulo}</Rotulo>
-          <TituloSeccion id={`${id}-titulo`} tono="oscuro" className="mt-5">
-            {titulo}
-          </TituloSeccion>
+          {rotulo ? <Rotulo tono="oscuro">{rotulo}</Rotulo> : null}
+          {/* Título vacío = decisión del panel. La sección sigue necesitando un
+              nombre accesible, así que queda uno solo para lectores de pantalla. */}
+          {titulo ? (
+            <TituloSeccion id={`${id}-titulo`} tono="oscuro" className="mt-5">
+              {titulo}
+            </TituloSeccion>
+          ) : (
+            <h2 id={`${id}-titulo`} className="sr-only">
+              Valores
+            </h2>
+          )}
           {intro ? (
             <EntradaSeccion tono="oscuro" className="mt-5">
               {intro}
