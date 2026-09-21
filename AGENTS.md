@@ -32,7 +32,19 @@ Roles — solo tres, no agregar "por si acaso" (cada rol es una matriz de RLS qu
 
 ## Marca
 
-Propuesta en revisión — la fuente de verdad será `src/lib/tokens.ts` (consumido desde Tailwind v4 vía `@theme`). Ningún color escrito a mano en un componente.
+Fuente de verdad: `src/lib/tokens.ts` + el bloque `@theme` de `src/app/globals.css` — **se tocan juntos, en el mismo commit**. La paleta por defecto de Tailwind está anulada: ningún color escrito a mano en un componente. Todos los valores se midieron pixel a pixel del logo.
+
+| Familia | Valores | Rol |
+| --- | --- | --- |
+| `azul-*` | 50 `#F0F4FD` · 100 `#DFE8FB` · 200 `#C2D4F8` · 300 `#8FB1F2` · 500 `#2C63D4` · 600 `#1A4CB6` · **700 `#123B94`** · 800 `#0C2A6B` · 900 `#0A2350` · 950 `#06142F` | Marca y color dominante. 700 = el del logo (botón primario, enlaces, titulares); 950/900 = fondos oscuros; 300 = trazos y detalles sobre oscuro; 50–200 = superficies |
+| `verde-*` | 100 `#E5F6D9` · 300 `#A3DC80` · 400 `#77C64B` · **500 `#52AC26`** · 600 `#3A801A` · 700 `#2C6314` | Acento, ~10 % de la superficie: CTA de WhatsApp, indicadores, señal energizada del ladder |
+| `acero-*` | 50 `#F4F6F9` · 100 · 200 · **300 `#BFC4CD`** · 400 · 500 · 600 `#56606E` · 700 `#3B434F` | Neutros fríos del engranaje: base clara, bordes, texto secundario (600) |
+| `error-*` | 50 · 300 `#F4A8A0` · **500 `#B42318`** · 700 | Solo validación de formularios. No es color de marca |
+| `blanco` | `#FFFFFF` | Fondo base del sitio |
+
+Tipografías: **Barlow Condensed** (títulos) · **IBM Plex Sans** (texto). Radios `fino` 2 px / `medio` 4 px — nada de tarjetas redondeadas.
+
+Uso: el azul domina y el verde se dosifica (nunca fondo de sección ni de bloque grande). Sobre `verde-500` va texto `azul-950` (6.6:1); **blanco sobre `verde-500` falla** (2.9:1) — si hace falta texto blanco, `verde-600` (4.9:1). Texto verde sobre fondo claro = `verde-700`; sobre fondo oscuro = `verde-400`/`verde-300`. Texto secundario = `acero-600`. Sobre `azul-950` va `blanco`/`acero-100`/`acero-200`. Sin naranja, en ningún caso.
 
 ## Datos de contacto oficiales
 
@@ -70,7 +82,7 @@ Variables de entorno en Vercel: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABAS
 10. CSP: `script-src` necesita `'unsafe-inline'` (el nonce obliga a renderizado dinámico y mata el ISR). El resto va estricto — ver `next.config.ts`.
 11. Cargar una variable de entorno en Vercel no basta: hay que volver a desplegar. Las páginas estáticas deciden en el build.
 12. Español de Colombia, con tildes. El cliente lee los textos.
-13. **El sitio no puede parecerse al de GPI.** Son empresas aliadas que comparten espacio físico. Nada de verde, nada de tema ambiental ("ambiental", hojas, sostenibilidad), otra retícula y ritmo (si GPI usa tarjetas con sombra y hero centrado, PIYC no), otra tipografía. Verificable poniéndolos lado a lado.
+13. **El sitio no puede parecerse al de GPI.** Son empresas aliadas que comparten espacio físico, y GPI se lee verde y gris. PIYC se lee **azul** a primera vista: el verde del logo entra solo como acento (~10 %), nunca como fondo de sección ni como color de la página. Nada de tema ambiental ("ambiental", hojas, sostenibilidad). Otra retícula y otro ritmo (si GPI usa tarjetas con sombra y hero centrado, PIYC no) y otra tipografía. Verificable poniéndolos lado a lado.
 14. Toda imagen de contenido se pinta con `ContentImage`, nunca con `next/image` directo (reservado para el chrome: logo del nav/pie, favicon). ≤ 400 KB, WebP, ancho máximo 1920 px. En la base de datos nunca van rutas `/images/` — todo va al bucket o a una URL externa permitida. `images.remotePatterns` de `next.config.ts` y `HOSTS_IMAGEN_OPTIMIZABLES` de `src/lib/imagenes.ts` son la misma lista escrita dos veces: se tocan juntas.
 15. `npm run build` limpio antes de cada commit. **Confirmar con Cesar antes de cada `git push`** — repo de organización con más de un miembro mirando. Mensajes de commit en español, describiendo el porqué y no solo el qué.
 

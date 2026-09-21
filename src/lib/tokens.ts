@@ -5,50 +5,79 @@
  * ⚠ SE TOCAN JUNTOS: los mismos valores viven en `src/app/globals.css`
  * dentro de `@theme`. Si cambias uno, cambia el otro en el mismo commit.
  *
- * Paleta derivada del logo (azul #103A93, gris acero del engranaje).
- * El verde del logo NO se usa en la interfaz: queda solo dentro del logo.
+ * Toda la paleta sale del logo (`public/brand/logo-piyc.png`), medido pixel
+ * a pixel: azul #123B94 (letras «PI», «C» y engranaje), verde #52AC26 (la «Y»
+ * y los nodos del circuito) y gris acero #BFC4CD (el engranaje).
+ * El sitio se lee AZUL; el verde es acento, en dosis pequeñas. Sin naranja.
  */
 
 export const colores = {
-  /** Base oscura: grafito con tinte azul. Texto principal y fondos oscuros. */
-  grafito: {
-    950: "#0B1322",
-    900: "#121C2E",
-    800: "#1B2740",
-    700: "#26334A",
-  },
-  /** Acento de marca: azul PIYC tomado del logo (700). */
+  /**
+   * Azul PIYC — color dominante. El 700 es el del logo; el 950/900 son el
+   * mismo tono llevado a noche y sirven de fondo oscuro (nada de grafito
+   * neutro), y del 300 para abajo son tintes de superficie.
+   */
   azul: {
-    50: "#EEF2FB",
-    100: "#DCE5F8",
-    300: "#93AEF0",
-    700: "#103A93",
-    800: "#0B2B70",
+    50: "#F0F4FD",
+    100: "#DFE8FB",
+    200: "#C2D4F8",
+    300: "#8FB1F2",
+    500: "#2C63D4",
+    600: "#1A4CB6",
+    700: "#123B94",
+    800: "#0C2A6B",
+    900: "#0A2350",
+    950: "#06142F",
   },
-  /** Base clara (50) y neutros medios (200–600) inspirados en el engranaje. */
+  /**
+   * Verde PIYC — acento, ~10 % de la superficie: CTA de WhatsApp, indicadores,
+   * señal energizada. El 500 es el del logo (texto oscuro encima, nunca
+   * blanco: 2.88:1). Para texto verde sobre claro va el 700; sobre fondo
+   * oscuro, el 300/400.
+   */
+  verde: {
+    100: "#E5F6D9",
+    300: "#A3DC80",
+    400: "#77C64B",
+    500: "#52AC26",
+    600: "#3A801A",
+    700: "#2C6314",
+  },
+  /** Gris acero frío del engranaje (el 300 es el medido). Neutros y bordes. */
   acero: {
-    50: "#F3F5F8",
-    100: "#E7EBF0",
-    200: "#D3D9E2",
-    400: "#9AA5B5",
-    600: "#566172",
+    50: "#F4F6F9",
+    100: "#E9EDF2",
+    200: "#D7DCE4",
+    300: "#BFC4CD",
+    400: "#99A2B0",
+    500: "#727C8B",
+    600: "#56606E",
+    700: "#3B434F",
   },
-  /** Estado / señal: naranja de seguridad. CTA de WhatsApp, indicadores, foco. */
-  naranja: {
-    500: "#F26A1B",
-    600: "#DB5810",
-    700: "#A8430A",
+  /** Error — solo validación de formularios. No es un color de marca. */
+  error: {
+    50: "#FEF3F2",
+    300: "#F4A8A0",
+    500: "#B42318",
+    700: "#8E1C14",
   },
   blanco: "#FFFFFF",
 } as const;
 
-/** Los cinco roles de la paleta. */
+/** Los seis roles de la paleta. */
 export const roles = {
-  baseOscura: colores.grafito[950],
+  /** Fondos oscuros (barra de datos, paneles técnicos). */
+  baseOscura: colores.azul[950],
+  /** Fondos claros con retícula de plano. */
   baseClara: colores.acero[50],
-  acento: colores.azul[700],
+  /** Marca: botones primarios, enlaces, titulares destacados. */
+  marca: colores.azul[700],
+  /** Acento: WhatsApp, indicadores, señal activa. Dosis pequeñas. */
+  acento: colores.verde[500],
+  /** Texto secundario y bordes. */
   neutroMedio: colores.acero[600],
-  estado: colores.naranja[500],
+  /** Estado de error en formularios. */
+  error: colores.error[500],
 } as const;
 
 export const fuentes = {

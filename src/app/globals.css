@@ -10,30 +10,41 @@
   --color-*: initial;
   --shadow-*: initial;
 
-  /* Base oscura — grafito azulado */
-  --color-grafito-950: #0b1322;
-  --color-grafito-900: #121c2e;
-  --color-grafito-800: #1b2740;
-  --color-grafito-700: #26334a;
+  /* Azul PIYC — color dominante (700 = el del logo, 950/900 = fondos oscuros) */
+  --color-azul-50: #f0f4fd;
+  --color-azul-100: #dfe8fb;
+  --color-azul-200: #c2d4f8;
+  --color-azul-300: #8fb1f2;
+  --color-azul-500: #2c63d4;
+  --color-azul-600: #1a4cb6;
+  --color-azul-700: #123b94;
+  --color-azul-800: #0c2a6b;
+  --color-azul-900: #0a2350;
+  --color-azul-950: #06142f;
 
-  /* Acento de marca — azul PIYC (700 = color del logo) */
-  --color-azul-50: #eef2fb;
-  --color-azul-100: #dce5f8;
-  --color-azul-300: #93aef0;
-  --color-azul-700: #103a93;
-  --color-azul-800: #0b2b70;
+  /* Verde PIYC — acento (500 = el del logo; encima va texto oscuro) */
+  --color-verde-100: #e5f6d9;
+  --color-verde-300: #a3dc80;
+  --color-verde-400: #77c64b;
+  --color-verde-500: #52ac26;
+  --color-verde-600: #3a801a;
+  --color-verde-700: #2c6314;
 
-  /* Base clara (50) y neutros medios — acero */
-  --color-acero-50: #f3f5f8;
-  --color-acero-100: #e7ebf0;
-  --color-acero-200: #d3d9e2;
-  --color-acero-400: #9aa5b5;
-  --color-acero-600: #566172;
+  /* Gris acero frío del engranaje (300 = el medido) — neutros y bordes */
+  --color-acero-50: #f4f6f9;
+  --color-acero-100: #e9edf2;
+  --color-acero-200: #d7dce4;
+  --color-acero-300: #bfc4cd;
+  --color-acero-400: #99a2b0;
+  --color-acero-500: #727c8b;
+  --color-acero-600: #56606e;
+  --color-acero-700: #3b434f;
 
-  /* Estado / señal — naranja de seguridad */
-  --color-naranja-500: #f26a1b;
-  --color-naranja-600: #db5810;
-  --color-naranja-700: #a8430a;
+  /* Error — solo validación de formularios */
+  --color-error-50: #fef3f2;
+  --color-error-300: #f4a8a0;
+  --color-error-500: #b42318;
+  --color-error-700: #8e1c14;
 
   --color-blanco: #ffffff;
 
@@ -90,6 +101,15 @@
   background-position: -1px -1px;
 }
 
+/* En /contacto el botón flotante tapaba el «Enviar» del formulario en móvil, y
+   los números ya están en la página. Se resuelve aquí para que el layout del
+   sitio siga siendo Server Component (leer la ruta lo volvería de cliente). */
+@layer components {
+  body:has(main[data-pagina="contacto"]) [data-whatsapp-flotante] {
+    display: none;
+  }
+}
+
 @layer base {
   html {
     -webkit-text-size-adjust: 100%;
@@ -98,7 +118,7 @@
 
   body {
     background-color: var(--color-blanco);
-    color: var(--color-grafito-950);
+    color: var(--color-azul-950);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -124,7 +144,7 @@
   }
 
   .sobre-oscuro :focus-visible {
-    outline-color: var(--color-naranja-500);
+    outline-color: var(--color-verde-400);
   }
 
   @media (prefers-reduced-motion: reduce) {
