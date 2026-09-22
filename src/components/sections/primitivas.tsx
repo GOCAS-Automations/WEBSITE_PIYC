@@ -252,7 +252,10 @@ export function GrupoDeBotones({
   return (
     <div
       data-grupo-botones=""
-      className={`grid items-stretch gap-3 ${porDireccion} ${
+      // `mx-auto sm:mx-0`: en móvil el grupo se centra en su columna (Cesar,
+      // 22-sep-2026). Como las cápsulas apiladas ocupan todo el ancho, lo que
+      // se nota es el texto centrado de cada una; desde `sm` nada cambia.
+      className={`mx-auto grid w-full items-stretch gap-3 sm:mx-0 ${porDireccion} ${
         alinear === "fin" ? "sm:ml-auto" : ""
       } ${className}`}
     >
@@ -360,7 +363,9 @@ export function EnlaceConFlecha({
       href={href}
       // `w-fit`: en una columna flex, un elemento de ancho `auto` se estira a
       // todo el ancho y la cápsula dejaría de leerse como tal en móvil.
-      className={`pulsable group inline-flex w-fit items-center gap-2.5 rounded-capsula py-1.5 pl-4 pr-1.5 text-[15px] font-semibold ${
+      // `mx-auto sm:mx-0`: en móvil la cápsula se centra en su columna —Cesar:
+      // «se ve más organizado»—; desde `sm` vuelve a alinearse a la izquierda.
+      className={`pulsable group mx-auto flex w-fit items-center gap-2.5 rounded-capsula py-1.5 pl-4 pr-1.5 text-[15px] font-semibold sm:mx-0 ${
         oscuro
           ? "bg-relleno-claro text-blanco hover:bg-azul-800"
           : "bg-relleno text-azul-700 hover:bg-relleno-medio"

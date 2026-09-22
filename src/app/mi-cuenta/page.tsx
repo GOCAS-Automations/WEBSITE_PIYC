@@ -213,6 +213,12 @@ async function Portal({ profile }: { profile: SessionProfile }) {
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
+              {/* Volver al sitio público: el portal es una isla y sin este
+                  enlace había que borrar la URL a mano (Cesar, 22-sep-2026). */}
+              <Link href="/" className={botonSecundario}>
+                <IconoFlecha className="h-4 w-4 rotate-180" />
+                Volver al sitio
+              </Link>
               {tienePanel && (
                 <Link
                   prefetch={false}

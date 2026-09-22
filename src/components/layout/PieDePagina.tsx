@@ -87,9 +87,12 @@ export async function PieDePagina() {
   return (
     // `pt-*`: el pie se separa solo de lo que tenga encima, sea el panel de
     // cierre o una sección blanca (en /contacto termina en las preguntas).
-    <footer className="sobre-oscuro bg-lienzo pb-4 pt-8 text-acero-200 lg:pb-6 lg:pt-10">
+    <footer className="sobre-oscuro fondo-noche text-acero-200">
+      {/* Franja a sangre, no tarjeta flotante (Cesar, 22-sep-2026): el pie
+          cierra la página de borde a borde y el contenido conserva los mismos
+          márgenes laterales que el resto del sitio. */}
       <div className="mx-auto w-full max-w-sitio px-4 sm:px-6 lg:px-8">
-        <div className="overflow-hidden rounded-lienzo fondo-noche px-6 py-10 shadow-elevada sm:px-10 lg:px-12 lg:py-12">
+        <div className="py-10 lg:py-12">
           {/* 1 · Marca y navegación */}
           {/* Marca y navegación en una fila solo desde `xl`: en 1024 no caben
               juntas y «Contacto» caía solo a una segunda línea. */}
