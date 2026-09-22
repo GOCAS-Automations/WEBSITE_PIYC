@@ -27,9 +27,12 @@ export function FranjaProceso({
   if (pasos.length === 0) return null;
   const oscuro = tono === "oscuro";
 
+  // El encabezado solo se parte si HAY entrada: sin ella, la rejilla de 12
+  // dejaba las seis columnas de la derecha vacías al lado del título.
+  const partido = Boolean(proceso?.intro);
   const encabezado = (
-    <div className="grid gap-5 lg:grid-cols-12 lg:items-end lg:gap-12">
-      <div className="lg:col-span-6">
+    <div className={partido ? "grid gap-5 lg:grid-cols-12 lg:items-end lg:gap-12" : "max-w-3xl"}>
+      <div className={partido ? "lg:col-span-6" : ""}>
         {proceso?.eyebrow ? <Rotulo tono={tono}>{proceso.eyebrow}</Rotulo> : null}
         <TituloSeccion id={id} tono={tono} className={proceso?.eyebrow ? "mt-5" : ""}>
           {proceso?.title ?? "Cómo trabajamos"}

@@ -168,10 +168,18 @@ export function CarrilDeFotos({
             aria-label={`${posicion + 1} de ${total}`}
             className="w-[min(78vw,20rem)] shrink-0 snap-start sm:w-[21rem] lg:w-[23rem]"
           >
+            {/* `relative`: el `sr-only` de abajo es `position:absolute`. Sin un
+                ancestro posicionado su bloque contenedor es el ICB, así que se
+                sale del carril —no lo recorta el `overflow-x`— y su texto, que
+                va en `white-space:nowrap`, entra en el desbordamiento del
+                DOCUMENTO. `documentElement.scrollWidth` se disparaba a ~1900 px
+                con una ventana de 687 y cualquier captura de página completa
+                salía con el sitio en una columna angosta a la izquierda y el
+                resto en blanco (el pantallazo de Cesar). */}
             <button
               type="button"
               onClick={(evento) => alAbrir(posicion, evento.currentTarget)}
-              className="pulsable block h-full w-full cursor-zoom-in rounded-tarjeta bg-blanco p-1.5 shadow-tarjeta hover:shadow-elevada"
+              className="pulsable relative block h-full w-full cursor-zoom-in rounded-tarjeta bg-blanco p-1.5 shadow-tarjeta hover:shadow-elevada"
             >
               {/* `proporcion` no tiene por qué ser una razón de aspecto: aquí
                   es una **altura fija**, que es lo que mantiene el carril

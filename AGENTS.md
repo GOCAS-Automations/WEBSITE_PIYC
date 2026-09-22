@@ -100,3 +100,11 @@ Nómina, volante de pago en PDF, calendario de programación, métricas con Rech
 - No pegar salidas largas en el chat. Un build que falla: leer el error, no volcar los renglones completos.
 - Un tema por sesión rinde más que saltar entre panel, SEO y diseño el mismo día.
 - No releer un archivo recién editado para verificar. Si `Edit` no falló, el cambio está.
+
+### Dos velocidades (decisión de Cesar, 22-sep-2026: gastar menos tokens y menos tiempo)
+
+**Cambio pequeño** — ≤ 3 archivos, sin lógica nueva ni migración: texto, color, espaciado, una clase, un campo que ya existe. **Lo hace el hilo principal, sin agente.** Grep para ubicar, leer solo el rango, `Edit` puntual. Verificación mínima y proporcional: `npx tsc --noEmit` (+ `npx eslint` de los archivos tocados) y, **solo si el cambio toca algo que se pinta o se calcula**, `npm run build`. Una captura solo si hay duda visual real, y de la sección, no de todo el sitio. Nada de Lighthouse, axe ni recorridos completos. Se agrupan varios cambios pequeños en una sola tanda y un solo commit.
+
+**Ronda grande** — varias secciones, lógica, datos, migración o rediseño: va a subagentes (Opus features/backend, Sonnet visual/documentos), en paralelo si no chocan de archivos, con su verificación completa (build, pruebas, capturas, Lighthouse/axe cuando aplique).
+
+En ambos casos: nunca dejar el árbol con `tsc`, `eslint`, `npm test` o `npm run build` en rojo, y nunca empujar sin confirmar con Cesar.

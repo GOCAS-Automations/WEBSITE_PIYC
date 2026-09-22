@@ -273,9 +273,14 @@ export default async function Contacto() {
                 >
                   {ajustes?.tituloMapa || "Cómo llegar"}
                 </h3>
+                {/* El mapa muestra la FICHA del negocio, con su nombre, no un
+                    pin con la dirección cruda (ver `urlMapaEmbebido`). El
+                    título del marco dice lo mismo que se ve dentro. */}
                 <iframe
                   src={mapaEmbebido}
-                  title={`Mapa de Google con la ubicación de PIYC: ${direccion}`}
+                  title={`Mapa de Google con la ficha de ${contacto.legalName ?? "PIYC"}${
+                    direccion ? ` en ${direccion}` : ""
+                  }`}
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
                   className="block min-h-[14rem] w-full flex-1 rounded-tarjeta border-0 lg:min-h-[6rem]"

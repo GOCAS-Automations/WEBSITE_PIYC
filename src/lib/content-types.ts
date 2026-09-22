@@ -301,6 +301,17 @@ export type AjustesContact = {
   geo?: GeoContacto;
   /** Consulta para el iframe de Google Maps. Si falta, se usa `address.full`. */
   mapsQuery?: string;
+  /**
+   * URL del iframe del mapa, tal cual. Se usa cuando está: es la única forma
+   * de que el mapa muestre la FICHA DEL NEGOCIO («PIYC PROGRAMACIÓN INDUSTRIAL
+   * Y CONTROL SAS») y no un pin con la dirección cruda. La que funciona sale
+   * del CID de la ficha: `https://www.google.com/maps?cid=<CID>&output=embed`.
+   * Si falta, `src/lib/contacto.ts` cae al CID que trae en código y, sin él, a
+   * la búsqueda por dirección.
+   */
+  mapsEmbedUrl?: string;
+  /** URL de la ficha de Google a la que llevan los enlaces «Abrir en Google Maps». */
+  mapsPlaceUrl?: string;
 };
 
 /* --- 5.2 `home` — página de inicio ------------------------------------ */

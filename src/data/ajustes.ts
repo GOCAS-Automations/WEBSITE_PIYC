@@ -240,6 +240,10 @@ export const nosotrosEstatico: AjustesNosotros = {
   // Tres fotos salieron el 22-sep-2026 para no repetirse: el técnico cableando
   // pasó a «Quiénes somos», el tablero de doble puerta a la cabecera de
   // /contacto y el tablero inox con PLC compacto a la portada de automatización.
+  // Ese mismo día entraron dos que nunca se habían publicado —la HMI en la
+  // puerta del tablero (rescatada de las descartadas por resolución) y el
+  // instrumento sobre el tanque—, y la galería quedó en nueve: la última sale
+  // de un fotograma del video del Drive (docs/CONTENIDO.md §2.4).
   galeria: [
     {
       src: `${BUCKET}/nosotros/puesta-en-marcha-variadores.webp`,
@@ -260,10 +264,22 @@ export const nosotrosEstatico: AjustesNosotros = {
       height: 1920,
     },
     {
+      src: `${BUCKET}/nosotros/instrumento-campo-tanque.webp`,
+      alt: "Instrumento de proceso con abrazadera sanitaria y cable naranja, instalado sobre la pared de un tanque de acero inoxidable",
+      width: 520,
+      height: 694,
+    },
+    {
       src: `${BUCKET}/nosotros/tablero-plc-modular-portatil.webp`,
       alt: "Tablero con PLC modular, protecciones y borneras, con un portátil conectado durante la programación",
       width: 933,
       height: 1920,
+    },
+    {
+      src: `${BUCKET}/nosotros/hmi-puerta-tablero-obra.webp`,
+      alt: "Pantalla HMI encendida en la puerta de un tablero recién instalado, que todavía conserva la película protectora de la lámina",
+      width: 357,
+      height: 497,
     },
     {
       src: `${BUCKET}/nosotros/gabinete-fuerza-armado-900.webp`,
@@ -276,6 +292,13 @@ export const nosotrosEstatico: AjustesNosotros = {
       alt: "Tablero de fuerza abierto con barraje de cobre, interruptores automáticos y bloques de borneras",
       width: 933,
       height: 1920,
+    },
+    {
+      src: `${BUCKET}/nosotros/linea-envasado-sala-produccion.webp`,
+      alt: "Línea de envasado y dosificación en operación dentro de una sala de producción, con la máquina cerrada por sus guardas de seguridad",
+      width: 1920,
+      height: 1080,
+      srcMovil: `${BUCKET}/nosotros/linea-envasado-sala-produccion-900.webp`,
     },
   ],
 };

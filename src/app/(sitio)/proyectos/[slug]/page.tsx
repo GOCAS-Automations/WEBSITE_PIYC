@@ -227,15 +227,29 @@ export default async function PaginaDeProyecto({
           className={galeria.length > 1 ? "bg-lienzo" : "bg-blanco"}
         >
           <Contenedor className="py-16 lg:py-20">
-            <div className="grid gap-5 lg:grid-cols-12 lg:items-end lg:gap-12">
-              <TituloSeccion id="titulo-servicios-caso" className="lg:col-span-6">
-                {plantilla?.tituloServicios || "Servicios que intervinieron"}
-              </TituloSeccion>
-              {/* La nota dice «combinó varios servicios»: con uno solo no aplica. */}
-              {notaServicios && serviciosDelCaso.length > 1 ? (
-                <EntradaSeccion className="lg:col-span-6">{notaServicios}</EntradaSeccion>
-              ) : null}
-            </div>
+            {/* La nota dice «combinó varios servicios»: con uno solo no
+                aplica. Y sin nota el encabezado NO se parte, o quedarían seis
+                columnas vacías a la derecha del título. */}
+            {(() => {
+              const conNota = Boolean(notaServicios) && serviciosDelCaso.length > 1;
+              return (
+                <div
+                  className={
+                    conNota ? "grid gap-5 lg:grid-cols-12 lg:items-end lg:gap-12" : "max-w-3xl"
+                  }
+                >
+                  <TituloSeccion
+                    id="titulo-servicios-caso"
+                    className={conNota ? "lg:col-span-6" : ""}
+                  >
+                    {plantilla?.tituloServicios || "Servicios que intervinieron"}
+                  </TituloSeccion>
+                  {conNota ? (
+                    <EntradaSeccion className="lg:col-span-6">{notaServicios}</EntradaSeccion>
+                  ) : null}
+                </div>
+              );
+            })()}
             <div className="mt-8">
               <RejillaDeFilasDeServicio
                 servicios={serviciosDelCaso}

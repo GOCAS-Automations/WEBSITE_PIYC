@@ -168,19 +168,24 @@ export const serviciosEstaticos: Servicio[] = [
     images: {
       cover: `${BUCKET}/tableros-de-control/tablero-plc-modular-reles-apaisada.webp`,
       coverAlt: "Tablero de gran formato abierto, con PLC modular, bancos de relés de interposición y protecciones",
+      // El tablero cerrado va primero a propósito: la primera foto es la
+      // miniatura del servicio, y el hub de /servicios toma como foto grande de
+      // la línea la primera que NO sea miniatura de ninguno de sus servicios.
+      // Así la línea «Tableros e ingeniería eléctrica» sale con el tablero
+      // armado y no con un armario cerrado (Cesar, 22-sep-2026).
       gallery: [
+        {
+          src: `${BUCKET}/tableros-de-control/tablero-doble-puerta-terminado-900.webp`,
+          alt: "Tablero de doble puerta terminado, con rejillas de ventilación y visor, listo para despacho",
+          width: 900,
+          height: 1200,
+        },
         {
           src: `${BUCKET}/tableros-de-control/tablero-plc-modular-reles-apaisada.webp`,
           srcMovil: `${BUCKET}/tableros-de-control/tablero-plc-modular-reles-apaisada-900.webp`,
           alt: "Tablero de gran formato abierto, con PLC modular, bancos de relés de interposición y protecciones",
           width: 1920,
           height: 1080,
-        },
-        {
-          src: `${BUCKET}/tableros-de-control/tablero-doble-puerta-terminado-900.webp`,
-          alt: "Tablero de doble puerta terminado, con rejillas de ventilación y visor, listo para despacho",
-          width: 900,
-          height: 1200,
         },
       ],
     },
@@ -256,7 +261,17 @@ export const serviciosEstaticos: Servicio[] = [
     images: {
       cover: `${BUCKET}/telecontrol/tablero-variadores-velocidad-apaisada.webp`,
       coverAlt: "Interior de un tablero con variadores de velocidad de distintas potencias, PLC modular y protecciones",
+      // El terminal de operación va primero (es la miniatura del servicio) para
+      // que el hub de /servicios pueda tomar el tablero de variadores como foto
+      // grande de la línea 3: es lo más cercano al mando remoto que hay en el
+      // material real de PIYC. No hay fotos de estación remota ni de enlace.
       gallery: [
+        {
+          src: `${BUCKET}/telecontrol/terminal-operacion-inox.webp`,
+          alt: "Terminal de operación en una caja de acero inoxidable montada junto al equipo, con la pantalla del proceso encendida",
+          width: 281,
+          height: 498,
+        },
         {
           src: `${BUCKET}/telecontrol/tablero-variadores-velocidad-apaisada.webp`,
           srcMovil: `${BUCKET}/telecontrol/tablero-variadores-velocidad-apaisada-900.webp`,
@@ -457,9 +472,12 @@ export const lineasDeServicio: LineaServicio[] = [
     id: "tableros-e-ingenieria-electrica",
     titulo: "Tableros e ingeniería eléctrica",
     resumen: "Del plano al tablero armado y al montaje entregado funcionando.",
+    // «Tableros» va primero, como el nombre de la línea: el hub recorre los
+    // servicios en este orden para escoger la foto grande, y así sale el
+    // tablero armado de `tableros-de-control` y no un armario cerrado.
     slugs: [
-      "diseno-ingenieria-electrica",
       "tableros-de-control",
+      "diseno-ingenieria-electrica",
       "proyectos-llave-en-mano",
     ],
   },

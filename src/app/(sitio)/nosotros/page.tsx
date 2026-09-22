@@ -8,7 +8,8 @@
  * Cesar: «se ve muy cuadriculado o escolar que la sección de arriba y la de
  * abajo sean texto a la izquierda, imagen a la derecha; démosle más vida». Las
  * secciones alternan composición y fondo:
- *  - Quiénes somos: foto a la IZQUIERDA, estirada al alto del texto (lienzo).
+ *  - Quiénes somos: collage de dos fotos a la IZQUIERDA, estirado al alto del
+ *    texto (lienzo). Ver `components/sections/Collage.tsx`.
  *  - Misión y visión: tríptico tarjeta · foto · tarjeta oscura (blanco).
  *  - Valores: panel azul noche con encabezado partido y los cuatro en fila.
  *  - Galería: carrusel con el encabezado partido (lienzo).
@@ -30,6 +31,7 @@ import {
 import { MENSAJES_WHATSAPP, enlaceWhatsAppDe } from "@/lib/contacto";
 import { jsonLdMigas, metadataDePagina, metadatosPagina, type Miga } from "@/lib/seo";
 import { CabeceraInterna } from "@/components/sections/CabeceraInterna";
+import { Collage } from "@/components/sections/Collage";
 import { FranjaCta } from "@/components/sections/FranjaCta";
 import { Galeria } from "@/components/sections/Galeria";
 import { Valores } from "@/components/sections/Valores";
@@ -42,6 +44,7 @@ import {
 } from "@/components/sections/primitivas";
 import { ContentImage } from "@/components/ui/ContentImage";
 import { JsonLd } from "@/components/ui/JsonLd";
+import { MarcadorDeMarca } from "@/components/ui/MarcadorDeMarca";
 
 export const revalidate = 300;
 
@@ -87,15 +90,24 @@ export default async function Nosotros() {
     imagenValida(nosotros.imagenMisionVision) ??
     [...galeria].reverse().find((foto) => !usadas.has(foto.src) && foto.alt) ??
     null;
-  // Segunda foto de «Quiénes somos» (el par escalonado de la izquierda): la
-  // primera de la galería que no esté usada ya en la página.
+  // Segunda ventana del collage de «Quiénes somos»: la primera de la galería
+  // que no esté usada ya en la página.
   const fotoDuo =
     galeria.find(
       (foto) => foto.alt && !usadas.has(foto.src) && foto.src !== fotoMisionVision?.src,
     ) ?? null;
-  // El carrusel no repite las fotos que ya se ven arriba, si le quedan
-  // suficientes (tres o más); si no, las muestra todas.
-  const yaVistas = new Set([fotoDuo?.src, fotoMisionVision?.src].filter(Boolean));
+  // El carrusel no repite NINGUNA de las fotos que ya se ven arriba —las dos
+  // ventanas del collage y la del tríptico—, si le quedan suficientes (tres o
+  // más); si no, las muestra todas. `fotoQuienes` entra aquí aunque venga del
+  // panel: si además está en la galería, se vería dos veces en la misma página.
+  const yaVistas = new Set(
+    [
+      nosotros.hero?.image?.src,
+      fotoQuienes?.src,
+      fotoDuo?.src,
+      fotoMisionVision?.src,
+    ].filter(Boolean),
+  );
   const restantes = galeria.filter((foto) => !yaVistas.has(foto.src));
   const galeriaCarrusel = restantes.length >= 3 ? restantes : galeria;
   const bloquesMisionVision = [
@@ -114,17 +126,16 @@ export default async function Nosotros() {
         migas={MIGAS}
       />
 
-      {/* Quiénes somos — foto a la izquierda, alineada arriba con el rótulo y
-          abajo con la ficha de razón social. */}
+      {/* Quiénes somos — collage a la izquierda, alineado arriba con el rótulo
+          y abajo con la ficha de razón social. */}
       {quienesSomos?.body ? (
         <section aria-labelledby="titulo-quienes-somos" className="bg-lienzo">
           <Contenedor className="py-16 lg:py-24">
             <div className="grid gap-10 lg:grid-cols-12 lg:gap-14">
-              <div
-                className={`flex flex-col items-start ${
-                  fotoQuienes ? "lg:col-span-7" : "max-w-3xl lg:col-span-12"
-                }`}
-              >
+              {/* La columna de texto siempre vale 7 de 12: al lado hay o bien
+                  el collage o bien el marcador de marca, nunca una celda
+                  vacía. */}
+              <div className="flex flex-col items-start lg:col-span-7">
                 {quienesSomos.eyebrow !== "" ? (
                   <Rotulo>{quienesSomos.eyebrow ?? "La empresa"}</Rotulo>
                 ) : null}
@@ -154,40 +165,19 @@ export default async function Nosotros() {
                 </dl>
               </div>
 
-              {/* Par escalonado: la foto principal a todo el alto de la
-                  columna de texto (arriba con el rótulo, abajo con la ficha) y
-                  una segunda, más baja, apoyada abajo. Una sola foto en un
-                  recuadro era justo la composición de GPI (regla 13). */}
-              {fotoQuienes ? (
-                <div
-                  className={`grid gap-4 lg:order-first lg:col-span-5 lg:min-h-[26rem] ${
-                    fotoDuo ? "grid-cols-5" : ""
-                  }`}
-                >
-                  <ContentImage
-                    src={fotoQuienes.src}
-                    alt={fotoQuienes.alt}
-                    width={fotoQuienes.width}
-                    height={fotoQuienes.height}
-                    srcMovil={fotoQuienes.srcMovil}
-                    sizes="(min-width: 1024px) 26vw, 60vw"
-                    proporcion={`${fotoDuo ? "col-span-3 aspect-[3/4]" : "aspect-[4/3] sm:aspect-[16/10]"} lg:aspect-auto lg:h-full`}
-                    claseContenedor="rounded-panel bg-acero-100 shadow-elevada ring-1 ring-separador"
-                  />
-                  {fotoDuo ? (
-                    <ContentImage
-                      src={fotoDuo.src}
-                      alt={fotoDuo.alt}
-                      width={fotoDuo.width}
-                      height={fotoDuo.height}
-                      srcMovil={fotoDuo.srcMovil}
-                      sizes="(min-width: 1024px) 17vw, 40vw"
-                      proporcion="col-span-2 aspect-[7/10] self-end lg:aspect-auto lg:h-[72%]"
-                      claseContenedor="rounded-panel bg-acero-100 shadow-elevada ring-1 ring-separador"
-                    />
-                  ) : null}
-                </div>
-              ) : null}
+              {/* Collage: las dos fotos comparten un solo marco (ver
+                  `Collage.tsx`). Antes eran dos recuadros escalonados de
+                  distinto alto con aire entre ellos, que es lo que Cesar pidió
+                  quitar. Sin ninguna foto va el marcador de marca, nunca un
+                  recuadro vacío. */}
+              {fotoQuienes || fotoDuo ? (
+                <Collage fotos={[fotoQuienes, fotoDuo]} className="lg:order-first lg:col-span-5" />
+              ) : (
+                <MarcadorDeMarca
+                  proporcion="aspect-[4/3] sm:aspect-[16/10] lg:aspect-auto lg:h-full lg:min-h-[26rem]"
+                  className="lg:order-first lg:col-span-5"
+                />
+              )}
             </div>
           </Contenedor>
         </section>
@@ -274,8 +264,17 @@ export default async function Nosotros() {
       {galeria.length > 0 ? (
         <section aria-labelledby="titulo-galeria" className="bg-lienzo">
           <Contenedor className="py-16 lg:py-20">
-            <div className="grid gap-5 lg:grid-cols-12 lg:items-end lg:gap-12">
-              <div className="lg:col-span-6">
+            {/* El encabezado solo se parte en dos si HAY entrada. Sin ella, la
+                rejilla de 12 dejaba las seis columnas de la derecha vacías:
+                medio ancho muerto al lado del título. */}
+            <div
+              className={
+                bloqueGaleria?.intro
+                  ? "grid gap-5 lg:grid-cols-12 lg:items-end lg:gap-12"
+                  : "max-w-3xl"
+              }
+            >
+              <div className={bloqueGaleria?.intro ? "lg:col-span-6" : ""}>
                 {bloqueGaleria?.eyebrow !== "" ? (
                   <Rotulo>{bloqueGaleria?.eyebrow ?? "En obra"}</Rotulo>
                 ) : null}

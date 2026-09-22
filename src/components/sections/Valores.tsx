@@ -47,14 +47,16 @@ export function Valores({
     >
       <Contenedor>
         <div className="sobre-oscuro overflow-hidden rounded-lienzo fondo-noche px-6 py-12 shadow-elevada sm:px-10 lg:px-14 lg:py-14">
+          {/* Solo se parte si HAY entrada: sin ella, la rejilla de 12 dejaba
+              ocho columnas vacías a la derecha del título. */}
           <div
             className={
-              enLista ? "grid gap-5 lg:grid-cols-12 lg:items-end lg:gap-12" : "max-w-3xl"
+              enLista && intro ? "grid gap-5 lg:grid-cols-12 lg:items-end lg:gap-12" : "max-w-3xl"
             }
           >
             {/* En lista, el encabezado se parte 4/8 como las filas: la entrada
                 arranca en la misma columna que las descripciones. */}
-            <div className={enLista ? "lg:col-span-4" : ""}>
+            <div className={enLista && intro ? "lg:col-span-4" : ""}>
               {rotulo ? <Rotulo tono="oscuro">{rotulo}</Rotulo> : null}
               {/* Título vacío = decisión del panel. La sección sigue necesitando
                   un nombre accesible: queda uno solo para lectores de pantalla. */}

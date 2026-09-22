@@ -243,7 +243,16 @@ secciones al 22-sep-2026.
 
 ### 2.1 Capturas de los casos de éxito
 
-No se tocaron: son de los proyectos y se quedan ahí.
+Son de los proyectos y se quedan ahí. **Única excepción** (22-sep-2026): de las
+23 imágenes que se extrajeron del PPTX, cinco nunca se publicaron, y una de
+ellas —`s12_19.jpg`, 520×694— no es una captura sino una **foto de obra**: un
+instrumento recién montado sobre la pared de un tanque. Como el material del
+Drive ya no daba para llenar la galería de /nosotros sin repetir, esa foto entró
+ahí como `nosotros/instrumento-campo-tanque.webp` (49 KB). No se usa en ningún
+proyecto, así que no repite nada. Las otras cuatro siguen fuera: `s08_20.png`
+(banco de imágenes), `s11_18.png` (válvula desgastada, foto de «antes»),
+`s12_26.png` (bastidor con el cableado suelto, también de «antes») y `s16_6.png`
+(un diagrama, no una foto).
 
 | Ruta en el bucket | Dimensiones | Peso |
 |---|---|---|
@@ -269,9 +278,11 @@ No se tocaron: son de los proyectos y se quedan ahí.
 ### 2.2 Catálogo de las fotos del Drive — las 26 que se publican
 
 Las 39 fotos de `9. FOTOS` se miraron una por una. Estas 26 quedaron dentro;
-una de ellas se retiró después por decisión de Cesar (22-sep-2026), así que hoy
-se usan **25**. El `alt` describe **solo lo que se ve**: no hay nombres de
-clientes ni de plantas, porque el Drive no dice de dónde es cada foto.
+una de ellas se retiró después por decisión de Cesar (22-sep-2026) y ese mismo
+día se **rescataron dos de las descartadas por resolución** (`FOTO 12` y
+`FOTO 13`), así que hoy se usan **27**. El `alt` describe **solo lo que se ve**:
+no hay nombres de clientes ni de plantas, porque el Drive no dice de dónde es
+cada foto.
 
 | Original | Qué muestra | Calidad | Uso asignado | `alt` |
 |---|---|---|---|---|
@@ -291,16 +302,43 @@ clientes ni de plantas, porque el Drive no dice de dónde es cada foto.
 | `20210603_115417.jpg` | Tablero de fuerza abierto con barraje de cobre e interruptores | Buena, vertical 2752×5664 | Nosotros · galería «Nuestro trabajo» (6.ª) → `nosotros/tablero-fuerza-barraje.webp` (933×1920, 147 KB) | Tablero de fuerza abierto con barraje de cobre, interruptores automáticos y bloques de borneras |
 | `20211230_164318.jpg` | Tablero inox con PLC compacto, fuente de 24 V y borneras marcadas una a una | Nítida, vertical 1184×2560 | Servicio `automatizacion-procesos-industriales` (galería, 2.ª) → `servicios/automatizacion-procesos-industriales/tablero-inox-plc-borneras.webp` (888×1920, 182 KB) | Tablero de automatización en acero inoxidable con PLC compacto, fuente de 24 V y borneras identificadas una a una |
 | `20220128_145701.jpg` | Tablero con PLC compacto, switch de red y fuente conmutada | Aceptable, vertical 948×2048. La de menor resolución de los JPG | Servicio `automatizacion-procesos-industriales` (galería, 3.ª) → `servicios/automatizacion-procesos-industriales/tablero-plc-compacto-red.webp` (889×1920, 103 KB) | Tablero con PLC compacto, switch de red industrial y fuente conmutada, cableado y marquillado |
-| `20211220_210218.jpg` | Tablero de doble puerta cerrado y terminado, con rejillas y visor | Buena, vertical 3000×4000 | Servicio `tableros-de-control` (galería, 2.ª) → `servicios/tableros-de-control/tablero-doble-puerta-terminado-900.webp` (900×1200, 35 KB) | Tablero de doble puerta terminado, con rejillas de ventilación y visor, listo para despacho |
-| `20211022_104107.jpg` | Tablero grande con PLC modular, bancos de relés y los planos abiertos | Buena, vertical 3000×4000 | Servicio `tableros-de-control` (portada, fondo) → `servicios/tableros-de-control/tablero-plc-modular-reles-apaisada.webp` (recorte 16:9, 1920×1080, 169 KB) + `-900` (56 KB) | Tablero de gran formato abierto, con PLC modular, bancos de relés de interposición y protecciones |
+| `20211220_210218.jpg` | Tablero de doble puerta cerrado y terminado, con rejillas y visor | Buena, vertical 3000×4000 | Servicio `tableros-de-control` (**miniatura**, 1.ª de la galería desde el 22-sep-2026) → `servicios/tableros-de-control/tablero-doble-puerta-terminado-900.webp` (900×1200, 35 KB) | Tablero de doble puerta terminado, con rejillas de ventilación y visor, listo para despacho |
+| `20211022_104107.jpg` | Tablero grande con PLC modular, bancos de relés y los planos abiertos | Buena, vertical 3000×4000 | Servicio `tableros-de-control` (portada, fondo) **y foto grande de la línea 2 en `/servicios`** → `servicios/tableros-de-control/tablero-plc-modular-reles-apaisada.webp` (recorte 16:9, 1920×1080, 169 KB) + `-900` (56 KB) | Tablero de gran formato abierto, con PLC modular, bancos de relés de interposición y protecciones |
 | `20220822_221050.jpg` | Interior de tablero de potencia: seccionador e interruptores de caja moldeada | Nítida aunque oscura, vertical 2084×4624 | Servicio `diseno-ingenieria-electrica` (portada, fondo) → `servicios/diseno-ingenieria-electrica/tablero-potencia-interruptores-apaisada.webp` (recorte 16:9, 1920×1080, 84 KB) + `-900` (30 KB) | Interior de un tablero de potencia con el seccionador de entrada y cuatro interruptores de caja moldeada |
 | `20210603_115506.jpg` | Dos tableros cerrados instalados en un cuarto eléctrico | Correcta, vertical 1588×3264. Encuadre plano, sirve de acompañamiento | Servicio `diseno-ingenieria-electrica` (galería, 2.ª) → `servicios/diseno-ingenieria-electrica/tableros-cuarto-electrico.webp` (934×1920, 28 KB) | Dos tableros cerrados instalados en un cuarto eléctrico, con ventilación forzada y panel de medición en la puerta |
 | `20220920_091002.jpg` | Tablero rotulado montado en pared, junto al visor de la sala de proceso | Buena, vertical 2316×3949 | Servicio `telemetria` (portada, fondo) → `servicios/telemetria/tablero-pared-sala-proceso-apaisada.webp` (recorte 16:9, 1920×1080, 36 KB) + `-900` (13 KB) | Tablero rotulado montado en pared junto al visor de la sala de proceso, con la canalización llevada al equipo |
-| `20211107_095706.jpg` | Interior de tablero con variadores de distintas potencias y PLC modular | Aceptable, vertical 2448×3264. Algo oscura | Servicio `telecontrol` (portada, fondo) → `servicios/telecontrol/tablero-variadores-velocidad-apaisada.webp` (recorte 16:9, 1920×1080, 118 KB) + `-900` (38 KB) | Interior de un tablero con variadores de velocidad de distintas potencias, PLC modular y protecciones |
+| `20211107_095706.jpg` | Interior de tablero con variadores de distintas potencias y PLC modular | Aceptable, vertical 2448×3264. Algo oscura | Servicio `telecontrol` (portada, fondo) **y foto grande de la línea 3 en `/servicios`** → `servicios/telecontrol/tablero-variadores-velocidad-apaisada.webp` (recorte 16:9, 1920×1080, 118 KB) + `-900` (38 KB) | Interior de un tablero con variadores de velocidad de distintas potencias, PLC modular y protecciones |
+| `FOTO 12.png` | Terminal de operación Schneider en una caja de acero inoxidable montada en campo | Baja: 281×498, del PPTX y algo oscura. Se acepta porque solo se pinta como miniatura de 96 px | Servicio `telecontrol` (**miniatura**, 1.ª de la galería) → `servicios/telecontrol/terminal-operacion-inox.webp` (281×498, 7 KB) | Terminal de operación en una caja de acero inoxidable montada junto al equipo, con la pantalla del proceso encendida |
+| `FOTO 13.png` | HMI encendida en la puerta de un tablero que aún conserva la película protectora | Baja: 357×497, del PPTX. Venía **espejada** (el texto de la película se leía al revés); se corrigió con un volteo horizontal | Nosotros · galería «Nuestro trabajo» (6.ª) → `nosotros/hmi-puerta-tablero-obra.webp` (357×497, 17 KB) | Pantalla HMI encendida en la puerta de un tablero recién instalado, que todavía conserva la película protectora de la lámina |
 | `20210923_161629.jpg` | Línea de transporte y empaque montada en planta, con el área aislada | Media: apaisada 3264×1588, pero a contraluz y con el plástico de obra | Servicio `proyectos-llave-en-mano` (portada, fondo) → `servicios/proyectos-llave-en-mano/linea-empaque-planta.webp` (1920×934, 100 KB) + `-900` (900×438, 48 KB) | Línea de transporte y empaque montada dentro de una planta, con el área aislada durante la obra |
 | `20220817_154311.jpg` | Tablero con PLC, arrancadores y servoaccionamientos sobre la placa de fondo | Buena, vertical 1468×3264 | Servicio `aplicaciones-industriales` (portada, fondo) → `servicios/aplicaciones-industriales/tablero-servodrives-apaisada.webp` (recorte 16:9 al ancho del original, 1468×826, 65 KB) + `-900` (35 KB) | Tablero de control abierto con PLC, arrancadores y servoaccionamientos montados sobre la placa de fondo |
 | `20220822_220427.jpg` | Gabinete metálico terminado en el taller, con rejillas y zócalo | Correcta, vertical 2084×4624. Foto de producto, poco contexto | Servicio `aplicaciones-industriales` (galería, 2.ª) → `servicios/aplicaciones-industriales/gabinete-terminado-taller.webp` (865×1920, 39 KB) | Gabinete metálico terminado en el taller, con rejillas de ventilación y base de zócalo |
 | `20220326_164241.jpg` | Dos técnicos sobre un andamio instalando en el techo de una sala con paneles aislantes | Media: apaisada 3264×2448, luz pobre. Única del lote compatible con refrigeración | Servicio `refrigeracion-industrial` (portada, fondo) → `servicios/refrigeracion-industrial/montaje-techo-sala-paneles.webp` (1920×1440, 115 KB) + `-900` (900×675, 50 KB) | Dos técnicos sobre un andamio instalan equipos en el techo de una sala con paneles aislantes y difusores |
+
+**Cómo escoge `/servicios` la foto grande de cada línea.** `fotoDeLinea()` recorre
+los servicios de la línea **en el orden de `slugs`** y se queda con la primera
+foto que **no** sea la 1.ª (la miniatura) de ninguno de ellos; si no hay ninguna,
+cae en la 1.ª del primer servicio. Es decir: **el orden de la galería de cada
+servicio decide qué sale grande en el hub**. Por eso, el 22-sep-2026:
+
+- Línea 2 — `slugs` pasó a empezar por `tableros-de-control`, y en ese servicio
+  el tablero cerrado quedó de 1.ª y el tablero armado de 2.ª. Resultado: la línea
+  sale con el tablero de gran formato abierto (PLC modular y relés) y ya no con
+  un armario cerrado.
+- Línea 3 — `telecontrol` recibió el terminal de operación como 1.ª, y así el
+  tablero de variadores queda libre para salir grande. Es lo más cercano al
+  mando remoto que hay en el material: **no existe ni una foto de estación
+  remota, antena, enlace o puesto de mando**, y no se puso una prestada.
+
+Si se reordena una galería en el panel, la foto grande del hub cambia sola.
+
+**No hay ningún archivo de marcador en el bucket, y es a propósito.** Con este
+reparto las cuatro líneas salen con una foto real, así que el marcador solo hace
+falta donde de verdad no hay material —`aires-acondicionados`, que sigue con
+`images = '{}'`— y ahí conviene pintarlo en código (como ya hace `PanelDeLinea`)
+y no guardarlo como foto del servicio: una imagen con el logo metida en la
+galería termina saliendo también en la portada de la ficha y en la imagen de
+compartir, donde se lee como contenido roto.
 
 ### 2.3 Las 13 fotos descartadas, y por qué
 
@@ -318,13 +356,17 @@ logo de PIYC encima, que es peor:
 - `FOTO 7.png` — unidades condensadoras en una azotea (_stock_). Es la **única**
   imagen de aire acondicionado del material, y aun así no se usa: es comprada.
 
-**Cuatro son fotos reales pero irrecuperables por resolución** (los PNG del PPTX
-se guardaron reducidos; ninguno pasa de 629 px):
+**Cuatro eran fotos reales descartadas por resolución** (los PNG del PPTX se
+guardaron reducidos; ninguno pasa de 629 px). El 22-sep-2026 se revisaron otra
+vez y **dos se rescataron**, porque el sitio las pinta pequeñas:
 
-- `FOTO 11.png` (351×629) y `FOTO 14.png` (375×505) — la misma escena existe en
-  alta resolución (`20211230_164318.jpg` y `20221214_133340.jpg`). Se usan esas.
-- `FOTO 12.png` (281×498) y `FOTO 13.png` (357×497) — HMI en la puerta de un
-  gabinete; 281 px de ancho no dan ni para una tarjeta.
+- `FOTO 11.png` (351×629) y `FOTO 14.png` (375×505) — **siguen fuera**: son el
+  mismo tablero, tomado casi igual, de `20211230_164318.jpg` y
+  `20221214_133340.jpg`, que ya están publicadas en alta resolución. Publicarlas
+  se leería como una foto repetida.
+- `FOTO 12.png` (281×498) → **entra** como miniatura de `telecontrol` (96 px en
+  pantalla) y `FOTO 13.png` (357×497) → **entra** en la galería de /nosotros,
+  que pinta tarjetas de unos 300 px. Ver §2.2.
 
 Aparte de esas 13, la carpeta trae `20220216_162823.mp4`, que tampoco entra: es
 video, y el sitio no tiene reproductor propio (`site_services.video` solo acepta
@@ -347,8 +389,22 @@ ve la chaqueta de PIYC puesta. Va en la galería de nosotros, que la pinta chica
   fondo. Las demás cabeceras y portadas de servicio son recortes 16:9 de
   verticales. Si PIYC manda fotos nuevas, lo que más falta son **apaisadas de
   gente trabajando** (para /nosotros y /contacto) y de **planta en proceso**.
-- **Galería de /nosotros:** quedó en seis fotos (el 22-sep-2026 salieron tres
-  para no repetir: ver la tabla). La única con la chaqueta de PIYC mide 447 px.
+- **Galería de /nosotros:** quedó en **ocho** fotos. El 22-sep-2026 salieron tres
+  para no repetir y entraron dos que nunca se habían publicado (`FOTO 13` y
+  `s12_19`). Cesar pidió nueve; se dejó en ocho porque **el material está
+  agotado**: las 39 del Drive más las 23 del PPTX ya están todas repartidas,
+  descartadas por ser de banco de imágenes o descartadas por repetir una escena
+  ya publicada. La novena tendría que ser un marcador o una foto repetida, y
+  ocho buenas se ven mejor. La única con la chaqueta de PIYC mide 447 px.
+- **Pedido concreto a PIYC** (lo que desbloquea todo lo anterior): fotos
+  apaisadas del equipo trabajando en planta, de un **tablero armado visto de
+  frente con la puerta abierta**, de **telecontrol de verdad** (estación remota,
+  antena o enlace, puesto de mando), de cuartos fríos y evaporadores, y de
+  climatización. Mientras no lleguen, `aires-acondicionados` sigue sin fotos y
+  la galería de /nosotros no puede crecer.
+- **Hay un video sin usar**, `20220216_162823.mp4` (26 MB, ~12 s). Se intentó
+  sacarle fotogramas con Edge y no decodificó; con `ffmpeg` saldrían tres o
+  cuatro imágenes nuevas de obra. Queda como pendiente.
 
 ---
 
@@ -522,3 +578,13 @@ este documento; desde el panel no se puede editar.
 Si esa relación tiene que ser editable o servir para filtrar `/proyectos` por servicio,
 hace falta una migración nueva: lo más simple sería `services text[] not null default '{}'`
 en `site_projects`. **No se alteró el esquema desde la semilla** — queda reportado.
+
+### Fotograma del video (22-sep-2026)
+
+`20220216_162823.mp4` (12 s, 1920×1080) era el único material del Drive sin
+usar. Con `ffmpeg` se sacó **un** fotograma aprovechable —el resto del video
+repite la misma escena— y entró a la galería de «Nuestro trabajo», que queda en
+nueve: `nosotros/linea-envasado-sala-produccion.webp` (1920×1080 · 104 KB) con
+su variante de 900 px (41 KB). Alt: «Línea de envasado y dosificación en
+operación dentro de una sala de producción, con la máquina cerrada por sus
+guardas de seguridad». El video no se sube al sitio.

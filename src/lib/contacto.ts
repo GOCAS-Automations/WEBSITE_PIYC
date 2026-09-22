@@ -87,19 +87,68 @@ export function direccionEnLinea(contacto: AjustesContact): string {
     .join(", ");
 }
 
+/* ===================================================================== */
+/* Mapa                                                                   */
+/* ===================================================================== */
+
 /**
- * URL del mapa embebido de Google.
- * `output=embed` es la forma sin clave de API; la CSP ya permite
- * `https://www.google.com` en `frame-src` (ver `next.config.ts`).
+ * LA FICHA DEL NEGOCIO, NO LA DIRECCIÓN CRUDA
+ * -------------------------------------------
+ * Cesar: «quiero que salga PIYC PROGRAMACIÓN INDUSTRIAL Y CONTROL SAS, no la
+ * dirección cruda». Buscar por texto (`?q=Cl. 33 #5-76…`) planta un pin sin
+ * nombre; lo que muestra la ficha con su rótulo es el **CID** del negocio.
+ *
+ * El CID es el segundo hexadecimal del tramo `!1s0x…:0x…` de la URL larga de
+ * Google Maps, pasado a decimal:
+ *   `0x37f6221799314f66` → 4032448001106595686
+ *
+ * Comprobado en un iframe real (`?cid=…&output=embed`): sale la tarjeta con
+ * «PIYC PROGRAMACION INDUSTRIAL Y CONTROL SAS» y el pin rotulado.
+ *
+ * Va en código como respaldo, no como única fuente: el panel puede sustituir
+ * las dos URL desde Ajustes → Mapa si PIYC cambia de sede o de ficha.
+ *
+ * `output=embed` es la forma sin clave de API, y la CSP ya permite
+ * `https://www.google.com` en `frame-src` (ver `next.config.ts`): no hace
+ * falta abrir ningún origen nuevo.
+ */
+const CID_FICHA_GOOGLE: string = "4032448001106595686";
+
+/** Respaldo en código de la ficha de Google de PIYC. */
+export const URL_FICHA_GOOGLE: string =
+  "https://www.google.com/maps/place/PIYC+PROGRAMACION+INDUSTRIAL+Y+CONTROL+SAS/@3.4579204,-76.5164019,17z/data=!4m6!3m5!1s0x2d231fb0340d391f:0x37f6221799314f66!8m2!3d3.457915!4d-76.513827!16s%2Fg%2F11y6rd3ykb";
+
+/** `https://www.google.com/maps?cid=…&output=embed` para un CID dado. */
+function embedDeCid(cid: string): string {
+  return `https://www.google.com/maps?cid=${encodeURIComponent(cid)}&output=embed`;
+}
+
+/**
+ * URL del iframe del mapa. Por orden: la que ponga el panel, el CID de la
+ * ficha y —solo si alguien vaciara el respaldo de arriba— la búsqueda por
+ * dirección, que pinta un pin sin nombre pero es mejor que un hueco. Las dos
+ * constantes van tipadas como `string` para que ese último tramo no quede
+ * como código muerto ante el compilador.
  */
 export function urlMapaEmbebido(contacto: AjustesContact): string {
+  const delPanel = contacto.mapsEmbedUrl?.trim();
+  if (delPanel) return delPanel;
+  if (CID_FICHA_GOOGLE) return embedDeCid(CID_FICHA_GOOGLE);
+
   const consulta = contacto.mapsQuery || direccionEnLinea(contacto);
   if (!consulta) return "";
   return `https://www.google.com/maps?q=${encodeURIComponent(consulta)}&output=embed`;
 }
 
-/** Enlace para abrir la dirección en Google Maps en una pestaña nueva. */
+/**
+ * Enlace «Abrir en Google Maps» (mapa de `/contacto` y pie de página): lleva a
+ * la **ficha** del negocio, no a una búsqueda por dirección.
+ */
 export function urlMapaExterno(contacto: AjustesContact): string {
+  const delPanel = contacto.mapsPlaceUrl?.trim();
+  if (delPanel) return delPanel;
+  if (URL_FICHA_GOOGLE) return URL_FICHA_GOOGLE;
+
   const consulta = contacto.mapsQuery || direccionEnLinea(contacto);
   if (!consulta) return "";
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(consulta)}`;

@@ -938,6 +938,14 @@ function soloDigitos(valor: string): string {
 }
 
 /**
+ * Orígenes que la CSP deja cargar dentro de un `<iframe>` (`frame-src` de
+ * `next.config.ts`). El mapa embebido se valida contra esta lista: si no, el
+ * ajuste se guardaría bien y el recuadro quedaría en blanco en el sitio, sin
+ * que nada lo explique.
+ */
+const ORIGENES_MAPA = ["https://www.google.com/", "https://maps.google.com/"] as const;
+
+/**
  * Datos de contacto.
  *
  * REGLA 5 DE `AGENTS.md`: `whatsappFormulario` es **el destino del formulario
@@ -991,6 +999,12 @@ export async function guardarContacto(
       `«${tramoMalo}» no es un tramo de horario válido para Google. Se escribe con los días en inglés abreviado y las horas de 24 h, por ejemplo «Mo-Fr 08:00-17:00». Varios tramos van separados por coma.`,
     );
 
+  const mapaEmbebido = text(formData, "maps_embed_url");
+  if (mapaEmbebido !== "" && !ORIGENES_MAPA.some((origen) => mapaEmbebido.startsWith(origen)))
+    return fail(
+      "La dirección del mapa embebido tiene que empezar por https://www.google.com/ o https://maps.google.com/. El navegador bloquea cualquier otro origen dentro del recuadro y el mapa quedaría en blanco.",
+    );
+
   const estado = await actualizarAjuste<AjustesContact>("contact", (c) => {
     const nuevo: AjustesContact = {
       ...c,
@@ -1027,6 +1041,16 @@ export async function guardarContacto(
     const mapsQuery = text(formData, "maps_query");
     if (mapsQuery !== "") nuevo.mapsQuery = mapsQuery;
     else delete nuevo.mapsQuery;
+
+    // Las dos URL del mapa siguen la misma regla: vacío = se borra la clave y
+    // el sitio vuelve a la ficha de Google que trae en código (la que muestra
+    // el nombre del negocio y no un pin con la dirección).
+    const mapsPlaceUrl = text(formData, "maps_place_url");
+    if (mapsPlaceUrl !== "") nuevo.mapsPlaceUrl = mapsPlaceUrl;
+    else delete nuevo.mapsPlaceUrl;
+
+    if (mapaEmbebido !== "") nuevo.mapsEmbedUrl = mapaEmbebido;
+    else delete nuevo.mapsEmbedUrl;
 
     // El horario visible y el que lee Google son el mismo dato escrito de dos
     // formas: se guardan y se borran juntos. Sin `label` no hay horario que

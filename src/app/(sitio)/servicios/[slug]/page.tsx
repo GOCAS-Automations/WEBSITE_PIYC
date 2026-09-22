@@ -57,6 +57,7 @@ import {
 import { FotoDeColumna } from "@/components/ui/ContentImage";
 import { IconoServicio } from "@/components/ui/iconos-servicio";
 import { JsonLd } from "@/components/ui/JsonLd";
+import { MarcadorDeMarca } from "@/components/ui/MarcadorDeMarca";
 
 export const revalidate = 300;
 
@@ -222,6 +223,13 @@ export default async function PaginaDeServicio({
 
             {fotoLateral ? (
               <FotoDeColumna imagen={fotoLateral} className="lg:col-span-5" />
+            ) : galeria.length === 0 ? (
+              // El servicio no tiene NINGUNA foto (hoy, aires acondicionados:
+              // el material del cliente no trae ninguna). En vez de dejar la
+              // página entera sin una sola imagen, la columna lleva el marcador
+              // de marca y los alcances bajan al bloque de abajo. Se ve que es
+              // provisional y PIYC sabe que ahí va una foto, desde el panel.
+              <MarcadorDeMarca className="lg:col-span-5" />
             ) : servicio.items.length > 0 ? (
               // Mismo alto que la columna de texto; el botón se sienta abajo
               // (`mt-auto`), alineado con el último párrafo.
@@ -242,10 +250,15 @@ export default async function PaginaDeServicio({
                   </BotonWhatsApp>
                 </div>
               </aside>
-            ) : null}
+            ) : (
+              // Sin foto y sin alcances, las cinco columnas de la derecha
+              // quedaban vacías al lado del texto. Va el marcador de marca:
+              // llena la columna y le dice a PIYC que ahí falta una foto.
+              <MarcadorDeMarca className="lg:col-span-5" />
+            )}
           </div>
 
-          {fotoLateral && servicio.items.length > 0 ? (
+          {(fotoLateral || galeria.length === 0) && servicio.items.length > 0 ? (
             <div className="mt-12">
               <h3 className="text-[1.375rem] font-semibold leading-tight text-azul-950">
                 {tituloIncluye}

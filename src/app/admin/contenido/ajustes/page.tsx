@@ -148,6 +148,32 @@ export default async function AjustesPage() {
                 </div>
               </fieldset>
 
+              {/* Mapa: las dos URL van juntas porque describen la misma ficha
+                  de Google. Vacías = el sitio usa la ficha que trae en código
+                  (la que muestra «PIYC PROGRAMACIÓN INDUSTRIAL Y CONTROL SAS»
+                  en vez de un pin con la dirección). */}
+              <fieldset className="rounded-control p-4 ring-1 ring-separador">
+                <legend className="px-2 text-sm font-semibold text-azul-950">Mapa</legend>
+                <div className="grid gap-4">
+                  <Campo
+                    label="Enlace de la ficha en Google Maps"
+                    name="maps_place_url"
+                    scope="direccion"
+                    defaultValue={contact.mapsPlaceUrl}
+                    placeholder="https://www.google.com/maps/place/PIYC+..."
+                    hint="A dónde llevan los enlaces «Abrir en Google Maps» del mapa y del pie. Déjalo vacío para usar la ficha que ya trae el sitio."
+                  />
+                  <Campo
+                    label="Dirección del mapa embebido"
+                    name="maps_embed_url"
+                    scope="direccion"
+                    defaultValue={contact.mapsEmbedUrl}
+                    placeholder="https://www.google.com/maps?cid=4032448001106595686&output=embed"
+                    hint="Es lo que se ve dentro del recuadro del mapa en Contacto. Tiene que terminar en «&output=embed» y ser de google.com o maps.google.com. Vacío = la ficha que ya trae el sitio."
+                  />
+                </div>
+              </fieldset>
+
               <fieldset className="rounded-control p-4 ring-1 ring-separador">
                 <legend className="px-2 text-sm font-semibold text-azul-950">
                   Teléfonos y WhatsApp

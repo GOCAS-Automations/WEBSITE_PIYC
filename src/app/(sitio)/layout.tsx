@@ -27,9 +27,17 @@ export default async function LayoutSitio({ children }: { children: React.ReactN
       {/* Organization + LocalBusiness + WebSite, una sola vez para todo el sitio. */}
       <JsonLd datos={jsonLdSitio(contacto)} />
 
+      {/*
+        `z-[60]` y no `z-50`: la cápsula del nav también es `z-50` y va después
+        en el documento, así que con el mismo nivel se pintaba ENCIMA del
+        enlace y al tabular solo se veía el anillo de foco sobre el logo. Es un
+        fallo de «foco no oscurecido» (WCAG 2.4.11) que axe no detecta, porque
+        no mide solapes. `rounded-chip` para que el enlace no sea el único
+        rectángulo de esquina viva del sitio.
+      */}
       <a
         href="#contenido"
-        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:bg-azul-950 focus:px-4 focus:py-2 focus:text-blanco"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-chip focus:bg-azul-950 focus:px-4 focus:py-2 focus:text-blanco focus:shadow-flotante"
       >
         Saltar al contenido
       </a>

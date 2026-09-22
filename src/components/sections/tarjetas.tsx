@@ -160,7 +160,13 @@ export function FilaDeServicio({
             {String(numero).padStart(2, "0")}
           </p>
         ) : null}
-        <h3 className="text-[1.125rem] font-semibold leading-snug text-azul-950">
+        {/* `overflow-wrap: anywhere` y no `break-words`: solo el primero baja el
+            ancho MÍNIMO intrínseco del título. Sin él, «Automatización» —14
+            caracteres en semibold de 18 px— fijaba un mínimo de 305 px para la
+            fila y a 320 px de ventana la página desbordaba 2 px. La palabra
+            solo se parte cuando de verdad no cabe; de 360 px para arriba nada
+            cambia. */}
+        <h3 className="text-[1.125rem] font-semibold leading-snug text-azul-950 [overflow-wrap:anywhere]">
           <Link
             href={`/servicios/${servicio.slug}`}
             className="after:absolute after:inset-0 after:rounded-tarjeta after:content-['']"
@@ -355,11 +361,15 @@ export function ListadoDeProyectos({ proyectos }: { proyectos: readonly Proyecto
   const cuantosDestacados = total <= 2 ? total : total % 2 === 0 ? 2 : 1;
   const destacados = proyectos.slice(0, cuantosDestacados);
   const resto = proyectos.slice(cuantosDestacados);
+  // Tres columnas solo desde `lg`: en `sm` (640 px) tres tarjetas con foto
+  // quedan de ~187 px y el título se parte en cuatro líneas. Hasta ahí van de
+  // dos en dos, que es lo que se ve hoy con seis casos y lo que se verá con
+  // siete, nueve o doce.
   const columnasResto =
     resto.length % 4 === 0
       ? "sm:grid-cols-2 lg:grid-cols-4"
       : resto.length % 3 === 0
-        ? "sm:grid-cols-3"
+        ? "sm:grid-cols-2 lg:grid-cols-3"
         : "sm:grid-cols-2";
 
   return (

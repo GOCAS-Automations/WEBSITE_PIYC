@@ -59,6 +59,7 @@ import {
 import { FotoDeColumna } from "@/components/ui/ContentImage";
 import { IconoServicio } from "@/components/ui/iconos-servicio";
 import { JsonLd } from "@/components/ui/JsonLd";
+import { MarcadorDeMarca } from "@/components/ui/MarcadorDeMarca";
 
 export const revalidate = 300;
 
@@ -100,24 +101,29 @@ function fotoDeLinea(servicios: readonly Servicio[]): ImagenContenido | null {
 }
 
 /**
- * Sustituto de la foto cuando ningún servicio de la línea tiene fotos: panel
- * de marca con los iconos de sus servicios. Tiene que verse a propósito.
+ * Sustituto de la foto cuando ningún servicio de la línea tiene fotos: la
+ * superficie de marca de `MarcadorDeMarca`, pero con los iconos de los
+ * servicios de la línea en vez del logo — dicen más de qué va la línea, y el
+ * logo ya está en el nav y en el pie de la misma pantalla.
  */
 function PanelDeLinea({ servicios, className = "" }: { servicios: readonly Servicio[]; className?: string }) {
   return (
-    <div
-      aria-hidden="true"
-      className={`sobre-oscuro fondo-noche reticula-cabecera relative flex aspect-[16/10] items-center justify-center gap-6 overflow-hidden rounded-panel shadow-elevada lg:aspect-auto lg:h-full lg:min-h-[22rem] ${className}`}
-    >
-      {servicios.slice(0, 3).map((servicio) => (
-        <IconoServicio
-          key={servicio.slug}
-          clave={servicio.iconKey}
-          className="relative size-16 text-azul-300 sm:size-20"
-          strokeWidth={1.2}
-        />
-      ))}
-    </div>
+    <MarcadorDeMarca
+      proporcion="aspect-[16/10] lg:aspect-auto lg:h-full lg:min-h-[24rem]"
+      className={className}
+      marca={
+        <span className="flex items-center justify-center gap-6">
+          {servicios.slice(0, 3).map((servicio) => (
+            <IconoServicio
+              key={servicio.slug}
+              clave={servicio.iconKey}
+              className="size-16 text-azul-300 sm:size-20"
+              strokeWidth={1.2}
+            />
+          ))}
+        </span>
+      }
+    />
   );
 }
 

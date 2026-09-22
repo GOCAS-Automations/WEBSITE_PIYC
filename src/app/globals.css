@@ -468,6 +468,27 @@
 }
 
 /* =====================================================================
+   `sr-only` NO PUEDE ENSANCHAR EL DOCUMENTO
+   El `sr-only` de Tailwind es `position:absolute` + `white-space:nowrap` con
+   una caja de 1 px. Sin un ancestro **posicionado**, su bloque contenedor es
+   el bloque contenedor inicial: se sale de cualquier carril con scroll y su
+   texto sin cortes entra en el desbordamiento del DOCUMENTO. Con eso,
+   `documentElement.scrollWidth` llegaba a ~1932 px en una ventana de 687 y
+   toda captura de página completa salía con el sitio en una columna angosta a
+   la izquierda y el resto en blanco — el pantallazo que reportó Cesar.
+
+   `contain: paint` cierra la puerta de raíz: los descendientes de un elemento
+   con contención de pintado no aportan al área desplazable de ningún
+   ancestro. No cambia nada de lo que lee un lector de pantalla.
+
+   Va SIN capa a propósito: así le gana a la utilidad `sr-only` de la capa
+   `utilities` sin depender del orden de declaración de Tailwind.
+   ===================================================================== */
+.sr-only {
+  contain: paint;
+}
+
+/* =====================================================================
    Ritmo vertical entre secciones
    Los paneles que flotan sobre el lienzo (valores, proceso oscuro, cierre)
    traen su propio aire arriba y abajo. Tras una sección que ya es lienzo, ese

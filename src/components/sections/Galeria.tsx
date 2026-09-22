@@ -149,7 +149,9 @@ export function Galeria({
               <button
                 type="button"
                 onClick={(evento) => abrir(indice, evento.currentTarget)}
-                className="pulsable group block w-full cursor-zoom-in rounded-tarjeta bg-blanco p-1.5 shadow-tarjeta hover:shadow-elevada"
+                // `relative`: contiene al `sr-only` de abajo, que es
+                // `position:absolute` (ver la nota de `CarrilDeFotos`).
+                className="pulsable group relative block w-full cursor-zoom-in rounded-tarjeta bg-blanco p-1.5 shadow-tarjeta hover:shadow-elevada"
               >
                 <ContentImage
                   src={imagen.src}
