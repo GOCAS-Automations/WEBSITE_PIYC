@@ -5,6 +5,17 @@
  *
  * `generateStaticParams` prerrenderiza los nueve servicios en el build. Un
  * slug que no exista cae en `notFound()`.
+ *
+ * COMPOSICIÓN (sep-2026)
+ * ----------------------
+ *  - Cabecera con la primera foto del servicio de fondo; sin fotos (hoy, aires
+ *    acondicionados), degradado de marca con el icono del servicio. Los datos
+ *    de la ficha (línea, zona, casos) van en cápsulas bajo la bajada: la
+ *    tarjeta «Resumen» de la derecha dejaba un hueco debajo.
+ *  - «En qué consiste» + «Qué incluye» en dos columnas del mismo alto. Con una
+ *    sola foto, la foto ocupa la columna derecha y los alcances van debajo.
+ *  - Galería (dos fotos o más), casos, otros servicios de la misma línea
+ *    primero, anterior/siguiente y cierre, con fondos alternos.
  */
 
 import type { Metadata } from "next";
@@ -13,6 +24,7 @@ import {
   enParrafos,
   galeriaCompleta,
   getContacto,
+  getLineasDeServicio,
   getPaginas,
   getProyectosDeServicio,
   getServicio,
@@ -25,13 +37,16 @@ import {
   metadataDePagina,
   type Miga,
 } from "@/lib/seo";
-import { lineasDeServicio } from "@/data/servicios";
-import { CabeceraInterna, FichaTecnica } from "@/components/sections/CabeceraInterna";
+import { CabeceraInterna } from "@/components/sections/CabeceraInterna";
 import { FranjaCta } from "@/components/sections/FranjaCta";
 import { Galeria } from "@/components/sections/Galeria";
-import { GraficoServicio } from "@/components/sections/GraficoServicio";
-import { RejillaDeProyectos, RejillaDeServicios } from "@/components/sections/tarjetas";
 import {
+  RejillaDeFilasDeServicio,
+  RejillaDeProyectos,
+  TarjetaProyecto,
+} from "@/components/sections/tarjetas";
+import {
+  BotonWhatsApp,
   Contenedor,
   ListaDeAlcances,
   NavegacionEntreFichas,
@@ -39,7 +54,8 @@ import {
   Rotulo,
   TituloSeccion,
 } from "@/components/sections/primitivas";
-import { FotoEnmarcada } from "@/components/ui/ContentImage";
+import { FotoDeColumna } from "@/components/ui/ContentImage";
+import { IconoServicio } from "@/components/ui/iconos-servicio";
 import { JsonLd } from "@/components/ui/JsonLd";
 
 export const revalidate = 300;
@@ -67,6 +83,33 @@ export async function generateMetadata({
   });
 }
 
+/** Lista de verificación de «Qué incluye», dentro de su tarjeta. */
+function ListaIncluye({ items }: { items: readonly string[] }) {
+  return (
+    <ul className="mt-4 divide-y divide-separador">
+      {items.map((item) => (
+        <li key={item} className="flex items-start gap-3 py-2.5 text-[15px] leading-snug text-azul-900">
+          <span
+            aria-hidden="true"
+            className="mt-0.5 inline-flex size-5 shrink-0 items-center justify-center rounded-capsula bg-verde-100 text-verde-700"
+          >
+            <svg viewBox="0 0 16 16" fill="none" className="size-3">
+              <path
+                d="M3.5 8.5l3 3 6-7"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </span>
+          <span>{item}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 export default async function PaginaDeServicio({
   params,
 }: {
@@ -76,11 +119,12 @@ export default async function PaginaDeServicio({
   const servicio = await getServicio(slug);
   if (!servicio) notFound();
 
-  const [contacto, todos, relacionados, paginas] = await Promise.all([
+  const [contacto, todos, relacionados, paginas, lineas] = await Promise.all([
     getContacto(),
     getServicios(),
     getProyectosDeServicio(slug),
     getPaginas(),
+    getLineasDeServicio(),
   ]);
 
   const hrefWhatsApp = enlaceWhatsAppDe(
@@ -95,15 +139,30 @@ export default async function PaginaDeServicio({
   ];
 
   const galeria = galeriaCompleta(servicio.images);
-  const portada = servicio.images.cover;
-  const otros = todos.filter((otro) => otro.slug !== servicio.slug).slice(0, 3);
+  // Foto de la cabecera: la primera con texto alternativo.
+  const fotoCabecera = galeria.find((foto) => foto.alt) ?? null;
+  // Cada foto se ve una sola vez en la ficha: la de la cabecera no se repite
+  // junto al texto ni en la galería. Si queda UNA, va junto al texto (y «Qué
+  // incluye» baja); si quedan dos o más, van a la galería.
+  const resto = galeria.filter((foto) => foto !== fotoCabecera);
+  const fotoLateral = resto.length === 1 && resto[0].alt ? resto[0] : null;
+  const galeriaInferior = resto.length > 1 ? resto : [];
   const parrafos = enParrafos(servicio.description);
-  // Línea a la que pertenece el servicio (agrupación propuesta, en el código).
-  const linea = lineasDeServicio.find((candidata) => candidata.slugs.includes(servicio.slug));
+  // Línea a la que pertenece el servicio (agrupación del código, nombre del panel).
+  const linea = lineas.find((candidata) => candidata.slugs.includes(servicio.slug));
+  // Otros servicios: primero los de la misma línea, luego el resto; tres.
+  const otrosDeLaLinea = todos.filter(
+    (otro) => otro.slug !== servicio.slug && linea?.slugs.includes(otro.slug),
+  );
+  const otros = [
+    ...otrosDeLaLinea,
+    ...todos.filter((otro) => otro.slug !== servicio.slug && !otrosDeLaLinea.includes(otro)),
+  ].slice(0, 3);
   // Títulos de las secciones de la plantilla, editables en «Textos de las
   // páginas». Se usa `||` y no `??`: un título vacío dejaría la sección sin
   // nombre accesible, así que ahí vuelve el de fábrica.
   const plantilla = paginas.servicioDetalle;
+  const tituloIncluye = plantilla?.tituloIncluye || "Qué incluye";
   // Anterior y siguiente dentro del listado: la ficha deja de ser un callejón
   // sin salida y el rastreador llega a las nueve desde cualquiera.
   const indiceActual = todos.findIndex((otro) => otro.slug === servicio.slug);
@@ -129,29 +188,29 @@ export default async function PaginaDeServicio({
         titulo={servicio.title}
         bajada={servicio.summary}
         migas={migas}
-        aside={
-          portada ? (
-            <FotoEnmarcada
-              src={portada}
-              alt={servicio.images.coverAlt ?? servicio.title}
-              proporcion="aspect-[4/3]"
-              prioritaria
-              className="mx-auto max-w-[min(100%,26rem)] lg:mx-0 lg:ml-auto"
-            />
-          ) : (
-            <GraficoServicio
-              servicio={servicio}
-              className="mx-auto max-w-[min(100%,26rem)] lg:mx-0 lg:ml-auto"
-            />
-          )
+        imagen={fotoCabecera}
+        marca={
+          <IconoServicio clave={servicio.iconKey} className="size-64 lg:size-80" strokeWidth={0.9} />
         }
+        datos={[
+          {
+            etiqueta: "Línea",
+            valor: linea?.titulo,
+            href: linea ? `/servicios#${linea.id}` : undefined,
+          },
+          { etiqueta: "Zona", valor: "Cali y Valle del Cauca" },
+          {
+            etiqueta: "Casos publicados",
+            valor: relacionados.length ? String(relacionados.length) : null,
+          },
+        ]}
       />
 
-      {/* Descripción + alcances */}
+      {/* En qué consiste + qué incluye (o la foto, si solo hay una) */}
       <section aria-labelledby="titulo-alcance" className="bg-lienzo">
         <Contenedor className="py-16 lg:py-20">
-          <div className="grid gap-12 lg:grid-cols-12 lg:gap-12">
-            <div className="lg:col-span-7">
+          <div className="grid gap-10 lg:grid-cols-12 lg:gap-14">
+            <div className="flex flex-col items-start lg:col-span-7">
               <Rotulo>En qué consiste</Rotulo>
               {/* El h2 no puede repetir el h1: en cuatro servicios `title` y
                   `navTitle` son la misma cadena («Telemetría» / «Telemetría»). */}
@@ -161,26 +220,35 @@ export default async function PaginaDeServicio({
               <Parrafos textos={parrafos} className="mt-6" />
             </div>
 
-            <div className="lg:col-span-5">
-              <FichaTecnica
-                titulo="Resumen"
-                filas={[
-                  { dato: "Servicio", valor: servicio.navTitle },
-                  { dato: "Línea", valor: linea?.titulo },
-                  { dato: "Zona", valor: "Cali y Valle del Cauca" },
-                  {
-                    dato: "Casos publicados",
-                    valor: relacionados.length ? String(relacionados.length) : null,
-                  },
-                ]}
-              />
-            </div>
+            {fotoLateral ? (
+              <FotoDeColumna imagen={fotoLateral} className="lg:col-span-5" />
+            ) : servicio.items.length > 0 ? (
+              // Mismo alto que la columna de texto; el botón se sienta abajo
+              // (`mt-auto`), alineado con el último párrafo.
+              <aside
+                aria-labelledby="titulo-incluye"
+                className="flex flex-col rounded-panel bg-blanco p-6 shadow-tarjeta ring-1 ring-separador lg:col-span-5 lg:p-8"
+              >
+                <h3
+                  id="titulo-incluye"
+                  className="text-[1.375rem] font-semibold leading-tight text-azul-950"
+                >
+                  {tituloIncluye}
+                </h3>
+                <ListaIncluye items={servicio.items} />
+                <div className="mt-auto pt-6">
+                  <BotonWhatsApp href={hrefWhatsApp} className="w-full">
+                    Consultar por WhatsApp
+                  </BotonWhatsApp>
+                </div>
+              </aside>
+            ) : null}
           </div>
 
-          {servicio.items.length > 0 ? (
+          {fotoLateral && servicio.items.length > 0 ? (
             <div className="mt-12">
               <h3 className="text-[1.375rem] font-semibold leading-tight text-azul-950">
-                {plantilla?.tituloIncluye || "Qué incluye"}
+                {tituloIncluye}
               </h3>
               <ListaDeAlcances items={servicio.items} className="mt-5" />
             </div>
@@ -188,21 +256,18 @@ export default async function PaginaDeServicio({
         </Contenedor>
       </section>
 
-      {/* Galería */}
-      {galeria.length > 0 ? (
-        <section
-          aria-labelledby="titulo-galeria-servicio"
-          className="bg-lienzo-alto"
-        >
+      {/* Galería: las fotos que no están ni en la cabecera ni junto al texto. */}
+      {galeriaInferior.length > 0 ? (
+        <section aria-labelledby="titulo-galeria-servicio" className="bg-blanco">
           <Contenedor className="py-16 lg:py-20">
             <Rotulo>Del trabajo</Rotulo>
             <TituloSeccion id="titulo-galeria-servicio" className="mt-5">
               {plantilla?.tituloGaleria || "Galería"}
             </TituloSeccion>
             <Galeria
-              imagenes={galeria}
+              imagenes={galeriaInferior}
               titulo={servicio.navTitle}
-              columnas={3}
+              columnas={galeriaInferior.length % 3 === 0 ? 3 : 2}
               className="mt-8"
             />
           </Contenedor>
@@ -211,31 +276,40 @@ export default async function PaginaDeServicio({
 
       {/* Proyectos relacionados */}
       {relacionados.length > 0 ? (
-        <section aria-labelledby="titulo-relacionados" className="bg-lienzo">
+        <section
+          aria-labelledby="titulo-relacionados"
+          className={galeriaInferior.length > 0 ? "bg-lienzo" : "bg-blanco"}
+        >
           <Contenedor className="py-16 lg:py-20">
             <Rotulo>Casos de éxito</Rotulo>
             <TituloSeccion id="titulo-relacionados" className="mt-5">
               {plantilla?.tituloCasos || "Proyectos con este servicio"}
             </TituloSeccion>
             <div className="mt-8">
-              <RejillaDeProyectos proyectos={relacionados} columnas={3} />
+              {/* Un caso solo va en horizontal, a todo el ancho: en una rejilla
+                  de tres quedaba una tarjeta sola y dos huecos. */}
+              {relacionados.length === 1 ? (
+                <TarjetaProyecto proyecto={relacionados[0]} variante="horizontal" />
+              ) : (
+                <RejillaDeProyectos
+                  proyectos={relacionados}
+                  columnas={relacionados.length % 3 === 0 ? 3 : 2}
+                />
+              )}
             </div>
           </Contenedor>
         </section>
       ) : null}
 
-      {/* Otros servicios */}
+      {/* Otros servicios: primero los de la misma línea. */}
       {otros.length > 0 ? (
-        <section
-          aria-labelledby="titulo-otros"
-          className="bg-lienzo-alto"
-        >
+        <section aria-labelledby="titulo-otros" className="bg-lienzo-alto">
           <Contenedor className="py-16 lg:py-20">
             <TituloSeccion id="titulo-otros">
               {plantilla?.tituloOtros || "Otros servicios"}
             </TituloSeccion>
             <div className="mt-8">
-              <RejillaDeServicios servicios={otros} columnas={3} />
+              <RejillaDeFilasDeServicio servicios={otros} columnas={otros.length === 3 ? 3 : 2} />
             </div>
           </Contenedor>
         </section>
@@ -247,6 +321,7 @@ export default async function PaginaDeServicio({
         siguiente={siguiente}
         etiqueta="Navegación entre servicios"
         base="/servicios"
+        etiquetaListado="Todos los servicios"
       />
 
       <FranjaCta

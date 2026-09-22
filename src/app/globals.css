@@ -297,6 +297,50 @@
   background-repeat: no-repeat;
 }
 
+/* Velo de las cabeceras con foto de fondo (`CabeceraInterna`).
+   Medido para el PEOR caso, una foto blanca: bajo el texto nunca queda menos
+   de ~75 % de azul noche → el título blanco da ≥ 7:1 y la bajada `acero-100`
+   ≥ 5:1. En móvil y tableta el texto ocupa todo el ancho, así que el velo es
+   casi parejo y se carga hacia abajo, donde va el texto; en escritorio el
+   texto vive a la izquierda y la foto respira a la derecha. */
+@utility velo-cabecera {
+  background-image: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--color-azul-950) 92%, transparent) 0%,
+    color-mix(in srgb, var(--color-azul-950) 80%, transparent) 55%,
+    color-mix(in srgb, var(--color-azul-950) 66%, transparent) 100%
+  );
+
+  @media (width >= 64rem) {
+    background-image:
+      linear-gradient(
+        to right,
+        color-mix(in srgb, var(--color-azul-950) 90%, transparent) 0%,
+        color-mix(in srgb, var(--color-azul-950) 80%, transparent) 44%,
+        color-mix(in srgb, var(--color-azul-950) 42%, transparent) 74%,
+        color-mix(in srgb, var(--color-azul-950) 26%, transparent) 100%
+      ),
+      linear-gradient(to top, color-mix(in srgb, var(--color-azul-950) 55%, transparent), transparent 60%);
+  }
+}
+
+/* Retícula tenue para la cabecera SIN foto: sobre el degradado de marca hace
+   que se lea como una decisión de diseño y no como una foto que no cargó. Se
+   apaga hacia la izquierda, donde va el texto. */
+@utility reticula-cabecera {
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(color-mix(in srgb, var(--color-blanco) 6%, transparent) 1px, transparent 1px),
+      linear-gradient(90deg, color-mix(in srgb, var(--color-blanco) 6%, transparent) 1px, transparent 1px);
+    background-size: 3rem 3rem;
+    -webkit-mask-image: linear-gradient(to left, black 10%, transparent 80%);
+    mask-image: linear-gradient(to left, black 10%, transparent 80%);
+  }
+}
+
 /* Lista agrupada tipo iOS: tarjeta blanca con separadores internos que no
    llegan al borde. Se aplica al contenedor; los hijos directos son las filas. */
 @utility lista-agrupada {
@@ -421,6 +465,20 @@
       animation: none !important;
     }
   }
+}
+
+/* =====================================================================
+   Ritmo vertical entre secciones
+   Los paneles que flotan sobre el lienzo (valores, proceso oscuro, cierre)
+   traen su propio aire arriba y abajo. Tras una sección que ya es lienzo, ese
+   aire se sumaba al relleno inferior de la anterior y quedaban ~140 px
+   muertos: ahí el panel no pone nada arriba y manda el relleno de la sección
+   anterior. Tras una sección blanca sí lo pone (el panel no puede pegarse al
+   borde del bloque blanco). Va fuera de `@layer` a propósito: tiene que
+   ganarle a las utilidades `py-*` del propio panel.
+   ===================================================================== */
+main > .bg-lienzo + [data-panel] {
+  padding-top: 0;
 }
 
 /* =====================================================================

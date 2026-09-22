@@ -18,26 +18,35 @@ export function Faq({
   titulo = "Preguntas frecuentes",
   rotulo = "Antes de escribirnos",
   id = "preguntas-frecuentes",
+  fondo = "lienzo",
 }: {
   preguntas: readonly PreguntaFrecuente[];
   titulo?: string;
   rotulo?: string;
   id?: string;
+  /** Fondo de la sección, para alternar con la sección anterior. */
+  fondo?: "lienzo" | "blanco";
 }) {
   if (preguntas.length === 0) return null;
 
   return (
-    <section aria-labelledby={`${id}-titulo`} className="bg-lienzo">
+    <section
+      aria-labelledby={`${id}-titulo`}
+      className={fondo === "blanco" ? "bg-blanco" : "bg-lienzo"}
+    >
       <Contenedor className="py-16 lg:py-20">
-        <div className="grid gap-10 lg:grid-cols-12 lg:gap-12">
-          <div className="lg:col-span-4">
+        {/* Título arriba y acordeón a todo el ancho. Antes iban en 4/8: el
+            acordeón es más alto que el título y a su izquierda quedaba un
+            hueco muerto. */}
+        <div className="grid gap-8 lg:gap-10">
+          <div>
             <Rotulo>{rotulo}</Rotulo>
             <TituloSeccion id={`${id}-titulo`} className="mt-5">
               {titulo}
             </TituloSeccion>
           </div>
 
-          <div className="overflow-hidden rounded-tarjeta bg-blanco shadow-tarjeta lg:col-span-8">
+          <div className="overflow-hidden rounded-tarjeta bg-blanco shadow-tarjeta ring-1 ring-separador">
             {preguntas.map((item, indice) => (
               <details
                 key={item.pregunta}

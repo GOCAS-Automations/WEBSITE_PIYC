@@ -12,6 +12,7 @@ import Link from "next/link";
 import {
   getContacto,
   getHome,
+  getLineasDeServicio,
   getProyectos,
   getSeo,
   getServicios,
@@ -21,7 +22,6 @@ import {
 } from "@/lib/content";
 import { MENSAJES_WHATSAPP, enlaceWhatsAppDe } from "@/lib/contacto";
 import { metadataDePagina, metadatosPagina } from "@/lib/seo";
-import { lineasDeServicio } from "@/data/servicios";
 import { HeroInicio } from "@/components/inicio/HeroInicio";
 import { FranjaProceso } from "@/components/inicio/FranjaProceso";
 import { FranjaCta } from "@/components/sections/FranjaCta";
@@ -35,7 +35,7 @@ import {
   Rotulo,
   TituloSeccion,
 } from "@/components/sections/primitivas";
-import { FotoEnmarcada } from "@/components/ui/ContentImage";
+import { FotoDeColumna } from "@/components/ui/ContentImage";
 
 export const revalidate = 300;
 
@@ -54,12 +54,13 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Inicio() {
-  const [home, contacto, valores, todosLosServicios, proyectos] = await Promise.all([
+  const [home, contacto, valores, todosLosServicios, proyectos, lineas] = await Promise.all([
     getHome(),
     getContacto(),
     getValores(),
     getServicios(),
     getProyectos(),
+    getLineasDeServicio(),
   ]);
 
   const hrefWhatsApp = enlaceWhatsAppDe(contacto, MENSAJES_WHATSAPP.general);
@@ -91,18 +92,19 @@ export default async function Inicio() {
       <HeroInicio
         hero={home.hero}
         eslogan={contacto.tagline}
-        lineas={lineasDeServicio}
+        lineas={lineas}
         hrefWhatsApp={hrefWhatsApp}
       />
 
-      {/* Qué hace PIYC */}
+      {/* Qué hace PIYC — foto a la izquierda (el hero tiene su panel a la
+          derecha: zigzag), estirada al alto de la columna de texto. */}
       {intro?.body ? (
         <section aria-labelledby="titulo-intro" className="bg-lienzo-alto">
           <Contenedor className="py-16 lg:py-20">
-            <div className="grid gap-10 lg:grid-cols-12 lg:items-center lg:gap-12">
-              <div className="lg:col-span-7">
+            <div className="grid gap-10 lg:grid-cols-12 lg:gap-14">
+              <div className="flex flex-col items-start lg:col-span-7">
                 {intro.eyebrow ? <Rotulo>{intro.eyebrow}</Rotulo> : null}
-                <TituloSeccion id="titulo-intro" className="mt-5">
+                <TituloSeccion id="titulo-intro" className={intro.eyebrow ? "mt-5" : ""}>
                   {intro.title ?? "Qué hacemos"}
                 </TituloSeccion>
                 <Parrafos textos={enParrafos(intro.body)} className="mt-6" />
@@ -113,18 +115,11 @@ export default async function Inicio() {
                 ) : null}
               </div>
 
-              {intro.image ? (
-                <div className="lg:col-span-5">
-                  <FotoEnmarcada
-                    src={intro.image.src}
-                    alt={intro.image.alt}
-                    width={intro.image.width}
-                    height={intro.image.height}
-                    proporcion="aspect-[4/3]"
-                    className="mx-auto max-w-[min(100%,28rem)] lg:mx-0 lg:ml-auto"
-                    pie={intro.image.alt}
-                  />
-                </div>
+              {intro.image?.src ? (
+                <FotoDeColumna
+                  imagen={intro.image}
+                  className="lg:order-first lg:col-span-5"
+                />
               ) : null}
             </div>
           </Contenedor>

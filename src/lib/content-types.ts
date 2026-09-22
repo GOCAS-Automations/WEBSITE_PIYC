@@ -34,6 +34,13 @@ export type ImagenContenido = {
   alt: string;
   width?: number;
   height?: number;
+  /**
+   * Variante angosta (~900 px de ancho) de la misma foto, para `srcset`. Con el
+   * optimizador de Vercel apagado no hay quien redimensione al vuelo: sin esta
+   * variante, un celular descarga la foto de 1920 px de un fondo de cabecera.
+   * Ausente = se sirve solo `src`. El panel la genera sola al subir.
+   */
+  srcMovil?: string;
 };
 
 /**
@@ -124,15 +131,36 @@ export type Servicio = {
  * Agrupación de los nueve servicios en cuatro líneas, para el menú y el hub.
  * **Propuesta de PIYC-web, pendiente de validar con Jorge** (plan §4.4: los
  * nueve servicios son planos, sin categorías, en el documento original).
- * Vive en el código, no en la base: no es contenido editable.
+ * La agrupación vive en el código; el nombre de cada línea y su frase corta
+ * de la portada se editan en el panel (`home.lineasServicio`).
  */
 export type LineaServicio = {
   id: string;
   titulo: string;
-  /** Una frase que explica qué resuelve la línea. */
+  /** Una frase que explica qué resuelve la línea (entrada de la línea en `/servicios`). */
   resumen: string;
+  /**
+   * Frase de UNA sola línea para la franja bajo el hero del inicio (≤ 45
+   * caracteres). La completa `src/lib/content.ts` con lo del panel
+   * (`home.lineasServicio`) o su respaldo; ausente en `src/data`.
+   */
+  resumenCorto?: string;
   /** Slugs en el orden en que se pintan. */
   slugs: string[];
+};
+
+/**
+ * Textos editables de una línea de servicio (`home.lineasServicio`). La
+ * agrupación —qué servicios van en cada línea— sigue en el código; el panel
+ * solo cambia cómo se llama cada línea y su frase corta de la portada.
+ */
+export type TextosLineaServicio = {
+  /** `id` de la línea en `lineasDeServicio` (código). */
+  id: string;
+  /** Nombre de la línea. Vacío = el de fábrica (la línea necesita nombre). */
+  titulo?: string;
+  /** Frase de una sola línea para la franja del inicio. Vacío = no se pinta. */
+  resumen?: string;
 };
 
 /* ===================================================================== */
@@ -332,6 +360,12 @@ export type AjustesHome = {
   /** Rótulo, título e intro del bloque de valores **en la portada**. Los de
    *  `/nosotros` viven en `AjustesNosotros.valores`: son dos textos distintos. */
   seccionValores?: { eyebrow?: string; title?: string; intro?: string };
+  /**
+   * Nombre y frase corta de cada una de las cuatro líneas de servicio (franja
+   * bajo el hero). El nombre se usa también en `/servicios` y en las fichas.
+   * Ausente = respaldo en `src/lib/content.ts`.
+   */
+  lineasServicio?: TextosLineaServicio[];
   /** Slugs destacados. Vacío = no se pinta la sección; ausente = respaldo. */
   serviciosDestacados?: string[];
   proyectosDestacados?: string[];
@@ -379,6 +413,12 @@ export type AjustesNosotros = {
   };
   mision?: { title?: string; body?: string };
   vision?: { title?: string; body?: string };
+  /**
+   * Foto entre las tarjetas de misión y visión (se estira al alto de ellas:
+   * mejor vertical). Ausente = la primera foto de la galería que no esté ya en
+   * la cabecera ni en «Quiénes somos».
+   */
+  imagenMisionVision?: ImagenContenido;
   /** Rótulo, título e introducción del bloque de valores (los valores van en `site_values`). */
   valores?: { eyebrow?: string; title?: string; intro?: string };
   /** Galería de la página. Vacía = no se pinta. */

@@ -116,10 +116,13 @@ export function Galeria({
 
   if (imagenes.length === 0) return null;
 
+  // En móvil, dos columnas solo si el número de fotos es par: con impar, la
+  // última quedaba sola en su fila, media rejilla vacía al lado.
+  const movil = imagenes.length % 2 === 0 ? "grid-cols-2 " : "";
   const clasesColumnas = {
     2: "sm:grid-cols-2",
-    3: "grid-cols-2 sm:grid-cols-3",
-    4: "grid-cols-2 sm:grid-cols-3 lg:grid-cols-4",
+    3: `${movil}sm:grid-cols-3`,
+    4: `${movil}sm:grid-cols-2 lg:grid-cols-4`,
   }[columnas];
 
   const actual = abierta !== null ? imagenes[abierta] : null;
@@ -153,6 +156,8 @@ export function Galeria({
                   alt={imagen.alt}
                   width={imagen.width}
                   height={imagen.height}
+                  srcMovil={imagen.srcMovil}
+                  sizes="(min-width: 640px) 34vw, 50vw"
                   proporcion="aspect-[4/3]"
                   claseContenedor="rounded-chip bg-acero-100"
                 />

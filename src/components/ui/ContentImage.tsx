@@ -18,21 +18,32 @@
  *  - `width`/`height` siempre → sin CLS.
  *  - `loading="lazy"` y `decoding="async"` salvo en el LCP (`prioritaria`).
  *  - `object-fit` estable cuando la foto no tiene la proporción del recuadro.
+ *  - `srcset` cuando la imagen trae su variante angosta (`srcMovil`, ~900 px):
+ *    sin optimizador nadie redimensiona al vuelo, y un celular no tiene por
+ *    qué bajar la foto de 1920 px de un fondo de cabecera.
  *
- * LÍMITE DE LAS FOTOS ACTUALES
- * ----------------------------
- * Las del PPTX están incrustadas ya reducidas: la más grande mide 1229 px de
- * ancho (`docs/CONTENIDO.md` §2.4). **No estirarlas a pantalla completa**: van
- * en recuadros de tamaño acorde, dentro de marco, no como fondo del hero.
+ * TRES FORMAS DE PINTAR
+ * ---------------------
+ *  - `ContentImage`: la pieza base (recuadro con proporción o imagen suelta).
+ *  - `FotoDeFondo`: foto a sangre que cubre a su padre, bajo un velo
+ *    (cabeceras de página). Es la LCP de las páginas internas.
+ *  - `FotoDeColumna`: la foto de una sección de texto + foto. En escritorio se
+ *    estira al alto de la columna de texto (empieza con el rótulo y termina con
+ *    el último párrafo o botón); en móvil tiene proporción fija.
  */
 
 import { esImagenOptimizable } from "@/lib/imagenes";
+import type { ImagenContenido } from "@/lib/content-types";
 
 type PropsContentImage = {
   src: string | null | undefined;
   alt: string;
   width?: number;
   height?: number;
+  /** Variante angosta (~900 px) de la misma foto. Con ella se emite `srcset`. */
+  srcMovil?: string;
+  /** `sizes` del `srcset`. Solo cuenta si hay `srcMovil`. */
+  sizes?: string;
   className?: string;
   /** true solo en la imagen más grande de la mitad superior (el LCP). */
   prioritaria?: boolean;
@@ -53,11 +64,63 @@ type PropsContentImage = {
 /** Proporción de respaldo cuando la imagen no trae medidas. */
 const PROPORCION_POR_DEFECTO = 4 / 3;
 
+/** Ancho de la variante angosta que genera el panel al subir. */
+const ANCHO_MOVIL = 900;
+
+/**
+ * Atributos comunes del `<img>`: medidas (sin CLS), carga y `srcset`.
+ *
+ * El `srcset` solo se emite cuando la foto grande es realmente más ancha que
+ * la variante: dos candidatos del mismo ancho no le dan al navegador nada que
+ * elegir. Si la imagen no declara su ancho y trae `srcMovil`, se asume la de
+ * 1920 px que prepara el panel (sin medida, el descriptor `w` no existe).
+ */
+function atributosDeImagen({
+  src,
+  width,
+  height,
+  srcMovil,
+  sizes,
+  prioritaria,
+  anticipada,
+}: {
+  src: string;
+  width?: number;
+  height?: number;
+  srcMovil?: string;
+  sizes?: string;
+  prioritaria: boolean;
+  anticipada: boolean;
+}) {
+  // Sin medidas declaradas se asume 4:3 para reservar el espacio igual: lo que
+  // no puede pasar es que el `<img>` salga sin `width`/`height` y desplace el
+  // contenido al cargar.
+  const anchoFinal = width ?? (srcMovil ? 1920 : 1200);
+  const altoFinal = height ?? Math.round(anchoFinal / PROPORCION_POR_DEFECTO);
+  const conVariante = Boolean(srcMovil) && anchoFinal > ANCHO_MOVIL;
+
+  return {
+    src,
+    width: anchoFinal,
+    height: altoFinal,
+    srcSet: conVariante ? `${srcMovil} ${ANCHO_MOVIL}w, ${src} ${anchoFinal}w` : undefined,
+    sizes: conVariante ? (sizes ?? "100vw") : undefined,
+    loading: prioritaria || anticipada ? ("eager" as const) : ("lazy" as const),
+    decoding: prioritaria ? ("sync" as const) : ("async" as const),
+    fetchPriority: prioritaria ? ("high" as const) : undefined,
+    // Marca de diagnóstico: en el panel sirve para avisar de hosts que la
+    // CSP bloquearía. No cambia cómo se ve la imagen.
+    "data-host-permitido": esImagenOptimizable(src) ? "si" : "no",
+  };
+}
+
 export function ContentImage({
   src,
   alt,
   width,
   height,
+  srcMovil,
+  sizes,
   className = "",
   prioritaria = false,
   anticipada = false,
@@ -66,12 +129,6 @@ export function ContentImage({
   claseContenedor = "",
 }: PropsContentImage) {
   if (!src) return null;
-
-  // Sin medidas declaradas se asume 4:3 para reservar el espacio igual: lo que
-  // no puede pasar es que el `<img>` salga sin `width`/`height` y desplace el
-  // contenido al cargar.
-  const anchoFinal = width ?? 1200;
-  const altoFinal = height ?? Math.round(anchoFinal / PROPORCION_POR_DEFECTO);
 
   // Una foto VERTICAL metida en un recuadro apaisado se recorta por arriba y
   // por abajo, y con el recorte centrado lo primero que se pierde es la cabeza
@@ -97,17 +154,9 @@ export function ContentImage({
     /* eslint-disable-next-line @next/next/no-img-element -- ver encabezado: el
        optimizador está apagado y `next/image` lanza con hosts no declarados. */
     <img
-      src={src}
       alt={alt}
-      width={anchoFinal}
-      height={altoFinal}
-      loading={prioritaria || anticipada ? "eager" : "lazy"}
-      decoding={prioritaria ? "sync" : "async"}
-      fetchPriority={prioritaria ? "high" : undefined}
       className={clasesImagen}
-      // Marca de diagnóstico: en el panel sirve para avisar de hosts que la
-      // CSP bloquearía. No cambia cómo se ve la imagen.
-      data-host-permitido={esImagenOptimizable(src) ? "si" : "no"}
+      {...atributosDeImagen({ src, width, height, srcMovil, sizes, prioritaria, anticipada })}
     />
   );
 
@@ -119,43 +168,99 @@ export function ContentImage({
 }
 
 /**
- * Foto dentro de una tarjeta iOS: esquinas continuas, sombra en capas y un
- * borde interior claro que despega la foto del lienzo. Es el tratamiento
- * estándar de las fotos del sitio — ninguna va suelta ni a sangre.
+ * Foto a sangre que cubre a su padre (que tiene que ser `relative`). Es el
+ * fondo de las cabeceras: va siempre bajo un velo y, en las páginas internas,
+ * es la imagen LCP — por eso es un `<img>` real y no un `background-image`
+ * (el navegador no descubre un fondo CSS hasta tener la hoja de estilos, y no
+ * se le puede dar prioridad ni `srcset`).
  *
- * (Antes este marco llevaba filete técnico y marcas de corte en las esquinas;
- * era justo lo que hacía ver antiguo el sitio, sistema v2.)
+ * `desenfocar` suaviza las capturas de pantalla (HMI de los casos): son de
+ * ~1229 px y a sangre se les notaría el píxel; con el velo y un desenfoque
+ * leve se leen como textura. Se escala un poco para que el borde desenfocado
+ * no deje un halo claro en los lados.
  */
-export function FotoEnmarcada({
-  src,
-  alt,
-  width,
-  height,
+export function FotoDeFondo({
+  imagen,
   prioritaria = false,
-  proporcion,
-  pie,
+  desenfocar = false,
   className = "",
-}: PropsContentImage & { pie?: string }) {
-  if (!src) return null;
+}: {
+  imagen: ImagenContenido;
+  prioritaria?: boolean;
+  desenfocar?: boolean;
+  className?: string;
+}) {
+  const recorte =
+    imagen.width && imagen.height && imagen.height >= imagen.width * 1.2
+      ? "object-[center_35%]"
+      : "object-center";
 
   return (
-    <figure className={`relative ${className}`}>
-      <div className="overflow-hidden rounded-panel bg-blanco p-2 shadow-elevada">
-        <ContentImage
-          src={src}
-          alt={alt}
-          width={width}
-          height={height}
-          prioritaria={prioritaria}
-          proporcion={proporcion}
-          claseContenedor="rounded-tarjeta bg-acero-100"
-        />
-      </div>
-      {pie ? (
-        <figcaption className="mt-3 px-1 text-[13px] leading-snug text-acero-600">
-          {pie}
-        </figcaption>
-      ) : null}
-    </figure>
+    /* eslint-disable-next-line @next/next/no-img-element -- ver encabezado. */
+    <img
+      alt={imagen.alt}
+      className={`absolute inset-0 size-full object-cover ${recorte} ${
+        desenfocar ? "scale-110 blur-[3px]" : ""
+      } ${className}`}
+      {...atributosDeImagen({
+        src: imagen.src,
+        width: imagen.width,
+        height: imagen.height,
+        srcMovil: imagen.srcMovil,
+        sizes: "100vw",
+        prioritaria,
+        anticipada: false,
+      })}
+    />
+  );
+}
+
+/**
+ * Foto de una sección de texto + foto.
+ *
+ * ALINEACIÓN CON LA COLUMNA DE TEXTO
+ * ----------------------------------
+ * Va como hijo DIRECTO de una rejilla (`lg:grid-cols-12`) con el
+ * `align-items: stretch` por defecto: la celda toma el alto de la fila, que lo
+ * pone la columna de texto, y la foto (absoluta, `object-cover`) lo llena. Así
+ * su borde superior queda a la altura del rótulo y el inferior a la del último
+ * párrafo o botón. `altoMinimo` evita una foto enana si el texto es muy corto.
+ *
+ * En móvil y tableta la rejilla es de una columna: ahí manda `proporcionMovil`.
+ * Sin marco blanco ni pie de foto: el `alt` sigue describiéndola para quien no
+ * la ve, y el marco desplazaba el borde de la foto 8 px respecto al texto.
+ */
+export function FotoDeColumna({
+  imagen,
+  prioritaria = false,
+  proporcionMovil = "aspect-[4/3] sm:aspect-[16/10]",
+  altoMinimo = "lg:min-h-[22rem]",
+  ajuste = "cover",
+  className = "",
+  claseMarco = "bg-acero-100",
+}: {
+  imagen: ImagenContenido;
+  prioritaria?: boolean;
+  proporcionMovil?: string;
+  altoMinimo?: string;
+  ajuste?: "cover" | "contain";
+  /** Clases de la celda: columnas de la rejilla, orden… */
+  className?: string;
+  /** Fondo del recuadro (se ve en `contain` o mientras carga la foto). */
+  claseMarco?: string;
+}) {
+  return (
+    <ContentImage
+      src={imagen.src}
+      alt={imagen.alt}
+      width={imagen.width}
+      height={imagen.height}
+      srcMovil={imagen.srcMovil}
+      sizes="(min-width: 1024px) 42vw, 100vw"
+      prioritaria={prioritaria}
+      ajuste={ajuste}
+      proporcion={`${proporcionMovil} lg:aspect-auto lg:h-full ${altoMinimo}`}
+      claseContenedor={`rounded-panel shadow-elevada ring-1 ring-separador ${claseMarco} ${className}`}
+    />
   );
 }

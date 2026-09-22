@@ -9,9 +9,19 @@
  * vigente —lunes a viernes de 8:00 a. m. a 5:00 p. m.— salió de la ficha de
  * Google del negocio; si algún día se borra desde el panel, el bloque
  * desaparece en vez de quedar en blanco.
+ *
+ * COMPOSICIÓN (sep-2026)
+ * ----------------------
+ * Cabecera con foto de fondo. Debajo, una rejilla de dos columnas: a la
+ * izquierda la tarjeta de datos y, bajo ella, el mapa, que se estira hasta el
+ * pie del formulario (antes la columna de datos terminaba mucho antes que el
+ * formulario y el mapa iba en otra sección); a la derecha el formulario. En
+ * móvil el orden es datos → formulario → mapa: el mapa no empuja el
+ * formulario hacia abajo.
  */
 
 import type { Metadata } from "next";
+import type { ReactNode } from "react";
 import { getContacto, getPaginas, getSeo, getServicios } from "@/lib/content";
 import {
   MENSAJES_WHATSAPP,
@@ -28,7 +38,7 @@ import { jsonLdFaq, jsonLdMigas, metadataDePagina, metadatosPagina, type Miga } 
 import { CabeceraInterna } from "@/components/sections/CabeceraInterna";
 import { Faq } from "@/components/sections/Faq";
 import { FormularioContacto } from "@/components/contacto/FormularioContacto";
-import { Contenedor, Rotulo, TituloSeccion } from "@/components/sections/primitivas";
+import { Contenedor, Rotulo } from "@/components/sections/primitivas";
 import { IconoInstagram, IconoUbicacion, IconoWhatsApp } from "@/components/ui/iconos";
 import { IconoCorreo, IconoReloj, IconoTelefono } from "@/components/ui/iconos-servicio";
 import { JsonLd } from "@/components/ui/JsonLd";
@@ -49,6 +59,35 @@ export async function generateMetadata(): Promise<Metadata> {
   }, seo.ogImage);
   return metadataDePagina({ titulo, descripcion, ruta: "/contacto", imagen });
 }
+
+/**
+ * Una fila de la lista de datos: icono, rótulo y valor. El icono va DENTRO
+ * del `<dt>` (decorativo, `aria-hidden`): un `<dl>` solo admite grupos de
+ * `<dt>`/`<dd>`, y un `<span>` suelto en el grupo lo marca axe.
+ */
+function FilaDato({
+  icono,
+  dato,
+  children,
+}: {
+  icono: ReactNode;
+  dato: string;
+  children: ReactNode;
+}) {
+  return (
+    <div className="border-t border-separador py-3 pl-11 first:border-t-0">
+      <dt className="relative text-[13px] text-acero-600">
+        <span aria-hidden="true" className="absolute -left-11 top-0.5">
+          {icono}
+        </span>
+        {dato}
+      </dt>
+      <dd className="mt-1 text-[15px] leading-relaxed text-azul-950">{children}</dd>
+    </div>
+  );
+}
+
+const CLASE_ENLACE = "font-medium text-azul-700 underline-offset-2 hover:underline";
 
 export default async function Contacto() {
   const [contacto, paginas, servicios] = await Promise.all([
@@ -84,72 +123,67 @@ export default async function Contacto() {
       />
 
       <section aria-labelledby="titulo-contacto" className="bg-lienzo">
-        <Contenedor className="py-16 lg:py-20">
+        <Contenedor className="py-14 lg:py-20">
           <h2 id="titulo-contacto" className="sr-only">
             Datos de contacto y formulario
           </h2>
 
-          <div className="grid gap-12 lg:grid-cols-12 lg:gap-12">
+          {/* Rejilla con áreas: datos (izq. arriba), mapa (izq. abajo, se estira)
+              y formulario (der., ocupa las dos filas). */}
+          <div className="grid gap-5 lg:grid-cols-12 lg:grid-rows-[auto_1fr] lg:gap-6">
             {/* Datos */}
-            <div className="lg:col-span-5">
+            <div className="rounded-panel bg-blanco p-6 shadow-tarjeta ring-1 ring-separador sm:p-8 lg:col-span-5 lg:row-start-1 lg:p-10">
               <Rotulo>Datos</Rotulo>
-              <TituloSeccion className="mt-5 !text-[1.75rem] sm:!text-[2rem]">
+              <h3 className="mt-4 text-[1.625rem] font-semibold leading-tight text-azul-950 sm:text-[1.875rem]">
                 {ajustes?.tituloDatos || "Dónde encontrarnos"}
-              </TituloSeccion>
+              </h3>
 
-              <dl className="mt-7 overflow-hidden rounded-tarjeta bg-blanco shadow-tarjeta">
+              <dl className="mt-4">
                 {direccion ? (
-                  <div className="grid grid-cols-[1.75rem_1fr] items-start gap-x-4 border-t border-separador px-5 py-4 first:border-t-0">
-                    <IconoUbicacion className="row-span-2 mt-0.5 size-6 shrink-0 text-azul-600" />
-                    <dt className="text-[13px] text-acero-600">
-                      Dirección
-                    </dt>
-                    <dd className="mt-1 text-[15px] leading-relaxed text-azul-950">
-                      {direccion}
-                      {mapaExterno ? (
-                        <>
-                          {" · "}
-                          <a
-                            href={mapaExterno}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="font-medium text-azul-700 underline-offset-2 hover:underline"
-                          >
-                            Abrir en Google Maps
-                          </a>
-                        </>
-                      ) : null}
-                    </dd>
-                  </div>
+                  <FilaDato
+                    dato="Dirección"
+                    icono={<IconoUbicacion className="size-6 text-azul-600" />}
+                  >
+                    {direccion}
+                    {mapaExterno ? (
+                      <>
+                        {" · "}
+                        <a
+                          href={mapaExterno}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={CLASE_ENLACE}
+                        >
+                          Abrir en Google Maps
+                        </a>
+                      </>
+                    ) : null}
+                  </FilaDato>
                 ) : null}
 
                 {numerosWhatsApp.length > 0 ? (
-                  <div className="grid grid-cols-[1.75rem_1fr] items-start gap-x-4 border-t border-separador px-5 py-4 first:border-t-0">
-                    <IconoWhatsApp className="row-span-2 mt-0.5 size-6 shrink-0 text-verde-600" />
-                    <dt className="text-[13px] text-acero-600">
-                      WhatsApp
-                    </dt>
-                    <dd className="mt-1 space-y-1.5">
-                      {numerosWhatsApp.map((numero) => {
-                        const href = enlaceWhatsApp(numero.intl, MENSAJES_WHATSAPP.general);
-                        return (
-                          <p key={numero.intl} className="text-[15px] text-azul-950">
-                            <a
-                              href={href}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="font-medium text-azul-700 underline-offset-2 hover:underline"
-                            >
-                              {numero.label}
-                            </a>
-                            {numero.person ? (
-                              <span className="text-acero-600"> · {numero.person}</span>
-                            ) : null}
-                          </p>
-                        );
-                      })}
-                    </dd>
-                  </div>
+                  <FilaDato
+                    dato="WhatsApp"
+                    icono={<IconoWhatsApp className="size-6 text-verde-600" />}
+                  >
+                    <span className="block space-y-1.5">
+                      {numerosWhatsApp.map((numero) => (
+                        <span key={numero.intl} className="block">
+                          <a
+                            href={enlaceWhatsApp(numero.intl, MENSAJES_WHATSAPP.general)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={CLASE_ENLACE}
+                          >
+                            {numero.label}
+                          </a>
+                          {numero.person ? (
+                            <span className="text-acero-600"> · {numero.person}</span>
+                          ) : null}
+                        </span>
+                      ))}
+                    </span>
+                  </FilaDato>
                 ) : null}
 
                 {/* El teléfono solo se repite si NO es uno de los WhatsApp:
@@ -157,90 +191,57 @@ export default async function Contacto() {
                     número y pintarlo dos veces confunde. */}
                 {telefono &&
                 !numerosWhatsApp.some((numero) => numero.intl === telefono.intl) ? (
-                  <div className="grid grid-cols-[1.75rem_1fr] items-start gap-x-4 border-t border-separador px-5 py-4 first:border-t-0">
-                    <IconoTelefono className="row-span-2 mt-0.5 size-6 shrink-0 text-azul-600" />
-                    <dt className="text-[13px] text-acero-600">
-                      Teléfono
-                    </dt>
-                    <dd className="mt-1 text-[15px] text-azul-950">
-                      <a
-                        href={hrefTelefono(telefono)}
-                        className="font-medium text-azul-700 underline-offset-2 hover:underline"
-                      >
-                        {telefono.label}
-                      </a>
-                    </dd>
-                  </div>
+                  <FilaDato dato="Teléfono" icono={<IconoTelefono className="size-6 text-azul-600" />}>
+                    <a href={hrefTelefono(telefono)} className={CLASE_ENLACE}>
+                      {telefono.label}
+                    </a>
+                  </FilaDato>
                 ) : null}
 
                 {correos.length > 0 ? (
-                  <div className="grid grid-cols-[1.75rem_1fr] items-start gap-x-4 border-t border-separador px-5 py-4 first:border-t-0">
-                    <IconoCorreo className="row-span-2 mt-0.5 size-6 shrink-0 text-azul-600" />
-                    <dt className="text-[13px] text-acero-600">
-                      Correo
-                    </dt>
-                    <dd className="mt-1 space-y-1.5">
+                  <FilaDato dato="Correo" icono={<IconoCorreo className="size-6 text-azul-600" />}>
+                    <span className="block space-y-1.5">
                       {correos.map((correo) => (
-                        <p key={correo.address} className="text-[15px] text-azul-950">
-                          <a
-                            href={`mailto:${correo.address}`}
-                            className="font-medium break-all text-azul-700 underline-offset-2 hover:underline"
-                          >
+                        <span key={correo.address} className="block">
+                          <a href={`mailto:${correo.address}`} className={`break-all ${CLASE_ENLACE}`}>
                             {correo.address}
                           </a>
-                        </p>
+                        </span>
                       ))}
-                    </dd>
-                  </div>
+                    </span>
+                  </FilaDato>
                 ) : null}
 
                 {/* Horario: solo si está en los ajustes. Nunca se inventa. */}
                 {horario ? (
-                  <div className="grid grid-cols-[1.75rem_1fr] items-start gap-x-4 border-t border-separador px-5 py-4 first:border-t-0">
-                    <IconoReloj className="row-span-2 mt-0.5 size-6 shrink-0 text-azul-600" />
-                    <dt className="text-[13px] text-acero-600">
-                      Horario
-                    </dt>
-                    <dd className="mt-1 text-[15px] text-azul-950">{horario}</dd>
-                  </div>
+                  <FilaDato dato="Horario" icono={<IconoReloj className="size-6 text-azul-600" />}>
+                    {horario}
+                  </FilaDato>
                 ) : null}
 
                 {instagram ? (
-                  <div className="grid grid-cols-[1.75rem_1fr] items-start gap-x-4 border-t border-separador px-5 py-4 first:border-t-0">
-                    <IconoInstagram className="row-span-2 mt-0.5 size-6 shrink-0 text-azul-600" />
-                    <dt className="text-[13px] text-acero-600">
-                      Instagram
-                    </dt>
-                    <dd className="mt-1 text-[15px]">
-                      <a
-                        href={instagram}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="font-medium text-azul-700 underline-offset-2 hover:underline"
-                      >
-                        {usuarioInstagram(instagram)}
-                      </a>
-                    </dd>
-                  </div>
+                  <FilaDato
+                    dato="Instagram"
+                    icono={<IconoInstagram className="size-6 text-azul-600" />}
+                  >
+                    <a href={instagram} target="_blank" rel="noopener noreferrer" className={CLASE_ENLACE}>
+                      {usuarioInstagram(instagram)}
+                    </a>
+                  </FilaDato>
                 ) : null}
               </dl>
-
-              <div className="mt-4 rounded-tarjeta bg-azul-50 px-5 py-4">
-                <p className="text-[14px] leading-relaxed text-azul-900">
-                  {contacto.legalName}
-                  {contacto.nit ? ` · NIT ${contacto.nit}` : ""}
-                </p>
-              </div>
+              {/* La razón social y el NIT ya van en la línea legal del pie:
+                  aquí le quitaban alto al mapa de abajo. */}
             </div>
 
             {/* Formulario */}
-            <div className="lg:col-span-7">
+            <div className="rounded-panel bg-blanco p-6 shadow-tarjeta ring-1 ring-separador sm:p-8 lg:col-span-7 lg:col-start-6 lg:row-span-2 lg:row-start-1 lg:p-10">
               <Rotulo>Formulario</Rotulo>
-              <TituloSeccion className="mt-5 !text-[1.75rem] sm:!text-[2rem]">
+              <h3 className="mt-4 text-[1.625rem] font-semibold leading-tight text-azul-950 sm:text-[1.875rem]">
                 {ajustes?.tituloFormulario || "Cuéntenos qué necesita"}
-              </TituloSeccion>
+              </h3>
               {ajustes?.introFormulario !== "" ? (
-                <p className="mt-4 max-w-[60ch] text-[15px] leading-relaxed text-acero-600">
+                <p className="mt-3 max-w-[60ch] text-[15px] leading-relaxed text-acero-600">
                   {ajustes?.introFormulario ??
                     "Al enviar, se abre WhatsApp con el mensaje ya escrito para que solo tenga que darle enviar. No enviamos correos automáticos."}
                 </p>
@@ -256,41 +257,41 @@ export default async function Contacto() {
                 />
               </div>
             </div>
+
+            {/* Mapa: llena lo que queda de la columna izquierda hasta el pie
+                del formulario. */}
+            {mapaEmbebido ? (
+              <section
+                aria-labelledby="titulo-mapa"
+                // Alto mínimo moderado: si fuera alto, la columna izquierda
+                // pasaría al formulario y este quedaría con un hueco abajo.
+                className="flex min-h-[18rem] flex-col overflow-hidden rounded-panel bg-blanco p-2 shadow-tarjeta ring-1 ring-separador lg:col-span-5 lg:row-start-2 lg:min-h-[10rem]"
+              >
+                <h3
+                  id="titulo-mapa"
+                  className="px-4 pb-2 pt-3 text-[15px] font-semibold text-azul-950"
+                >
+                  {ajustes?.tituloMapa || "Cómo llegar"}
+                </h3>
+                <iframe
+                  src={mapaEmbebido}
+                  title={`Mapa de Google con la ubicación de PIYC: ${direccion}`}
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  className="block min-h-[14rem] w-full flex-1 rounded-tarjeta border-0 lg:min-h-[6rem]"
+                />
+              </section>
+            ) : null}
           </div>
         </Contenedor>
       </section>
-
-      {/* Mapa */}
-      {mapaEmbebido ? (
-        <section
-          aria-labelledby="titulo-mapa"
-          className="bg-lienzo-alto"
-        >
-          <Contenedor className="py-16 lg:py-20">
-            <Rotulo>Ubicación</Rotulo>
-            <TituloSeccion id="titulo-mapa" className="mt-5">
-              {ajustes?.tituloMapa || "Cómo llegar"}
-            </TituloSeccion>
-            <p className="mt-4 text-[15px] text-acero-600">{direccion}</p>
-
-            <div className="mt-8 overflow-hidden rounded-panel bg-blanco p-2 shadow-elevada">
-              <iframe
-                src={mapaEmbebido}
-                title={`Mapa de Google con la ubicación de PIYC: ${direccion}`}
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                className="block aspect-[16/10] w-full rounded-tarjeta border-0 sm:aspect-[21/9]"
-              />
-            </div>
-          </Contenedor>
-        </section>
-      ) : null}
 
       <Faq
         preguntas={faq}
         rotulo="Dudas frecuentes"
         titulo="Antes de escribirnos"
         id="faq-contacto"
+        fondo="blanco"
       />
     </main>
   );

@@ -38,12 +38,13 @@ import type {
   BloqueImagenes,
   ClaveAjustes,
   ImagenContenido,
+  LineaServicio,
   Proyecto,
   Servicio,
   Valor,
   VideoContenido,
 } from "@/lib/content-types";
-import { serviciosEstaticos } from "@/data/servicios";
+import { lineasDeServicio, serviciosEstaticos } from "@/data/servicios";
 import { valoresEstaticos } from "@/data/valores";
 import { proyectosEstaticos } from "@/data/proyectos";
 import {
@@ -84,11 +85,14 @@ function normalizarImagen(valor: unknown): ImagenContenido | null {
   if (!esObjeto(valor)) return null;
   const src = textoODefecto(valor.src).trim();
   if (!src) return null;
+  const srcMovil = textoODefecto(valor.srcMovil).trim();
   return {
     src,
     alt: textoODefecto(valor.alt),
     width: typeof valor.width === "number" ? valor.width : undefined,
     height: typeof valor.height === "number" ? valor.height : undefined,
+    // Variante de ~900 px para `srcset` (la genera el panel al subir).
+    ...(srcMovil ? { srcMovil } : {}),
   };
 }
 
@@ -436,6 +440,70 @@ export async function getAjustes<K extends ClaveAjustes>(clave: K): Promise<Ajus
 /** Atajos, para no repetir el genérico en cada página. */
 export const getContacto = (): Promise<AjustesContact> => getAjustes("contact");
 export const getHome = (): Promise<AjustesHome> => getAjustes("home");
+
+/* ===================================================================== */
+/* Líneas de servicio                                                     */
+/* ===================================================================== */
+
+/**
+ * Frase de UNA línea de cada línea de servicio, para la franja bajo el hero
+ * del inicio. Respaldo de `home.lineasServicio`: vive aquí y no en
+ * `src/data/servicios.ts` porque es texto de presentación de la portada.
+ *
+ * ≤ 45 caracteres: la franja la pinta en una sola línea en escritorio y
+ * tableta (las frases largas de `lineasDeServicio.resumen` se partían en dos
+ * y se veían raras — Cesar, sep-2026). Mismo sentido que la frase larga.
+ */
+export const RESUMENES_CORTOS_DE_LINEA: Readonly<Record<string, string>> = {
+  "automatizacion-y-control": "Procesos por receta, repetibles y con registro",
+  "tableros-e-ingenieria-electrica": "Del plano al tablero montado y funcionando",
+  "telemetria-y-telecontrol": "Operar a distancia sin perder protecciones",
+  "refrigeracion-y-climatizacion": "Temperatura estable para producto y equipos",
+};
+
+/** Largo máximo de la frase corta. El panel lo usa como `maxLength`. */
+export const LARGO_RESUMEN_CORTO = 48;
+
+/**
+ * Aplica los textos del panel (`home.lineasServicio`) a las líneas del
+ * código. El JSON de la base no se da por bueno: se ignora lo que no tenga
+ * forma de `{ id, titulo?, resumen? }`.
+ *  - `titulo` vacío o ausente → el de fábrica (una línea necesita nombre).
+ *  - `resumen` ausente → respaldo; presente y vacío → decisión del panel, la
+ *    franja pinta solo el nombre.
+ */
+export function aplicarTextosDeLinea(
+  lineas: readonly LineaServicio[],
+  textos: unknown,
+): LineaServicio[] {
+  const porId = new Map<string, { titulo?: unknown; resumen?: unknown }>();
+  if (Array.isArray(textos)) {
+    for (const texto of textos) {
+      if (esObjeto(texto) && typeof texto.id === "string") porId.set(texto.id, texto);
+    }
+  }
+
+  return lineas.map((linea) => {
+    const delPanel = porId.get(linea.id);
+    const titulo = typeof delPanel?.titulo === "string" ? delPanel.titulo.trim() : "";
+    const resumenCorto =
+      typeof delPanel?.resumen === "string"
+        ? delPanel.resumen.trim()
+        : (RESUMENES_CORTOS_DE_LINEA[linea.id] ?? linea.resumen);
+    return { ...linea, titulo: titulo || linea.titulo, resumenCorto };
+  });
+}
+
+/** Las líneas de servicio con los textos del panel ya aplicados. */
+export const getLineasDeServicio = cache(async (): Promise<LineaServicio[]> => {
+  const home = await getHome();
+  return aplicarTextosDeLinea(lineasDeServicio, home.lineasServicio);
+});
+
+/** Primera foto de un servicio (galería o portada), o `null` si no tiene. */
+export function primeraFotoDe(images: BloqueImagenes): ImagenContenido | null {
+  return galeriaCompleta(images)[0] ?? null;
+}
 export const getNosotros = (): Promise<AjustesNosotros> => getAjustes("nosotros");
 export const getPaginas = (): Promise<AjustesPaginas> => getAjustes("paginas");
 export const getSeo = (): Promise<AjustesSeo> => getAjustes("seo");

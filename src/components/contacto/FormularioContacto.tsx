@@ -235,7 +235,9 @@ export function FormularioContacto({
           <button
             type="submit"
             disabled={enviando}
-            className="pulsable inline-flex h-12 items-center justify-center gap-2.5 rounded-capsula bg-verde-500 px-6 text-[15px] font-semibold text-azul-950 shadow-tarjeta hover:bg-verde-400 disabled:cursor-not-allowed disabled:bg-acero-200 disabled:text-acero-600 disabled:shadow-none"
+            // `whitespace-nowrap` + `shrink-0`: junto a la nota de campos
+            // obligatorios, la cápsula se encogía y partía su etiqueta en dos.
+            className="pulsable inline-flex h-12 shrink-0 items-center justify-center gap-2.5 whitespace-nowrap rounded-capsula bg-verde-500 px-6 text-[15px] font-semibold text-azul-950 shadow-tarjeta hover:bg-verde-400 disabled:cursor-not-allowed disabled:bg-acero-200 disabled:text-acero-600 disabled:shadow-none"
           >
             <IconoWhatsApp className="size-5" />
             {enviando ? "Enviando…" : "Enviar y abrir WhatsApp"}

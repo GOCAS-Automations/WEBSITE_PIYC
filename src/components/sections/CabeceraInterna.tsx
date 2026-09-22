@@ -1,23 +1,41 @@
 /**
  * CABECERA DE PÁGINA INTERNA + MIGAS
  * ==================================
- * La cabecera es **tipográfica**, no una foto a sangre con el título encima.
- * Dos motivos:
- *  1. Las fotos disponibles están incrustadas ya reducidas — la mayor mide
- *     1229 px y la de `cabeceras/` solo 658×493 (`docs/CONTENIDO.md` §2.4).
- *     Estiradas a pantalla completa se ven blandas.
- *  2. Es justo el recurso que usa GPI (hero centrado con foto de fondo). Aquí
- *     el fondo es un degradado suave y la foto va en una tarjeta elevada.
+ * Todas las páginas menos el inicio abren con esta cabecera: **foto a sangre
+ * de fondo**, detrás de la cápsula flotante del nav, con un velo azul noche en
+ * degradado encima. Sustituye al recuadro con foto a la derecha del título
+ * (pedido de Cesar, sep-2026: «imágenes para los fondos de los heros de cada
+ * página, en vez de un cuadro con imagen en cada hero»).
  *
- * Deja sitio arriba para la cápsula flotante del nav (`--alto-nav`).
+ * Lo que la separa de GPI (regla 13 de AGENTS.md), que usa hero centrado con
+ * foto verde-gris: el texto va **alineado a la izquierda y abajo**, el velo es
+ * azul de marca, la altura es contenida (no pantalla completa) y arriba van
+ * las migas.
+ *
+ * CONTRASTE
+ * ---------
+ * El velo (`velo-cabecera`, `globals.css`) está medido para el peor caso —una
+ * foto blanca—: bajo el título y la bajada nunca queda por debajo de ~75 % de
+ * azul noche, lo que da ≥ 7:1 con blanco y ≥ 5:1 con `acero-100`.
+ *
+ * LA FOTO ES LA LCP
+ * -----------------
+ * `<img>` real con `fetchpriority="high"`, sin `lazy`, con medidas y `srcset`
+ * cuando la imagen trae su variante de 900 px (`FotoDeFondo`).
+ *
+ * SIN FOTO
+ * --------
+ * Cabecera sobre el degradado de marca (`fondo-noche`) con una retícula tenue
+ * y, si la página la da, una marca de agua (el icono del servicio). Tiene que
+ * leerse como una decisión, no como una foto que no cargó.
  */
 
 import Link from "next/link";
 import type { ReactNode } from "react";
 import type { CabeceraPagina, ImagenContenido } from "@/lib/content-types";
 import type { Miga } from "@/lib/seo";
-import { FotoEnmarcada } from "@/components/ui/ContentImage";
-import { Contenedor, EntradaSeccion, Rotulo, TituloSeccion } from "./primitivas";
+import { FotoDeFondo } from "@/components/ui/ContentImage";
+import { Contenedor, Rotulo } from "./primitivas";
 
 /* ===================================================================== */
 /* Migas                                                                  */
@@ -28,29 +46,47 @@ import { Contenedor, EntradaSeccion, Rotulo, TituloSeccion } from "./primitivas"
  * `aria-current`. El `BreadcrumbList` equivalente lo emite la página con
  * `jsonLdMigas`.
  */
-export function Migas({ migas, className = "" }: { migas: readonly Miga[]; className?: string }) {
+export function Migas({
+  migas,
+  tono = "claro",
+  className = "",
+}: {
+  migas: readonly Miga[];
+  tono?: "claro" | "oscuro";
+  className?: string;
+}) {
   if (migas.length === 0) return null;
+  const oscuro = tono === "oscuro";
 
   return (
     <nav aria-label="Ruta de navegación" className={className}>
-      <ol className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[13px] text-acero-600">
+      <ol
+        className={`flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[13px] ${
+          oscuro ? "text-acero-200" : "text-acero-600"
+        }`}
+      >
         {migas.map((miga, indice) => {
           const esUltima = indice === migas.length - 1;
           return (
             <li key={miga.href} className="flex items-center gap-1.5">
               {indice > 0 ? (
-                <span aria-hidden="true" className="text-acero-400">
+                <span aria-hidden="true" className={oscuro ? "text-acero-300" : "text-acero-400"}>
                   ›
                 </span>
               ) : null}
               {esUltima ? (
-                <span aria-current="page" className="font-medium text-azul-900">
+                <span
+                  aria-current="page"
+                  className={`font-medium ${oscuro ? "text-blanco" : "text-azul-900"}`}
+                >
                   {miga.etiqueta}
                 </span>
               ) : (
                 <Link
                   href={miga.href}
-                  className="rounded-chip px-1 transition-colors hover:text-azul-700"
+                  className={`rounded-chip px-1 transition-colors ${
+                    oscuro ? "hover:text-blanco" : "hover:text-azul-700"
+                  }`}
                 >
                   {miga.etiqueta}
                 </Link>
@@ -67,6 +103,13 @@ export function Migas({ migas, className = "" }: { migas: readonly Miga[]; class
 /* Cabecera                                                               */
 /* ===================================================================== */
 
+/** Un dato de la ficha en cápsula: «Línea · Automatización y control». */
+export type DatoDeCabecera = {
+  etiqueta: string;
+  valor: string | null | undefined;
+  href?: string;
+};
+
 type PropsCabecera = {
   /** Contenido editable desde el panel (`site_settings.paginas`). */
   ajustes?: CabeceraPagina;
@@ -74,10 +117,18 @@ type PropsCabecera = {
   rotulo?: string;
   titulo: string;
   bajada?: string;
+  /** Foto de fondo. Manda sobre `ajustes.image`. `null` = sin foto a propósito. */
   imagen?: ImagenContenido | null;
   migas?: readonly Miga[];
-  /** Columna derecha a medida (ficha técnica, datos del proyecto…). */
-  aside?: ReactNode;
+  /** Desenfoque leve para capturas de pantalla que no aguantan ampliación. */
+  desenfocar?: boolean;
+  /** Marca de agua cuando no hay foto (el icono del servicio, por ejemplo). */
+  marca?: ReactNode;
+  /**
+   * Datos de la ficha en cápsulas bajo la bajada. Un dato vacío, `null` o
+   * `"0"` no se pinta (regla 9 de AGENTS.md: `0` nunca se muestra como dato).
+   */
+  datos?: readonly DatoDeCabecera[];
   /** Bloque extra bajo la bajada (botones, por ejemplo). */
   children?: ReactNode;
 };
@@ -89,96 +140,92 @@ export function CabeceraInterna({
   bajada,
   imagen,
   migas = [],
-  aside,
+  desenfocar = false,
+  marca,
+  datos = [],
   children,
 }: PropsCabecera) {
   const rotuloFinal = ajustes?.eyebrow ?? rotulo;
   const tituloFinal = ajustes?.title || titulo;
   const bajadaFinal = ajustes?.subtitle ?? bajada;
-  const imagenFinal = imagen ?? ajustes?.image ?? null;
-  const columnaDerecha = aside ?? (imagenFinal ? <FotoDeCabecera imagen={imagenFinal} /> : null);
+  // `imagen === null` es «sin foto» explícito; `undefined`, «la del ajuste».
+  const candidata = imagen === undefined ? ajustes?.image : imagen;
+  // Una foto sin `src` no se pinta; tampoco una sin `alt` (entraría al sitio
+  // sin texto alternativo): la cabecera cae al degradado de marca.
+  const fondo = candidata?.src && candidata.alt ? candidata : null;
+  const datosVisibles = datos.filter(
+    (dato): dato is DatoDeCabecera & { valor: string } =>
+      dato.valor != null && dato.valor.trim() !== "" && dato.valor.trim() !== "0",
+  );
 
   return (
-    <section className="fondo-plano">
-      <Contenedor className="pb-10 pt-[calc(var(--alto-nav)+0.5rem)] lg:pb-12 lg:pt-[calc(var(--alto-nav)+1.5rem)]">
-        <Migas migas={migas} className="mb-7" />
+    <section className="sobre-oscuro relative isolate overflow-hidden bg-azul-950">
+      {fondo ? (
+        <>
+          <FotoDeFondo imagen={fondo} prioritaria desenfocar={desenfocar} className="-z-20" />
+          {/* Viraje al azul de marca: la capa toma el tono de `azul-700` y deja
+              la luminosidad de la foto (`mix-blend-color`). Es lo que hace que
+              la cabecera se lea PIYC —azul— a primera vista y no como la de
+              GPI, que usa la foto en su color con un velo neutro (regla 13). */}
+          <div aria-hidden="true" className="absolute inset-0 -z-10 bg-azul-700 opacity-75 mix-blend-color" />
+        </>
+      ) : (
+        <div aria-hidden="true" className="fondo-noche reticula-cabecera absolute inset-0 -z-20">
+          {marca ? (
+            <div className="absolute -right-10 top-1/2 hidden -translate-y-1/2 text-azul-300/25 sm:block lg:right-[6%]">
+              {marca}
+            </div>
+          ) : null}
+        </div>
+      )}
+      <div aria-hidden="true" className={`absolute inset-0 -z-10 ${fondo ? "velo-cabecera" : ""}`} />
 
-        <div
-          className={
-            columnaDerecha
-              ? "grid gap-10 lg:grid-cols-12 lg:items-center lg:gap-12"
-              : "max-w-4xl"
-          }
-        >
-          <div className={columnaDerecha ? "lg:col-span-7" : ""}>
-            {rotuloFinal ? <Rotulo>{rotuloFinal}</Rotulo> : null}
-            <TituloSeccion as="h1" className={rotuloFinal ? "mt-5" : ""}>
-              {tituloFinal}
-            </TituloSeccion>
-            {bajadaFinal ? (
-              <EntradaSeccion className="mt-6">{bajadaFinal}</EntradaSeccion>
-            ) : null}
-            {children}
-          </div>
+      <Contenedor className="flex min-h-[20rem] flex-col pb-9 pt-[calc(var(--alto-nav)+0.75rem)] sm:min-h-[23rem] lg:min-h-[26rem] lg:pb-12 lg:pt-[calc(var(--alto-nav)+1.25rem)]">
+        <Migas migas={migas} tono="oscuro" />
 
-          {columnaDerecha ? <div className="lg:col-span-5">{columnaDerecha}</div> : null}
+        <div className="mt-auto max-w-[52rem] pt-8 lg:pt-10">
+          {rotuloFinal ? <Rotulo tono="oscuro">{rotuloFinal}</Rotulo> : null}
+          <h1
+            className={`text-balance text-[2rem] font-semibold leading-[1.06] text-blanco sm:text-[2.625rem] lg:text-[3rem] ${
+              rotuloFinal ? "mt-4" : ""
+            }`}
+          >
+            {tituloFinal}
+          </h1>
+          {bajadaFinal ? (
+            <p className="mt-4 max-w-[60ch] text-[1.0625rem] leading-[1.6] text-acero-100 sm:mt-5 sm:text-[1.125rem]">
+              {bajadaFinal}
+            </p>
+          ) : null}
+
+          {datosVisibles.length > 0 ? (
+            <dl className="mt-6 flex flex-wrap gap-2">
+              {datosVisibles.map((dato) => (
+                <div
+                  key={dato.etiqueta}
+                  className="inline-flex items-center gap-2 rounded-capsula bg-azul-950/55 px-3.5 py-1.5 text-[13px] ring-1 ring-separador-claro backdrop-blur-material"
+                >
+                  <dt className="text-acero-300">{dato.etiqueta}</dt>
+                  <dd className="font-medium text-blanco">
+                    {dato.href ? (
+                      <Link
+                        href={dato.href}
+                        className="underline decoration-acero-400 underline-offset-2 hover:decoration-blanco"
+                      >
+                        {dato.valor}
+                      </Link>
+                    ) : (
+                      dato.valor
+                    )}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          ) : null}
+
+          {children}
         </div>
       </Contenedor>
     </section>
-  );
-}
-
-/** Foto de cabecera dentro de su marco, con tope de ancho para no ampliarla. */
-function FotoDeCabecera({ imagen }: { imagen: ImagenContenido }) {
-  return (
-    <FotoEnmarcada
-      src={imagen.src}
-      alt={imagen.alt}
-      width={imagen.width}
-      height={imagen.height}
-      prioritaria
-      proporcion="aspect-[4/3]"
-      className="mx-auto max-w-[min(100%,26rem)] lg:mx-0 lg:ml-auto"
-    />
-  );
-}
-
-/**
- * Ficha técnica: lista agrupada tipo iOS (dato a la izquierda, valor a la
- * derecha), sobre panel azul noche. Se usa como columna derecha de la cabecera
- * en las páginas de detalle.
- *
- * Una fila cuyo valor sea vacío, `null` o `"0"` **no se pinta** (regla 9 de
- * AGENTS.md: `0` nunca se muestra como dato).
- */
-export function FichaTecnica({
-  filas,
-  titulo = "Ficha",
-}: {
-  filas: readonly { dato: string; valor: string | null | undefined }[];
-  titulo?: string;
-}) {
-  const visibles = filas.filter(
-    (fila) => fila.valor != null && fila.valor.trim() !== "" && fila.valor.trim() !== "0",
-  );
-  if (visibles.length === 0) return null;
-
-  return (
-    <div className="sobre-oscuro overflow-hidden rounded-panel fondo-noche shadow-elevada ring-1 ring-separador-claro">
-      <p className="px-5 pb-1 pt-4 text-[13px] font-medium text-acero-300">{titulo}</p>
-      <dl className="p-3">
-        {visibles.map((fila) => (
-          <div
-            key={fila.dato}
-            className="flex items-baseline justify-between gap-6 border-t border-separador-claro px-2 py-3 first:border-t-0"
-          >
-            <dt className="text-[14px] text-acero-300">{fila.dato}</dt>
-            <dd className="text-right text-[14px] font-medium leading-snug text-acero-100">
-              {fila.valor}
-            </dd>
-          </div>
-        ))}
-      </dl>
-    </div>
   );
 }

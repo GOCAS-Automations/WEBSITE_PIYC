@@ -388,15 +388,17 @@ export function EnlaceConFlecha({
  * páginas de caso y de servicio: sin ellas cada ficha es un callejón sin
  * salida, tanto para el visitante como para el rastreador.
  *
- * Las dos celdas existen siempre —aunque una esté vacía— para que la tarjeta
- * que sí hay conserve su mitad y no se estire a todo el ancho; y comparten
- * altura (`h-full` dentro de una rejilla de dos columnas).
+ * Las dos celdas existen siempre y comparten altura (`h-full` dentro de una
+ * rejilla de dos columnas). En la primera y la última ficha falta una de las
+ * dos: esa celda no queda vacía —media fila muerta— sino que lleva al listado
+ * completo (`etiquetaListado`).
  */
 export function NavegacionEntreFichas({
   anterior,
   siguiente,
   etiqueta,
   base,
+  etiquetaListado,
 }: {
   anterior?: { slug: string; title: string } | null;
   siguiente?: { slug: string; title: string } | null;
@@ -404,12 +406,36 @@ export function NavegacionEntreFichas({
   etiqueta: string;
   /** Prefijo de la ruta: `/servicios` o `/proyectos`. */
   base: string;
+  /** Texto del enlace al listado en la celda que falte: «Todos los servicios». */
+  etiquetaListado?: string;
 }) {
   if (!anterior && !siguiente) return null;
 
+  const alListado = etiquetaListado ? (
+    <Link
+      href={base}
+      className="pulsable group flex h-full items-center gap-4 rounded-tarjeta bg-relleno p-5 ring-1 ring-separador hover:bg-relleno-medio"
+    >
+      <span
+        aria-hidden="true"
+        className="inline-flex size-9 shrink-0 items-center justify-center rounded-capsula bg-blanco text-azul-700"
+      >
+        <svg viewBox="0 0 16 16" fill="none" className="size-4">
+          <path d="M3 4h10M3 8h10M3 12h10" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+        </svg>
+      </span>
+      <span>
+        <span className="block text-[13px] text-acero-600">Listado</span>
+        <span className="mt-0.5 block text-[1.0625rem] font-semibold leading-tight text-azul-800">
+          {etiquetaListado}
+        </span>
+      </span>
+    </Link>
+  ) : null;
+
   return (
     <nav aria-label={etiqueta} className="bg-lienzo">
-      <Contenedor className="pb-4">
+      <Contenedor className="py-8 lg:py-10">
         <ul className="grid gap-4 sm:grid-cols-2">
           <li>
             {anterior ? (
@@ -430,7 +456,9 @@ export function NavegacionEntreFichas({
                   </span>
                 </span>
               </Link>
-            ) : null}
+            ) : (
+              alListado
+            )}
           </li>
           <li>
             {siguiente ? (
@@ -451,7 +479,9 @@ export function NavegacionEntreFichas({
                   <IconoFlecha className="size-4 transition-transform duration-300 ease-ios group-hover:translate-x-0.5" />
                 </span>
               </Link>
-            ) : null}
+            ) : (
+              alListado
+            )}
           </li>
         </ul>
       </Contenedor>

@@ -5,6 +5,18 @@
  * resultado (así los escribió el agente de contenido desde el PPTX). El
  * componente no los etiqueta uno por uno porque el panel puede escribir más o
  * menos de tres; se pintan como cuerpo continuo.
+ *
+ * COMPOSICIÓN (sep-2026)
+ * ----------------------
+ *  - Cabecera con la portada del caso de fondo. Son capturas de HMI de
+ *    ~1229 px: van con velo y un desenfoque leve, que las vuelve textura. Sin
+ *    portada, la foto de cabecera de `/proyectos`.
+ *  - Cuerpo del caso a la izquierda y, a la derecha, la captura nítida en un
+ *    marco oscuro tipo pantalla, del mismo alto que el texto (sin recortarla:
+ *    una HMI recortada pierde lo que muestra). Los datos del caso —cliente,
+ *    servicios, ubicación— pasan a cápsulas de la cabecera: la tarjeta de la
+ *    derecha dejaba un hueco debajo.
+ *  - Galería, servicios que intervinieron, anterior/siguiente y cierre.
  */
 
 import type { Metadata } from "next";
@@ -23,18 +35,19 @@ import {
 import { MENSAJES_WHATSAPP, enlaceWhatsAppDe } from "@/lib/contacto";
 import { jsonLdCaso, jsonLdMigas, metadataDePagina, type Miga } from "@/lib/seo";
 import { proyectosEstaticos } from "@/data/proyectos";
-import { CabeceraInterna, FichaTecnica } from "@/components/sections/CabeceraInterna";
+import { CabeceraInterna } from "@/components/sections/CabeceraInterna";
 import { FranjaCta } from "@/components/sections/FranjaCta";
 import { Galeria } from "@/components/sections/Galeria";
-import { RejillaDeServicios, columnasParaCantidad } from "@/components/sections/tarjetas";
+import { RejillaDeFilasDeServicio } from "@/components/sections/tarjetas";
 import {
   Contenedor,
+  EntradaSeccion,
   NavegacionEntreFichas,
   Parrafos,
   Rotulo,
   TituloSeccion,
 } from "@/components/sections/primitivas";
-import { FotoEnmarcada } from "@/components/ui/ContentImage";
+import { ContentImage } from "@/components/ui/ContentImage";
 import { JsonLd } from "@/components/ui/JsonLd";
 
 export const revalidate = 300;
@@ -93,7 +106,16 @@ export default async function PaginaDeProyecto({
   const hrefWhatsApp = enlaceWhatsAppDe(contacto, MENSAJES_WHATSAPP.proyecto(proyecto.title));
   const cuerpo = enParrafos(proyecto.body || proyecto.description);
   const galeria = galeriaCompleta(proyecto.images);
-  const portada = proyecto.images.cover;
+  // Portada del caso (la primera de la galería completa), con `alt` de
+  // respaldo: sin él la cabecera no la pintaría.
+  const portada = galeria[0]
+    ? { ...galeria[0], alt: galeria[0].alt || `Imagen del caso: ${proyecto.title}` }
+    : null;
+  // Segunda imagen del caso, bajo la captura (solo si tiene texto alternativo).
+  const segunda = galeria[1]?.alt ? galeria[1] : null;
+  // Fondo de la cabecera: la portada, desenfocada; si el caso no tiene, la
+  // foto de cabecera de `/proyectos`.
+  const fondoCabecera = portada ?? paginas.proyectos?.image ?? null;
 
   const migas: Miga[] = [
     { etiqueta: "Inicio", href: "/" },
@@ -120,24 +142,19 @@ export default async function PaginaDeProyecto({
         titulo={proyecto.title}
         bajada={proyecto.description}
         migas={migas}
-        aside={
-          portada ? (
-            <FotoEnmarcada
-              src={portada}
-              alt={proyecto.images.coverAlt ?? proyecto.title}
-              proporcion="aspect-[4/3]"
-              prioritaria
-              className="mx-auto max-w-[min(100%,26rem)] lg:mx-0 lg:ml-auto"
-            />
-          ) : undefined
-        }
+        imagen={fondoCabecera}
+        desenfocar={Boolean(portada)}
+        datos={[
+          { etiqueta: "Cliente", valor: proyecto.client },
+          { etiqueta: "Ubicación", valor: "Valle del Cauca, Colombia" },
+        ]}
       />
 
-      {/* Cuerpo del caso */}
+      {/* Cuerpo del caso + captura nítida en marco de pantalla */}
       <section aria-labelledby="titulo-caso" className="bg-lienzo">
         <Contenedor className="py-16 lg:py-20">
-          <div className="grid gap-12 lg:grid-cols-12">
-            <div className="lg:col-span-7">
+          <div className="grid gap-10 lg:grid-cols-12 lg:gap-14">
+            <div className={portada ? "lg:col-span-6" : "max-w-3xl lg:col-span-12"}>
               <Rotulo>El proyecto</Rotulo>
               <TituloSeccion id="titulo-caso" className="mt-5">
                 {plantilla?.tituloCuerpo || "Contexto, solución y resultado"}
@@ -145,33 +162,49 @@ export default async function PaginaDeProyecto({
               <Parrafos textos={cuerpo} className="mt-6" />
             </div>
 
-            <div className="lg:col-span-5">
-              <FichaTecnica
-                titulo="Datos del proyecto"
-                filas={[
-                  { dato: "Cliente", valor: proyecto.client },
-                  {
-                    dato: "Servicios",
-                    valor: serviciosDelCaso.map((servicio) => servicio.navTitle).join(" · "),
-                  },
-                  { dato: "Ubicación", valor: "Valle del Cauca, Colombia" },
-                ]}
-              />
-
-              {serviciosDelCaso.length > 0 && notaServicios ? (
-                <p className="mt-4 text-[13px] leading-snug text-acero-600">{notaServicios}</p>
-              ) : null}
-            </div>
+            {/* Columna de imágenes, del alto del texto: la captura de la
+                pantalla (entera, en marco oscuro) y, si el caso tiene más, la
+                segunda imagen debajo —pantalla y campo—. Con una sola, la
+                captura ocupa toda la columna. */}
+            {portada ? (
+              <div className="flex flex-col gap-4 lg:col-span-6">
+                <ContentImage
+                  src={portada.src}
+                  alt={portada.alt}
+                  width={portada.width}
+                  height={portada.height}
+                  srcMovil={portada.srcMovil}
+                  sizes="(min-width: 1024px) 50vw, 100vw"
+                  ajuste="contain"
+                  className="p-3 sm:p-4"
+                  proporcion={
+                    segunda
+                      ? "aspect-[16/10] lg:aspect-auto lg:min-h-[13rem] lg:flex-1"
+                      : "aspect-[4/3] lg:aspect-auto lg:min-h-[22rem] lg:flex-1"
+                  }
+                  claseContenedor="fondo-noche rounded-panel shadow-elevada ring-1 ring-separador"
+                />
+                {segunda ? (
+                  <ContentImage
+                    src={segunda.src}
+                    alt={segunda.alt}
+                    width={segunda.width}
+                    height={segunda.height}
+                    srcMovil={segunda.srcMovil}
+                    sizes="(min-width: 1024px) 50vw, 100vw"
+                    proporcion="aspect-[16/10] lg:aspect-auto lg:min-h-[13rem] lg:flex-1"
+                    claseContenedor="rounded-panel bg-acero-100 shadow-elevada ring-1 ring-separador"
+                  />
+                ) : null}
+              </div>
+            ) : null}
           </div>
         </Contenedor>
       </section>
 
-      {/* Galería */}
-      {galeria.length > 0 ? (
-        <section
-          aria-labelledby="titulo-galeria-proyecto"
-          className="bg-lienzo-alto"
-        >
+      {/* Galería: con más de una imagen (la portada ya está arriba). */}
+      {galeria.length > 1 ? (
+        <section aria-labelledby="titulo-galeria-proyecto" className="bg-blanco">
           <Contenedor className="py-16 lg:py-20">
             <Rotulo>Del proyecto</Rotulo>
             <TituloSeccion id="titulo-galeria-proyecto" className="mt-5">
@@ -180,7 +213,7 @@ export default async function PaginaDeProyecto({
             <Galeria
               imagenes={galeria}
               titulo={proyecto.title}
-              columnas={3}
+              columnas={galeria.length % 3 === 0 ? 3 : 2}
               className="mt-8"
             />
           </Contenedor>
@@ -189,15 +222,26 @@ export default async function PaginaDeProyecto({
 
       {/* Servicios que intervinieron */}
       {serviciosDelCaso.length > 0 ? (
-        <section aria-labelledby="titulo-servicios-caso" className="bg-lienzo">
+        <section
+          aria-labelledby="titulo-servicios-caso"
+          className={galeria.length > 1 ? "bg-lienzo" : "bg-blanco"}
+        >
           <Contenedor className="py-16 lg:py-20">
-            <TituloSeccion id="titulo-servicios-caso">
-              {plantilla?.tituloServicios || "Servicios que intervinieron"}
-            </TituloSeccion>
+            <div className="grid gap-5 lg:grid-cols-12 lg:items-end lg:gap-12">
+              <TituloSeccion id="titulo-servicios-caso" className="lg:col-span-6">
+                {plantilla?.tituloServicios || "Servicios que intervinieron"}
+              </TituloSeccion>
+              {/* La nota dice «combinó varios servicios»: con uno solo no aplica. */}
+              {notaServicios && serviciosDelCaso.length > 1 ? (
+                <EntradaSeccion className="lg:col-span-6">{notaServicios}</EntradaSeccion>
+              ) : null}
+            </div>
             <div className="mt-8">
-              <RejillaDeServicios
+              <RejillaDeFilasDeServicio
                 servicios={serviciosDelCaso}
-                columnas={columnasParaCantidad(serviciosDelCaso.length)}
+                columnas={
+                  serviciosDelCaso.length === 1 ? 1 : serviciosDelCaso.length % 3 === 0 ? 3 : 2
+                }
               />
             </div>
           </Contenedor>
@@ -210,6 +254,7 @@ export default async function PaginaDeProyecto({
         siguiente={vecinos.siguiente}
         etiqueta="Navegación entre proyectos"
         base="/proyectos"
+        etiquetaListado="Todos los casos de éxito"
       />
 
       <FranjaCta

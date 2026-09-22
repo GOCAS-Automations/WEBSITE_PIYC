@@ -3,14 +3,38 @@
  *
  * Los nueve servicios agrupados en cuatro líneas. La agrupación
  * (`lineasDeServicio`) es una **propuesta pendiente de validar con Jorge**: el
- * documento original de PIYC los lista planos, sin categorías.
+ * documento original de PIYC los lista planos, sin categorías. El nombre de
+ * cada línea se edita en el panel (Inicio → líneas de servicio).
  *
  * Un servicio que la base traiga y que no esté en ninguna línea igual aparece,
  * en un grupo final: nunca se pierde contenido por una agrupación desfasada.
+ *
+ * COMPOSICIÓN (sep-2026)
+ * ----------------------
+ * Cesar: «el contenido está bien pero la página se ve muy pobre solo con
+ * cuadros y texto». Ahora:
+ *  1. Cabecera con foto de fondo.
+ *  2. Entrada + índice de las cuatro líneas (anclas).
+ *  3. Cada línea como sección propia: foto grande que alterna de lado
+ *     (zigzag) y fondos alternos, y sus servicios en filas con miniatura.
+ *  4. Banda oscura del proceso de trabajo (los mismos pasos del inicio).
+ *  5. Casos de éxito, preguntas frecuentes y cierre.
+ * Nada de cifras ni datos nuevos: todo sale del contenido que ya existe.
  */
 
 import type { Metadata } from "next";
-import { getContacto, getPaginas, getSeo, getServicios } from "@/lib/content";
+import type { ImagenContenido, LineaServicio, Servicio } from "@/lib/content-types";
+import {
+  galeriaCompleta,
+  getContacto,
+  getHome,
+  getLineasDeServicio,
+  getPaginas,
+  getProyectos,
+  getSeo,
+  getServicios,
+  primeraFotoDe,
+} from "@/lib/content";
 import { MENSAJES_WHATSAPP, enlaceWhatsAppDe } from "@/lib/contacto";
 import {
   jsonLdFaq,
@@ -20,12 +44,20 @@ import {
   metadatosPagina,
   type Miga,
 } from "@/lib/seo";
-import { lineasDeServicio } from "@/data/servicios";
+import { FranjaProceso } from "@/components/inicio/FranjaProceso";
 import { CabeceraInterna } from "@/components/sections/CabeceraInterna";
 import { Faq } from "@/components/sections/Faq";
 import { FranjaCta } from "@/components/sections/FranjaCta";
-import { RejillaDeServicios, columnasParaCantidad } from "@/components/sections/tarjetas";
-import { Contenedor, EntradaSeccion } from "@/components/sections/primitivas";
+import { RejillaDeFilasDeServicio, RejillaDeProyectos } from "@/components/sections/tarjetas";
+import {
+  Contenedor,
+  EnlaceConFlecha,
+  EntradaSeccion,
+  Rotulo,
+  TituloSeccion,
+} from "@/components/sections/primitivas";
+import { FotoDeColumna } from "@/components/ui/ContentImage";
+import { IconoServicio } from "@/components/ui/iconos-servicio";
 import { JsonLd } from "@/components/ui/JsonLd";
 
 export const revalidate = 300;
@@ -45,11 +77,58 @@ export async function generateMetadata(): Promise<Metadata> {
   return metadataDePagina({ titulo, descripcion, ruta: "/servicios", imagen });
 }
 
+/**
+ * Foto grande de una línea. Se prefiere una que NO sea la miniatura de ningún
+ * servicio de la línea (la segunda de alguna galería), para no ver la misma
+ * foto en grande y en pequeño a la vez; si no hay, la primera de la línea.
+ */
+function fotoDeLinea(servicios: readonly Servicio[]): ImagenContenido | null {
+  const miniaturas = new Set(
+    servicios.map((servicio) => primeraFotoDe(servicio.images)?.src).filter(Boolean),
+  );
+  for (const servicio of servicios) {
+    const otra = galeriaCompleta(servicio.images).find(
+      (foto) => !miniaturas.has(foto.src) && foto.alt,
+    );
+    if (otra) return otra;
+  }
+  for (const servicio of servicios) {
+    const primera = primeraFotoDe(servicio.images);
+    if (primera?.alt) return primera;
+  }
+  return null;
+}
+
+/**
+ * Sustituto de la foto cuando ningún servicio de la línea tiene fotos: panel
+ * de marca con los iconos de sus servicios. Tiene que verse a propósito.
+ */
+function PanelDeLinea({ servicios, className = "" }: { servicios: readonly Servicio[]; className?: string }) {
+  return (
+    <div
+      aria-hidden="true"
+      className={`sobre-oscuro fondo-noche reticula-cabecera relative flex aspect-[16/10] items-center justify-center gap-6 overflow-hidden rounded-panel shadow-elevada lg:aspect-auto lg:h-full lg:min-h-[22rem] ${className}`}
+    >
+      {servicios.slice(0, 3).map((servicio) => (
+        <IconoServicio
+          key={servicio.slug}
+          clave={servicio.iconKey}
+          className="relative size-16 text-azul-300 sm:size-20"
+          strokeWidth={1.2}
+        />
+      ))}
+    </div>
+  );
+}
+
 export default async function HubDeServicios() {
-  const [servicios, paginas, contacto] = await Promise.all([
+  const [servicios, paginas, contacto, lineas, home, proyectos] = await Promise.all([
     getServicios(),
     getPaginas(),
     getContacto(),
+    getLineasDeServicio(),
+    getHome(),
+    getProyectos(),
   ]);
 
   const hrefWhatsApp = enlaceWhatsAppDe(contacto, MENSAJES_WHATSAPP.general);
@@ -60,7 +139,7 @@ export default async function HubDeServicios() {
   const porSlug = new Map(servicios.map((servicio) => [servicio.slug, servicio]));
   const usados = new Set<string>();
 
-  const grupos = lineasDeServicio
+  const grupos: { linea: LineaServicio; servicios: Servicio[] }[] = lineas
     .map((linea) => {
       const delGrupo = linea.slugs
         .map((slug) => {
@@ -95,6 +174,16 @@ export default async function HubDeServicios() {
     return acumulado + grupo.servicios.length;
   }, 0);
 
+  // Casos de la franja: los destacados del inicio (o los tres primeros). Los
+  // textos del encabezado son los mismos de la franja de casos del inicio.
+  const casos = home.proyectosDestacados
+    ? home.proyectosDestacados
+        .map((slug) => proyectos.find((proyecto) => proyecto.slug === slug))
+        .filter((proyecto) => proyecto !== undefined)
+        .slice(0, 3)
+    : proyectos.slice(0, 3);
+  const seccionCasos = home.seccionProyectos;
+
   return (
     <main id="contenido">
       <JsonLd datos={jsonLdMigas(MIGAS)} />
@@ -121,53 +210,140 @@ export default async function HubDeServicios() {
         migas={MIGAS}
       />
 
-      <section aria-labelledby="titulo-lineas" className="bg-lienzo">
-        <Contenedor className="py-16 lg:py-20">
-          <h2 id="titulo-lineas" className="sr-only">
-            Líneas de servicio
-          </h2>
-
-          {ajustes?.intro ? (
-            <EntradaSeccion className="mb-12 max-w-[72ch]">{ajustes.intro}</EntradaSeccion>
-          ) : null}
-
-          <div className="space-y-14 lg:space-y-16">
-            {grupos.map(({ linea, servicios: delGrupo }, indiceGrupo) => {
-              const desde = desplazamientos[indiceGrupo];
-
-              return (
-                <section
-                  key={linea.id}
-                  id={linea.id}
-                  aria-labelledby={`${linea.id}-titulo`}
-                  className="scroll-mt-[calc(var(--alto-nav)+1.5rem)]"
-                >
-                  <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between sm:gap-8">
-                    <h3
-                      id={`${linea.id}-titulo`}
-                      className="text-[1.625rem] font-semibold leading-tight text-azul-950 sm:text-[1.875rem]"
+      {/* Entrada + índice de líneas. Dos columnas centradas en vertical: el
+          párrafo a la izquierda y las cuatro anclas a la derecha. */}
+      <div className="bg-lienzo">
+        <Contenedor className="py-12 lg:py-16">
+          <div className="grid gap-8 lg:grid-cols-12 lg:items-center lg:gap-14">
+            {ajustes?.intro ? (
+              <EntradaSeccion className="lg:col-span-6 sm:!text-[1.1875rem]">
+                {ajustes.intro}
+              </EntradaSeccion>
+            ) : null}
+            <nav
+              aria-label="Líneas de servicio"
+              className={ajustes?.intro ? "lg:col-span-6" : "lg:col-span-12"}
+            >
+              <ol className="grid gap-px overflow-hidden rounded-tarjeta bg-separador shadow-tarjeta ring-1 ring-separador sm:grid-cols-2">
+                {grupos.map(({ linea, servicios: delGrupo }, indice) => (
+                  <li
+                    key={linea.id}
+                    className={
+                      grupos.length % 2 === 1 && indice === grupos.length - 1
+                        ? "sm:col-span-2"
+                        : ""
+                    }
+                  >
+                    <a
+                      href={`#${linea.id}`}
+                      className="group flex h-full items-center gap-3.5 bg-blanco px-5 py-4 transition-colors duration-300 ease-ios hover:bg-lienzo-alto"
                     >
-                      {linea.titulo}
-                    </h3>
-                    <p className="max-w-[46ch] text-[15px] leading-snug text-acero-600">
-                      {linea.resumen}
-                    </p>
-                  </div>
-
-                  <div className="mt-6">
-                    <RejillaDeServicios
-                      servicios={delGrupo}
-                      columnas={columnasParaCantidad(delGrupo.length)}
-                      numerar
-                      desde={desde}
-                    />
-                  </div>
-                </section>
-              );
-            })}
+                      <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-capsula bg-relleno text-[13px] font-semibold tabular-nums text-azul-700 transition-colors duration-300 ease-ios group-hover:bg-azul-700 group-hover:text-blanco">
+                        {String(indice + 1).padStart(2, "0")}
+                      </span>
+                      <span className="min-w-0">
+                        <span className="block text-[15px] font-semibold leading-snug text-azul-950">
+                          {linea.titulo}
+                        </span>
+                        <span className="mt-0.5 block text-[13px] text-acero-600">
+                          {delGrupo.length === 1 ? "1 servicio" : `${delGrupo.length} servicios`}
+                        </span>
+                      </span>
+                    </a>
+                  </li>
+                ))}
+              </ol>
+            </nav>
           </div>
         </Contenedor>
-      </section>
+      </div>
+
+      {/* Una sección por línea: foto que alterna de lado y fondo alterno. */}
+      {grupos.map(({ linea, servicios: delGrupo }, indice) => {
+        const foto = fotoDeLinea(delGrupo);
+        const fotoALaIzquierda = indice % 2 === 0;
+        const numero = String(indice + 1).padStart(2, "0");
+
+        return (
+          <section
+            key={linea.id}
+            id={linea.id}
+            aria-labelledby={`${linea.id}-titulo`}
+            className={`scroll-mt-[calc(var(--alto-nav)+1rem)] ${
+              indice % 2 === 0 ? "bg-blanco" : "bg-lienzo"
+            }`}
+          >
+            <Contenedor className="py-16 lg:py-20">
+              <div className="grid gap-8 lg:grid-cols-12 lg:gap-14">
+                <div className="flex flex-col lg:col-span-7">
+                  <Rotulo className="self-start">Línea {numero}</Rotulo>
+                  <TituloSeccion id={`${linea.id}-titulo`} className="mt-5">
+                    {linea.titulo}
+                  </TituloSeccion>
+                  {linea.resumen ? (
+                    <EntradaSeccion className="mt-4">{linea.resumen}</EntradaSeccion>
+                  ) : null}
+                  <div className="mt-8">
+                    <RejillaDeFilasDeServicio
+                      servicios={delGrupo}
+                      numerarDesde={desplazamientos[indice]}
+                      evitarFoto={foto?.src}
+                    />
+                  </div>
+                </div>
+
+                {foto ? (
+                  <FotoDeColumna
+                    imagen={foto}
+                    className={`lg:col-span-5 ${fotoALaIzquierda ? "lg:order-first" : ""}`}
+                    altoMinimo="lg:min-h-[24rem]"
+                  />
+                ) : (
+                  <PanelDeLinea
+                    servicios={delGrupo}
+                    className={`lg:col-span-5 ${fotoALaIzquierda ? "lg:order-first" : ""}`}
+                  />
+                )}
+              </div>
+            </Contenedor>
+          </section>
+        );
+      })}
+
+      {/* Banda oscura: el proceso de trabajo, los mismos pasos del inicio. */}
+      <FranjaProceso proceso={home.proceso} tono="oscuro" id="titulo-proceso-servicios" />
+
+      {/* Casos de éxito */}
+      {casos.length > 0 ? (
+        <section aria-labelledby="titulo-casos-servicios" className="bg-blanco">
+          <Contenedor className="py-16 lg:py-20">
+            <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+              <div className="max-w-2xl">
+                {seccionCasos?.eyebrow !== "" ? (
+                  <Rotulo>{seccionCasos?.eyebrow ?? "Casos de éxito"}</Rotulo>
+                ) : null}
+                <TituloSeccion
+                  id="titulo-casos-servicios"
+                  className={seccionCasos?.eyebrow !== "" ? "mt-5" : ""}
+                >
+                  {seccionCasos?.title || "Proyectos entregados y funcionando"}
+                </TituloSeccion>
+                {seccionCasos?.intro ? (
+                  <EntradaSeccion className="mt-5">{seccionCasos.intro}</EntradaSeccion>
+                ) : null}
+              </div>
+              {seccionCasos?.ctaEtiqueta !== "" ? (
+                <EnlaceConFlecha href="/proyectos" className="shrink-0">
+                  {seccionCasos?.ctaEtiqueta ?? "Ver todos los proyectos"}
+                </EnlaceConFlecha>
+              ) : null}
+            </div>
+            <div className="mt-10">
+              <RejillaDeProyectos proyectos={casos} columnas={casos.length === 2 ? 2 : 3} />
+            </div>
+          </Contenedor>
+        </section>
+      ) : null}
 
       <Faq preguntas={faq} />
 

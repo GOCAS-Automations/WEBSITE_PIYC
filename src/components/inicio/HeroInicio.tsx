@@ -22,6 +22,7 @@ import {
   GrupoDeBotones,
 } from "@/components/sections/primitivas";
 import { ContentImage } from "@/components/ui/ContentImage";
+import { IconoFlecha } from "@/components/ui/iconos";
 import { DiagramaEscalera } from "./DiagramaEscalera";
 
 const cartela = [
@@ -144,6 +145,8 @@ export function HeroInicio({
                   alt={imagen.alt}
                   width={imagen.width}
                   height={imagen.height}
+                  srcMovil={imagen.srcMovil}
+                  sizes="(min-width: 1024px) 40vw, 100vw"
                   prioritaria
                   proporcion="aspect-[4/3]"
                   claseContenedor="rounded-tarjeta bg-azul-950/55 ring-1 ring-separador-claro"
@@ -178,28 +181,48 @@ export function HeroInicio({
         </figure>
       </div>
 
-      {/* Líneas de trabajo: tarjetas redondeadas */}
+      {/* LÍNEAS DE SERVICIO
+          Una sola tarjeta que ocupa exactamente el ancho del contenedor (su
+          borde derecho es el margen derecho del contenido) partida en celdas
+          por filetes (`gap-px` sobre fondo `separador`). Dos columnas desde
+          `lg` y una debajo: así cada frase corta cabe en UNA línea en
+          escritorio y tableta — en cuatro columnas no cabían 45 caracteres y
+          se partían en dos (Cesar, sep-2026). Nombre y frase salen del panel
+          (`home.lineasServicio`). */}
       {lineas.length > 0 ? (
-        <div className="mx-auto max-w-sitio px-4 pb-16 sm:px-6 lg:px-8 lg:pb-20">
+        <div className="mx-auto max-w-sitio px-4 pb-14 sm:px-6 lg:px-8 lg:pb-20">
           <h2 className="sr-only">Líneas de servicio</h2>
-          <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-5">
+          <ul
+            data-franja-lineas=""
+            className="grid gap-px overflow-hidden rounded-tarjeta bg-separador shadow-tarjeta ring-1 ring-separador lg:grid-cols-2"
+          >
             {lineas.map((linea, indice) => (
               <li
                 key={linea.id}
-                className="group relative rounded-tarjeta bg-blanco p-5 shadow-tarjeta transition-[transform,box-shadow] duration-300 ease-ios hover:-translate-y-1 hover:shadow-elevada"
+                className="group relative flex items-center gap-4 bg-blanco px-5 py-4 transition-colors duration-300 ease-ios hover:bg-lienzo-alto sm:px-6 sm:py-5"
               >
-                <span className="inline-flex size-8 items-center justify-center rounded-capsula bg-relleno text-[13px] font-semibold tabular-nums text-azul-700">
+                <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-capsula bg-relleno text-[13px] font-semibold tabular-nums text-azul-700 transition-colors duration-300 ease-ios group-hover:bg-azul-700 group-hover:text-blanco">
                   {String(indice + 1).padStart(2, "0")}
                 </span>
-                <h3 className="mt-3.5 text-[1.0625rem] font-semibold leading-snug text-azul-950">
-                  <Link
-                    href={`/servicios#${linea.id}`}
-                    className="after:absolute after:inset-0 after:content-['']"
-                  >
-                    {linea.titulo}
-                  </Link>
-                </h3>
-                <p className="mt-1.5 text-[14px] leading-snug text-acero-600">{linea.resumen}</p>
+                <div className="min-w-0 flex-1">
+                  <h3 className="text-[1.0625rem] font-semibold leading-snug text-azul-950">
+                    <Link
+                      href={`/servicios#${linea.id}`}
+                      className="after:absolute after:inset-0 after:content-['']"
+                    >
+                      {linea.titulo}
+                    </Link>
+                  </h3>
+                  {linea.resumenCorto ? (
+                    <p
+                      data-resumen-linea=""
+                      className="mt-0.5 text-[14px] leading-snug text-acero-600"
+                    >
+                      {linea.resumenCorto}
+                    </p>
+                  ) : null}
+                </div>
+                <IconoFlecha className="hidden size-4.5 shrink-0 text-azul-700 transition-transform duration-300 ease-ios group-hover:translate-x-1 sm:block" />
               </li>
             ))}
           </ul>

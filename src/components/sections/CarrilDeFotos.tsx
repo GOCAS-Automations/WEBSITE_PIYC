@@ -182,6 +182,8 @@ export function CarrilDeFotos({
                 alt={imagen.alt}
                 width={imagen.width}
                 height={imagen.height}
+                srcMovil={imagen.srcMovil}
+                sizes="(min-width: 1024px) 23rem, 80vw"
                 anticipada={posicion < anticipadas}
                 proporcion="h-[13.5rem] sm:h-[14.5rem] lg:h-[16rem]"
                 claseContenedor="rounded-chip bg-acero-100"
