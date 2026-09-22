@@ -71,6 +71,10 @@ function galeria(valor: unknown): ImagenContenido[] {
     const src = texto(item.src).trim();
     if (src === "") return [];
     const imagen: ImagenContenido = { src, alt: texto(item.alt) };
+    // La variante de 900 px viaja con la foto: si el formulario no la recibe,
+    // al guardar se perdería.
+    const srcMovil = texto(item.srcMovil).trim();
+    if (srcMovil !== "") imagen.srcMovil = srcMovil;
     if (typeof item.width === "number") imagen.width = item.width;
     if (typeof item.height === "number") imagen.height = item.height;
     return [imagen];

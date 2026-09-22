@@ -20,6 +20,23 @@
  * el tope. Solo si ni al mínimo entra (fotos enormes con muchísimo detalle) se
  * devuelve un mensaje que explica exactamente qué hacer.
  *
+ * DOS VERSIONES DE CADA FOTO
+ * --------------------------
+ * Sin optimizador tampoco hay quien sirva una foto más chica al celular: sin
+ * ayuda, un teléfono descargaría los 1920 px del fondo de una cabecera. Por eso,
+ * si la foto mide más de 900 px de ancho, se genera además una **variante de
+ * 900 px** (≤ ~100 KB) que sube junto a la principal con el mismo nombre más
+ * `-900`. Su URL vuelve como `urlMovil` y el formulario la guarda en
+ * `srcMovil`, que el sitio usa en el `srcset`. Si la variante falla, la foto
+ * principal queda igual de bien subida: el sitio sirve entonces solo `src`.
+ *
+ * También vuelven `width` y `height` reales de la principal: el sitio los usa
+ * para reservar el espacio de la foto antes de que cargue (sin saltos).
+ *
+ * Quitar o cambiar una foto en el panel NO borra archivos del bucket, ni la
+ * principal ni la variante: nunca se hizo, y una foto puede estar en uso en
+ * otra pantalla. La limpieza de huérfanas es manual (`docs/CONTENIDO.md` §2).
+ *
  * Las carpetas son las cinco del bucket (`inicio/`, `nosotros/`, `servicios/`,
  * `proyectos/`, `cabeceras/`) y las fija cada pantalla con la prop `folder`:
  * mantenerlas ordenadas es lo que permite que PIYC reconozca sus propias fotos
@@ -33,6 +50,19 @@ import {
   PESO_MAXIMO_IMAGEN,
   TIPOS_IMAGEN_ACEPTADOS,
 } from "@/lib/admin-types";
+
+/** Ancho de la variante para celular (`srcMovil`). */
+const ANCHO_VARIANTE = 900;
+/** Tope orientativo de la variante: a 900 px, una foto ronda 40–90 KB. */
+const PESO_MAXIMO_VARIANTE = 100 * 1024;
+
+/**
+ * Un año: cada archivo lleva una marca de tiempo en el nombre y nunca se
+ * reescribe (`upsert: false`), así que su contenido no cambia jamás. Con una
+ * hora, el navegador volvía a pedir cada foto —y los fondos de 1920 px— una y
+ * otra vez. Es el mismo valor que tienen las fotos subidas a mano al bucket.
+ */
+const CACHE_UN_ANO = "31536000";
 
 /** Nombre de archivo apto para una URL: sin tildes, sin espacios, corto. */
 export function nombreSeguro(nombre: string): string {
@@ -54,16 +84,52 @@ export function pesoLegible(bytes: number): string {
 }
 
 export type ResultadoSubida =
-  | { url: string; pesoFinal: number; comprimida: boolean }
+  | {
+      url: string;
+      /** Variante de 900 px. Ausente si la foto ya era angosta o si no se pudo subir. */
+      urlMovil?: string;
+      /** Medidas reales de la principal. Ausentes si el navegador no pudo leer la foto. */
+      width?: number;
+      height?: number;
+      pesoFinal: number;
+      pesoMovil?: number;
+      comprimida: boolean;
+    }
   | { error: string };
 
-/** Lee el archivo a un bitmap sin pasar por el DOM (rápido y sin fugas). */
+/**
+ * Lee el archivo a un bitmap sin pasar por el DOM (rápido y sin fugas).
+ * `from-image` aplica la orientación EXIF, para que una foto de celular tomada
+ * en vertical no quede acostada; si el navegador no conoce la opción, se lee
+ * sin ella antes de rendirse.
+ */
 async function aBitmap(file: File): Promise<ImageBitmap | null> {
   try {
-    return await createImageBitmap(file);
+    return await createImageBitmap(file, { imageOrientation: "from-image" });
   } catch {
-    return null;
+    try {
+      return await createImageBitmap(file);
+    } catch {
+      return null;
+    }
   }
+}
+
+/** Pinta `fuente` en un canvas nuevo de `ancho` × `alto`. */
+function lienzo(
+  fuente: CanvasImageSource,
+  ancho: number,
+  alto: number,
+): HTMLCanvasElement | null {
+  const canvas = document.createElement("canvas");
+  canvas.width = ancho;
+  canvas.height = alto;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return null;
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+  ctx.drawImage(fuente, 0, 0, ancho, alto);
+  return canvas;
 }
 
 function canvasABlob(
@@ -76,38 +142,75 @@ function canvasABlob(
 }
 
 /**
- * Redimensiona a `ANCHO_MAXIMO_IMAGEN` como mucho y convierte a WebP bajando la
- * calidad por pasos hasta entrar en `PESO_MAXIMO_IMAGEN`. Devuelve `null` si el
- * navegador no pudo procesar la imagen (entonces se sube el original y el tope
- * de peso se aplica tal cual).
+ * Codifica el canvas a WebP bajando la calidad por pasos hasta entrar en
+ * `tope`. El último intento se devuelve aunque no entre: quien llama decide si
+ * avisa. `null` si el navegador no sabe codificar WebP (Safari devuelve un PNG
+ * en su lugar, y subirlo disfrazado de WebP sería peor que no comprimir).
  */
-async function comprimir(file: File): Promise<Blob | null> {
+async function aWebp(
+  canvas: HTMLCanvasElement,
+  calidades: readonly number[],
+  tope: number,
+): Promise<Blob | null> {
+  let blob: Blob | null = null;
+  for (const calidad of calidades) {
+    blob = await canvasABlob(canvas, calidad);
+    if (!blob || blob.type !== "image/webp") return null;
+    if (blob.size <= tope) return blob;
+  }
+  return blob;
+}
+
+type Versiones = {
+  principal: Blob;
+  ancho: number;
+  alto: number;
+  /** Variante de 900 px, o `null` si la foto no pasa de 900 px o no se pudo. */
+  movil: Blob | null;
+};
+
+/**
+ * Genera la principal (≤ `ANCHO_MAXIMO_IMAGEN`, ≤ `PESO_MAXIMO_IMAGEN`) y la
+ * variante de 900 px. La variante se pinta desde la principal ya reducida, no
+ * desde el original: reducir por pasos deja la foto más limpia. Devuelve
+ * `null` si el navegador no pudo procesar la imagen (entonces se sube el
+ * original y el tope de peso se aplica tal cual).
+ */
+async function comprimir(file: File): Promise<Versiones | null> {
   const bitmap = await aBitmap(file);
   if (!bitmap) return null;
 
-  const escala = Math.min(1, ANCHO_MAXIMO_IMAGEN / bitmap.width);
-  const ancho = Math.max(1, Math.round(bitmap.width * escala));
-  const alto = Math.max(1, Math.round(bitmap.height * escala));
+  try {
+    const escala = Math.min(1, ANCHO_MAXIMO_IMAGEN / bitmap.width);
+    const ancho = Math.max(1, Math.round(bitmap.width * escala));
+    const alto = Math.max(1, Math.round(bitmap.height * escala));
 
-  const canvas = document.createElement("canvas");
-  canvas.width = ancho;
-  canvas.height = alto;
-  const ctx = canvas.getContext("2d");
-  if (!ctx) {
+    const grande = lienzo(bitmap, ancho, alto);
+    if (!grande) return null;
+    const principal = await aWebp(
+      grande,
+      [0.86, 0.78, 0.7, 0.6, 0.5],
+      PESO_MAXIMO_IMAGEN,
+    );
+    if (!principal) return null;
+
+    let movil: Blob | null = null;
+    if (ancho > ANCHO_VARIANTE) {
+      const altoMovil = Math.max(1, Math.round((alto * ANCHO_VARIANTE) / ancho));
+      const chico = lienzo(grande, ANCHO_VARIANTE, altoMovil);
+      if (chico) {
+        movil = await aWebp(
+          chico,
+          [0.8, 0.74, 0.68, 0.62, 0.56],
+          PESO_MAXIMO_VARIANTE,
+        );
+      }
+    }
+
+    return { principal, ancho, alto, movil };
+  } finally {
     bitmap.close();
-    return null;
   }
-  ctx.drawImage(bitmap, 0, 0, ancho, alto);
-  bitmap.close();
-
-  for (const calidad of [0.86, 0.78, 0.7, 0.6, 0.5]) {
-    const blob = await canvasABlob(canvas, calidad);
-    if (!blob) return null;
-    if (blob.size <= PESO_MAXIMO_IMAGEN) return blob;
-    // El último intento se devuelve igual: quien llama decide si avisa.
-    if (calidad === 0.5) return blob;
-  }
-  return null;
 }
 
 export async function subirImagenAlBucket(
@@ -129,11 +232,11 @@ export async function subirImagenAlBucket(
     };
   }
 
-  const comprimida = await comprimir(file);
-  const cuerpo: Blob = comprimida ?? file;
-  const tipo = comprimida ? "image/webp" : file.type;
+  const versiones = await comprimir(file);
+  const cuerpo: Blob = versiones?.principal ?? file;
+  const tipo = versiones ? "image/webp" : file.type;
 
-  if (!comprimida && !(TIPOS_IMAGEN_ACEPTADOS as readonly string[]).includes(tipo)) {
+  if (!versiones && !(TIPOS_IMAGEN_ACEPTADOS as readonly string[]).includes(tipo)) {
     return {
       error:
         "Ese formato de imagen no se admite. Guárdala como JPG, PNG o WebP y vuelve a intentarlo.",
@@ -150,17 +253,17 @@ export async function subirImagenAlBucket(
     };
   }
 
-  // La marca de tiempo evita pisar una foto anterior con el mismo nombre.
-  const extension = comprimida ? "webp" : (file.name.split(".").pop() ?? "jpg");
-  const path = `${folder}/${Date.now()}-${nombreSeguro(file.name)}.${extension}`;
+  // La marca de tiempo evita pisar una foto anterior con el mismo nombre. La
+  // variante comparte nombre y marca: así se reconocen como pareja en el bucket.
+  const base = `${folder}/${Date.now()}-${nombreSeguro(file.name)}`;
+  const extension = versiones ? "webp" : (file.name.split(".").pop() ?? "jpg");
+  const bucket = supabase.storage.from(SITE_IMAGES_BUCKET);
 
-  const { data, error } = await supabase.storage
-    .from(SITE_IMAGES_BUCKET)
-    .upload(path, cuerpo, {
-      cacheControl: "3600",
-      upsert: false,
-      contentType: tipo,
-    });
+  const { data, error } = await bucket.upload(`${base}.${extension}`, cuerpo, {
+    cacheControl: CACHE_UN_ANO,
+    upsert: false,
+    contentType: tipo,
+  });
 
   if (error || !data) {
     const mensaje = error?.message ?? "";
@@ -173,13 +276,28 @@ export async function subirImagenAlBucket(
     return { error: mensaje || "No se pudo subir la imagen. Inténtalo otra vez." };
   }
 
-  const {
-    data: { publicUrl },
-  } = supabase.storage.from(SITE_IMAGES_BUCKET).getPublicUrl(data.path);
+  // La variante sube DESPUÉS de la principal: si la principal falla no queda
+  // una variante suelta en el bucket. Si falla la variante, no se avisa: la
+  // foto ya está arriba y el sitio simplemente sirve la principal.
+  let urlMovil: string | undefined;
+  if (versiones?.movil) {
+    const movil = await bucket.upload(`${base}-900.webp`, versiones.movil, {
+      cacheControl: CACHE_UN_ANO,
+      upsert: false,
+      contentType: "image/webp",
+    });
+    if (!movil.error && movil.data) {
+      urlMovil = bucket.getPublicUrl(movil.data.path).data.publicUrl;
+    }
+  }
 
   return {
-    url: publicUrl,
+    url: bucket.getPublicUrl(data.path).data.publicUrl,
+    urlMovil,
+    width: versiones?.ancho,
+    height: versiones?.alto,
     pesoFinal: cuerpo.size,
-    comprimida: Boolean(comprimida) && cuerpo.size < file.size,
+    pesoMovil: urlMovil ? versiones?.movil?.size : undefined,
+    comprimida: Boolean(versiones) && cuerpo.size < file.size,
   };
 }

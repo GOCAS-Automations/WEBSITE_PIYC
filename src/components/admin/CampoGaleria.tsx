@@ -11,20 +11,31 @@ import type { ImagenContenido } from "@/lib/content-types";
 /**
  * GALERÍA DE UN SERVICIO O DE UN PROYECTO
  * =======================================
- * Una lista de filas `{ src, alt }` que viaja al servidor como **dos campos
- * repetidos en paralelo** (`gallery_src` y `gallery_alt`): la server action las
- * vuelve a emparejar con `paresDeListas()`. Es la forma más simple que
- * sobrevive a un formulario HTML sin JSON escondido en un input.
+ * Una lista de filas `{ src, alt }` que viaja al servidor como **campos
+ * repetidos en paralelo** (`gallery_src` y `gallery_alt`, más los ocultos
+ * `gallery_movil`, `gallery_ancho` y `gallery_alto`): la server action los
+ * vuelve a emparejar por posición. Es la forma más simple que sobrevive a un
+ * formulario HTML sin JSON escondido en un input. Por eso cada fila pinta
+ * SIEMPRE los cinco campos, aunque vayan vacíos: si faltara uno, las listas
+ * se correrían y las medidas quedarían pegadas a la foto equivocada.
  *
  * Cada fila tiene su propia subida al bucket y su propio texto alternativo:
  * una foto sin descripción no se puede publicar, así que el campo está ahí
- * mismo y no en otra pantalla.
+ * mismo y no en otra pantalla. La subida trae además la variante de 900 px
+ * (`srcMovil`) y las medidas reales; ver `subir-imagen.ts`.
  */
 
 type Fila = ImagenContenido & { key: number };
 
 let contador = 0;
-const nuevaFila = (src = "", alt = ""): Fila => ({ src, alt, key: contador++ });
+const nuevaFila = (imagen: Partial<ImagenContenido> = {}): Fila => ({
+  src: imagen.src ?? "",
+  alt: imagen.alt ?? "",
+  srcMovil: imagen.srcMovil,
+  width: imagen.width,
+  height: imagen.height,
+  key: contador++,
+});
 
 export function CampoGaleria({
   label,
@@ -42,8 +53,10 @@ export function CampoGaleria({
   hint?: string;
 }) {
   const [filas, setFilas] = useState<Fila[]>(() =>
-    (defaultValue ?? []).map((img) => nuevaFila(img.src, img.alt)),
+    (defaultValue ?? []).map((img) => nuevaFila(img)),
   );
+  // `gallery_src` → `gallery`: raíz de los tres campos ocultos de cada fila.
+  const raiz = name.replace(/_src$/, "");
 
   function actualizar(key: number, cambio: Partial<ImagenContenido>) {
     setFilas((prev) =>
@@ -84,6 +97,7 @@ export function CampoGaleria({
                 fila={fila}
                 name={name}
                 altName={altName}
+                raiz={raiz}
                 folder={folder}
                 onCambio={(cambio) => actualizar(fila.key, cambio)}
                 onQuitar={() =>
@@ -103,6 +117,7 @@ function FilaGaleria({
   fila,
   name,
   altName,
+  raiz,
   folder,
   onCambio,
   onQuitar,
@@ -111,6 +126,7 @@ function FilaGaleria({
   fila: Fila;
   name: string;
   altName: string;
+  raiz: string;
   folder: CarpetaImagen;
   onCambio: (cambio: Partial<ImagenContenido>) => void;
   onQuitar: () => void;
@@ -121,13 +137,20 @@ function FilaGaleria({
 
   const enlaceNoPermitido =
     /^https?:\/\/\S+$/i.test(fila.src.trim()) && !esImagenOptimizable(fila.src.trim());
+  const conFoto = fila.src.trim() !== "";
 
   async function manejarArchivo(file: File) {
     setSubiendo(true);
     setError(null);
     const resultado = await subirImagenAlBucket(file, folder);
     if ("error" in resultado) setError(resultado.error);
-    else onCambio({ src: resultado.url });
+    else
+      onCambio({
+        src: resultado.url,
+        srcMovil: resultado.urlMovil,
+        width: resultado.width,
+        height: resultado.height,
+      });
     setSubiendo(false);
     if (fileRef.current) fileRef.current.value = "";
   }
@@ -137,7 +160,18 @@ function FilaGaleria({
       <div className="flex h-20 w-28 shrink-0 items-center justify-center overflow-hidden rounded-control bg-blanco ring-1 ring-separador">
         {fila.src ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={fila.src} alt="" className="h-full w-full object-contain" />
+          <img
+            src={fila.src}
+            alt=""
+            className="h-full w-full object-contain"
+            onLoad={(e) => {
+              // Medidas reales de lo que cargó: cubre la URL pegada a mano.
+              const { naturalWidth: width, naturalHeight: height } = e.currentTarget;
+              if (width > 0 && height > 0 && (width !== fila.width || height !== fila.height)) {
+                onCambio({ width, height });
+              }
+            }}
+          />
         ) : (
           <IconoFoto className="h-6 w-6 text-acero-400" />
         )}
@@ -148,11 +182,24 @@ function FilaGaleria({
           name={name}
           type="text"
           value={fila.src}
-          onChange={(e) => onCambio({ src: e.target.value })}
+          // Otra URL es otra foto: la variante y las medidas de la anterior
+          // ya no le corresponden.
+          onChange={(e) =>
+            onCambio({
+              src: e.target.value,
+              srcMovil: undefined,
+              width: undefined,
+              height: undefined,
+            })
+          }
           placeholder="https://… (o sube un archivo)"
           aria-label={`Dirección de la foto ${indice + 1}`}
           className={inputClass}
         />
+        {/* Siempre los tres, aunque vayan vacíos: las listas se emparejan por posición. */}
+        <input type="hidden" name={`${raiz}_movil`} value={conFoto ? (fila.srcMovil ?? "") : ""} />
+        <input type="hidden" name={`${raiz}_ancho`} value={conFoto ? (fila.width ?? "") : ""} />
+        <input type="hidden" name={`${raiz}_alto`} value={conFoto ? (fila.height ?? "") : ""} />
         <input
           name={altName}
           type="text"

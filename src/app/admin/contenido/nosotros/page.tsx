@@ -24,6 +24,10 @@ import {
 
 export const dynamic = "force-dynamic";
 
+/** Misma ayuda que en «Textos de las páginas»: la foto va de fondo, a sangre. */
+const AYUDA_FONDO_CABECERA =
+  "Va de fondo, a todo el ancho, detrás del título, con un velo azul encima para que el texto se lea. Usa una foto apaisada (horizontal), de 1920 px de ancho o más, sin textos ni logos; el título ocupa la izquierda, así que lo importante de la foto luce mejor al centro o a la derecha.";
+
 /** Edita la clave `nosotros` de `site_settings` (forma `AjustesNosotros`). */
 export default async function NosotrosPage() {
   await requireContentEditor();
@@ -77,13 +81,17 @@ export default async function NosotrosPage() {
               />
               <div className="sm:col-span-2">
                 <CampoImagen
-                  label="Foto de cabecera"
+                  label="Imagen de fondo de la cabecera"
                   name="cover"
                   altName="cover_alt"
                   folder="cabeceras"
                   scope="nosotros-hero"
                   defaultValue={nosotros.hero?.image?.src}
                   defaultAlt={nosotros.hero?.image?.alt}
+                  defaultMovil={nosotros.hero?.image?.srcMovil}
+                  defaultWidth={nosotros.hero?.image?.width}
+                  defaultHeight={nosotros.hero?.image?.height}
+                  hint={AYUDA_FONDO_CABECERA}
                 />
               </div>
             </div>
@@ -127,6 +135,9 @@ export default async function NosotrosPage() {
                 scope="quienes"
                 defaultValue={nosotros.quienesSomos?.image?.src}
                 defaultAlt={nosotros.quienesSomos?.image?.alt}
+                defaultMovil={nosotros.quienesSomos?.image?.srcMovil}
+                defaultWidth={nosotros.quienesSomos?.image?.width}
+                defaultHeight={nosotros.quienesSomos?.image?.height}
               />
             </div>
           </FormularioAdmin>
@@ -169,6 +180,21 @@ export default async function NosotrosPage() {
                   name="vision_body"
                   rows={7}
                   defaultValue={nosotros.vision?.body}
+                />
+              </div>
+              <div className="sm:col-span-2">
+                <CampoImagen
+                  label="Foto entre misión y visión"
+                  name="mv_imagen"
+                  altName="mv_imagen_alt"
+                  folder="nosotros"
+                  scope="mision-vision"
+                  defaultValue={nosotros.imagenMisionVision?.src}
+                  defaultAlt={nosotros.imagenMisionVision?.alt}
+                  defaultMovil={nosotros.imagenMisionVision?.srcMovil}
+                  defaultWidth={nosotros.imagenMisionVision?.width}
+                  defaultHeight={nosotros.imagenMisionVision?.height}
+                  hint="Va en medio de las dos tarjetas y toma su mismo alto, así que funciona mejor una foto vertical (de obra o de un tablero). Si la dejas vacía, el sitio toma una foto de la galería que no esté ya en la cabecera ni en «Quiénes somos»."
                 />
               </div>
             </div>

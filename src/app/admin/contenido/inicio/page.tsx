@@ -20,9 +20,12 @@ import {
   guardarInicioFranja,
   guardarInicioHero,
   guardarInicioIntro,
+  guardarInicioLineas,
   guardarInicioProceso,
   guardarInicioValores,
 } from "../actions";
+import { LARGO_RESUMEN_CORTO, RESUMENES_CORTOS_DE_LINEA } from "@/lib/content";
+import { lineasDeServicio } from "@/data/servicios";
 
 export const dynamic = "force-dynamic";
 
@@ -45,7 +48,8 @@ const FRANJAS = [
   {
     clave: "seccionProyectos",
     titulo: "Franja de casos de éxito",
-    descripcion: "Los textos que encabezan la franja de proyectos de la portada.",
+    descripcion:
+      "Los textos que encabezan la franja de proyectos de la portada. Los mismos encabezan los casos de éxito de la página Servicios.",
     ruta: "/proyectos",
     placeholderEyebrow: "Casos de éxito",
     placeholderTitulo: "Proyectos entregados y funcionando",
@@ -156,9 +160,56 @@ export default async function InicioPage() {
                   scope="hero"
                   defaultValue={home.hero?.image?.src}
                   defaultAlt={home.hero?.image?.alt}
+                  defaultMovil={home.hero?.image?.srcMovil}
+                  defaultWidth={home.hero?.image?.width}
+                  defaultHeight={home.hero?.image?.height}
                   hint="Es la foto grande del recuadro de la derecha, lo primero que se ve al abrir el sitio. Si la dejas vacía (botón «Quitar»), la portada vuelve a mostrar el esquema eléctrico animado que trae de fábrica. Se recorta a 4:3, así que elige una foto apaisada donde lo importante quede al centro."
                 />
               </div>
+            </div>
+          </FormularioAdmin>
+        </Tarjeta>
+
+        {/* --- Líneas de servicio (franja bajo el hero) -------------- */}
+        <Tarjeta>
+          <TituloTarjeta
+            title="Líneas de servicio"
+            description="La franja de cuatro líneas que va justo debajo de la primera pantalla. Cada línea lleva al grupo de servicios correspondiente en la página Servicios."
+          />
+          <AyudaSeccion className="mb-5">
+            El <strong>nombre</strong> de la línea se usa también en la página Servicios y en las
+            fichas de cada servicio. La <strong>frase corta</strong> tiene que caber en un solo
+            renglón: {LARGO_RESUMEN_CORTO - 3} caracteres como máximo. Qué servicios van en cada
+            línea no se cambia aquí.
+          </AyudaSeccion>
+          <FormularioAdmin action={guardarInicioLineas}>
+            <div className="space-y-5">
+              {lineasDeServicio.map((linea, indice) => {
+                const guardada = home.lineasServicio?.find((texto) => texto.id === linea.id);
+                return (
+                  <div key={linea.id} className="grid gap-4 sm:grid-cols-2">
+                    <Campo
+                      label={`Línea ${indice + 1} — nombre`}
+                      name={`linea_${linea.id}_titulo`}
+                      scope="lineas"
+                      maxLength={80}
+                      defaultValue={guardada?.titulo || linea.titulo}
+                      placeholder={linea.titulo}
+                    />
+                    <Campo
+                      label={`Línea ${indice + 1} — frase corta`}
+                      name={`linea_${linea.id}_resumen`}
+                      scope="lineas"
+                      maxLength={LARGO_RESUMEN_CORTO}
+                      defaultValue={
+                        guardada?.resumen ?? RESUMENES_CORTOS_DE_LINEA[linea.id] ?? ""
+                      }
+                      placeholder={RESUMENES_CORTOS_DE_LINEA[linea.id]}
+                      hint={indice === 0 ? "Si la dejas vacía, la franja muestra solo el nombre." : undefined}
+                    />
+                  </div>
+                );
+              })}
             </div>
           </FormularioAdmin>
         </Tarjeta>
@@ -211,6 +262,9 @@ export default async function InicioPage() {
                   scope="intro"
                   defaultValue={home.intro?.image?.src}
                   defaultAlt={home.intro?.image?.alt}
+                  defaultMovil={home.intro?.image?.srcMovil}
+                  defaultWidth={home.intro?.image?.width}
+                  defaultHeight={home.intro?.image?.height}
                 />
               </div>
             </div>
@@ -267,7 +321,7 @@ export default async function InicioPage() {
         <Tarjeta>
           <TituloTarjeta
             title="Cómo trabajamos"
-            description="Los pasos del proceso, del diagnóstico al soporte. Es lo que le quita el miedo a quien nunca ha contratado automatización."
+            description="Los pasos del proceso, del diagnóstico al soporte. Es lo que le quita el miedo a quien nunca ha contratado automatización. Se muestra en la portada y, en una banda oscura, en la página Servicios."
           />
           <FormularioAdmin action={guardarInicioProceso}>
             <div className="space-y-4">

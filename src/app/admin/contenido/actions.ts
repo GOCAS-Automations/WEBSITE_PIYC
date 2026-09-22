@@ -29,6 +29,7 @@ import { revalidatePath } from "next/cache";
 import { getContentEditorOrNull } from "@/lib/supabase/auth";
 import { slugify } from "@/lib/slug";
 import { youtubeId } from "@/lib/youtube";
+import { esImagenOptimizable } from "@/lib/imagenes";
 import {
   bool,
   fail,
@@ -50,8 +51,11 @@ import type {
   AjustesSeo,
   BloqueImagenes,
   ImagenContenido,
+  TextosLineaServicio,
   VideoContenido,
 } from "@/lib/content-types";
+import { lineasDeServicio } from "@/data/servicios";
+import { LARGO_RESUMEN_CORTO } from "@/lib/content";
 
 /* ================================================================== */
 /* Revalidación                                                        */
@@ -100,10 +104,63 @@ function mensajeDeError(error: { message?: string; code?: string }): string {
   return "No se pudo guardar. Inténtalo de nuevo; si vuelve a fallar, copia este detalle y pásaselo a quien administra el sitio: " + mensaje;
 }
 
+/** Medida en píxeles: entero positivo razonable, o `undefined`. */
+function medida(valor: string): number | undefined {
+  const n = Number(valor);
+  return Number.isInteger(n) && n > 0 && n <= 10000 ? n : undefined;
+}
+
+/**
+ * `ImagenContenido` a partir de lo que mandó el formulario. Los campos ocultos
+ * de `CampoImagen`/`CampoGaleria` son opcionales y se validan aquí: la variante
+ * solo se guarda si es una URL https de un host que el sitio puede mostrar
+ * (otra la bloquearía la CSP y el celular vería un hueco), y las medidas solo
+ * si vienen las dos.
+ */
+function armarImagen(
+  src: string,
+  alt: string,
+  movil = "",
+  ancho = "",
+  alto = "",
+): ImagenContenido {
+  const imagen: ImagenContenido = { src, alt };
+  if (movil !== "" && movil !== src && /^https:\/\/\S+$/i.test(movil) && esImagenOptimizable(movil)) {
+    imagen.srcMovil = movil;
+  }
+  const width = medida(ancho);
+  const height = medida(alto);
+  if (width && height) {
+    imagen.width = width;
+    imagen.height = height;
+  }
+  return imagen;
+}
+
+/**
+ * Galería de un formulario: `<raiz>_src[]` y `<raiz>_alt[]`, más los ocultos
+ * `<raiz>_movil[]`, `<raiz>_ancho[]` y `<raiz>_alto[]`, emparejados por
+ * posición. Si una lista oculta no trae una entrada por fila (un formulario
+ * viejo o manipulado), se ignora entera: mejor sin medidas que con las de
+ * otra foto.
+ */
+function galeriaDeFormulario(formData: FormData, raiz = "gallery"): ImagenContenido[] {
+  const valores = (clave: string) =>
+    formData.getAll(`${raiz}_${clave}`).map((v) => (typeof v === "string" ? v.trim() : ""));
+  const srcs = valores("src");
+  const alts = valores("alt");
+  const alineada = (lista: string[]) => (lista.length === srcs.length ? lista : []);
+  const moviles = alineada(valores("movil"));
+  const anchos = alineada(valores("ancho"));
+  const altos = alineada(valores("alto"));
+  return srcs.flatMap((src, i) =>
+    src === "" ? [] : [armarImagen(src, alts[i] ?? "", moviles[i], anchos[i], altos[i])],
+  );
+}
+
 /**
  * Bloque `images` tal como lo guarda la base: portada + galería. Se arma desde
- * los campos del formulario (`cover`, `cover_alt`, `gallery_src[]`,
- * `gallery_alt[]`).
+ * los campos del formulario (`cover`, `cover_alt`, `gallery_*[]`).
  */
 function bloqueImagenesDeFormulario(formData: FormData): BloqueImagenes {
   const bloque: BloqueImagenes = {};
@@ -112,16 +169,16 @@ function bloqueImagenesDeFormulario(formData: FormData): BloqueImagenes {
     bloque.cover = cover;
     bloque.coverAlt = text(formData, "cover_alt");
   }
-  const gallery: ImagenContenido[] = paresDeListas(
-    formData,
-    "gallery_src",
-    "gallery_alt",
-  ).map(({ a, b }) => ({ src: a, alt: b }));
+  const gallery = galeriaDeFormulario(formData);
   if (gallery.length > 0) bloque.gallery = gallery;
   return bloque;
 }
 
-/** Una imagen suelta (`{src, alt}`) o `undefined` si no se puso ninguna. */
+/**
+ * Una imagen suelta o `undefined` si no se puso ninguna. Además de la URL y el
+ * `alt`, recoge los ocultos de `CampoImagen` (`<campo>_movil`, `<campo>_ancho`,
+ * `<campo>_alto`): sin ellos, cada guardado borraría la variante y las medidas.
+ */
 function imagenDeFormulario(
   formData: FormData,
   campo: string,
@@ -129,7 +186,13 @@ function imagenDeFormulario(
 ): ImagenContenido | undefined {
   const src = text(formData, campo);
   if (src === "") return undefined;
-  return { src, alt: text(formData, campoAlt) };
+  return armarImagen(
+    src,
+    text(formData, campoAlt),
+    text(formData, `${campo}_movil`),
+    text(formData, `${campo}_ancho`),
+    text(formData, `${campo}_alto`),
+  );
 }
 
 /** Slug propuesto desde el título si quien edita no escribió uno. */
@@ -465,7 +528,38 @@ export async function guardarInicioFranja(
       ctaEtiqueta: text(formData, "cta_etiqueta"),
     },
   }));
-  if (estado.status === "success") revalidarSitio("/");
+  // La franja de casos también encabeza los casos de `/servicios`.
+  if (estado.status === "success") revalidarSitio("/", "/servicios");
+  return estado;
+}
+
+/**
+ * Nombre y frase corta de cada línea de servicio (franja bajo el hero).
+ *
+ * Qué líneas existen y qué servicios agrupan lo decide el código
+ * (`lineasDeServicio`): la acción solo acepta esos `id` y guarda un texto por
+ * línea. El nombre se usa también en `/servicios` y en las fichas; por eso se
+ * revalidan todas. Un nombre vacío hace volver el de fábrica (la línea
+ * necesita nombre); una frase vacía se respeta: la franja pinta solo el nombre.
+ */
+export async function guardarInicioLineas(
+  _prev: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  const lineasServicio: TextosLineaServicio[] = lineasDeServicio.map((linea) => ({
+    id: linea.id,
+    titulo: text(formData, `linea_${linea.id}_titulo`).slice(0, 80),
+    resumen: text(formData, `linea_${linea.id}_resumen`).slice(0, LARGO_RESUMEN_CORTO),
+  }));
+
+  const estado = await actualizarAjuste<AjustesHome>("home", (home) => ({
+    ...home,
+    lineasServicio,
+  }));
+  if (estado.status === "success") {
+    revalidarSitio("/", "/servicios");
+    revalidatePath("/servicios/[slug]", "page");
+  }
   return estado;
 }
 
@@ -502,7 +596,8 @@ export async function guardarInicioProceso(
       pasos,
     },
   }));
-  if (estado.status === "success") revalidarSitio("/");
+  // Los pasos también se pintan en la banda oscura de `/servicios`.
+  if (estado.status === "success") revalidarSitio("/", "/servicios");
   return estado;
 }
 
@@ -522,7 +617,8 @@ export async function guardarInicioDestacados(
     serviciosDestacados: lista(formData, "servicio"),
     proyectosDestacados: lista(formData, "proyecto"),
   }));
-  if (estado.status === "success") revalidarSitio("/");
+  // Los casos destacados también son los de la franja de `/servicios`.
+  if (estado.status === "success") revalidarSitio("/", "/servicios");
   return estado;
 }
 
@@ -614,6 +710,9 @@ export async function guardarNosotrosMisionVision(
       title: text(formData, "vision_title"),
       body: text(formData, "vision_body"),
     },
+    // Foto del tríptico. Sin foto (`undefined`) la clave no se guarda y el
+    // sitio toma una de la galería.
+    imagenMisionVision: imagenDeFormulario(formData, "mv_imagen", "mv_imagen_alt"),
   }));
   if (estado.status === "success") revalidarSitio("/nosotros");
   return estado;
@@ -652,11 +751,7 @@ export async function guardarNosotrosGaleria(
   _prev: ActionState,
   formData: FormData,
 ): Promise<ActionState> {
-  const galeria: ImagenContenido[] = paresDeListas(
-    formData,
-    "gallery_src",
-    "gallery_alt",
-  ).map(({ a, b }) => ({ src: a, alt: b }));
+  const galeria = galeriaDeFormulario(formData);
 
   const estado = await actualizarAjuste<AjustesNosotros>("nosotros", (n) => ({
     ...n,

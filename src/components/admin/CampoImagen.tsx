@@ -12,7 +12,10 @@ import type { CarpetaImagen } from "@/lib/admin-types";
  * Vive aquí y no en `ui.tsx` porque este archivo es de cliente (regla 1).
  */
 export const AYUDA_IMAGEN =
-  "Sube la foto desde tu computador: el panel la convierte sola a WebP, la reduce a 1920 píxeles de ancho y la deja por debajo de 400 KB antes de guardarla, que es lo que necesita el sitio para cargar rápido. También puedes pegar la dirección de una imagen que ya esté publicada en internet.";
+  "Sube la foto desde tu computador: el panel la convierte sola a WebP, la reduce a 1920 píxeles de ancho y la deja por debajo de 400 KB antes de guardarla, y prepara además una copia de 900 píxeles para celulares. Es lo que necesita el sitio para cargar rápido. También puedes pegar la dirección de una imagen que ya esté publicada en internet.";
+
+/** Ancho y alto reales de la foto (`undefined` mientras no se conozcan). */
+type Medidas = { width?: number; height?: number };
 
 /**
  * CAMPO DE IMAGEN
@@ -27,6 +30,15 @@ export const AYUDA_IMAGEN =
  * La vista previa es un `<img>` a secas **a propósito**: acepta cualquier URL
  * sin pasar por el optimizador de Next, así que una dirección rara se ve rota
  * en el recuadro pero no tumba la pantalla del panel (regla 14).
+ *
+ * LO QUE VIAJA ESCONDIDO
+ * ----------------------
+ * Además de la URL y el `alt`, el campo manda tres ocultos que la acción del
+ * servidor junta en la misma `ImagenContenido`: `<name>_movil` (la variante de
+ * 900 px que genera la subida → `srcMovil`), `<name>_ancho` y `<name>_alto`
+ * (medidas reales → `width`/`height`). Las medidas salen de la subida o, si la
+ * URL se pegó a mano, de la propia vista previa cuando termina de cargar.
+ * Escribir otra URL a mano borra la variante: ya no sería la misma foto.
  */
 export function CampoImagen({
   label,
@@ -34,6 +46,9 @@ export function CampoImagen({
   altName,
   defaultValue,
   defaultAlt,
+  defaultMovil,
+  defaultWidth,
+  defaultHeight,
   folder,
   hint,
   required,
@@ -46,12 +61,22 @@ export function CampoImagen({
   altName: string;
   defaultValue?: string | null;
   defaultAlt?: string | null;
+  /** `srcMovil` guardado: sin él, al guardar se perdería la variante. */
+  defaultMovil?: string | null;
+  defaultWidth?: number | null;
+  defaultHeight?: number | null;
   folder: CarpetaImagen;
   hint?: string;
   required?: boolean;
   scope?: string;
 }) {
   const [value, setValue] = useState(defaultValue ?? "");
+  const [movil, setMovil] = useState(defaultValue ? (defaultMovil ?? "") : "");
+  const [medidas, setMedidas] = useState<Medidas>(() =>
+    defaultValue && defaultWidth && defaultHeight
+      ? { width: defaultWidth, height: defaultHeight }
+      : {},
+  );
   const [subiendo, setSubiendo] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [aviso, setAviso] = useState<string | null>(null);
@@ -64,6 +89,13 @@ export function CampoImagen({
   const enlaceNoPermitido =
     /^https?:\/\/\S+$/i.test(value.trim()) && !esImagenOptimizable(value.trim());
 
+  /** Cambia la foto: la variante y las medidas de la anterior ya no sirven. */
+  function cambiarFoto(src: string, variante = "", nuevas: Medidas = {}) {
+    setValue(src);
+    setMovil(variante);
+    setMedidas(nuevas);
+  }
+
   async function manejarArchivo(file: File) {
     setSubiendo(true);
     setError(null);
@@ -73,10 +105,17 @@ export function CampoImagen({
     if ("error" in resultado) {
       setError(resultado.error);
     } else {
-      setValue(resultado.url);
+      cambiarFoto(resultado.url, resultado.urlMovil ?? "", {
+        width: resultado.width,
+        height: resultado.height,
+      });
       if (resultado.comprimida) {
         setAviso(
-          `Listo. La foto se convirtió a WebP y quedó en ${pesoLegible(resultado.pesoFinal)}.`,
+          `Listo. La foto se convirtió a WebP y quedó en ${pesoLegible(resultado.pesoFinal)}${
+            resultado.pesoMovil
+              ? ` (${pesoLegible(resultado.pesoMovil)} la copia para celulares)`
+              : ""
+          }.`,
         );
       }
     }
@@ -97,7 +136,19 @@ export function CampoImagen({
         <div className="flex h-24 w-32 shrink-0 items-center justify-center overflow-hidden rounded-control bg-lienzo-alto ring-1 ring-separador">
           {value ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={value} alt="Vista previa" className="h-full w-full object-contain" />
+            <img
+              src={value}
+              alt="Vista previa"
+              className="h-full w-full object-contain"
+              onLoad={(e) => {
+                // Medidas reales de lo que de verdad cargó (sirve para una URL
+                // pegada a mano, que no pasa por la subida).
+                const { naturalWidth: width, naturalHeight: height } = e.currentTarget;
+                if (width > 0 && height > 0 && (width !== medidas.width || height !== medidas.height)) {
+                  setMedidas({ width, height });
+                }
+              }}
+            />
           ) : (
             <IconoFoto className="h-7 w-7 text-acero-400" />
           )}
@@ -109,11 +160,14 @@ export function CampoImagen({
             type="text"
             required={required}
             value={value}
-            onChange={(e) => setValue(e.target.value)}
+            onChange={(e) => cambiarFoto(e.target.value)}
             placeholder="https://… (o sube un archivo)"
             aria-label={`Dirección de la imagen: ${label}`}
             className={inputClass}
           />
+          <input type="hidden" name={`${name}_movil`} value={value ? movil : ""} />
+          <input type="hidden" name={`${name}_ancho`} value={value ? (medidas.width ?? "") : ""} />
+          <input type="hidden" name={`${name}_alto`} value={value ? (medidas.height ?? "") : ""} />
 
           <div className="flex flex-wrap items-center gap-2">
             <button
@@ -129,7 +183,7 @@ export function CampoImagen({
               <button
                 type="button"
                 onClick={() => {
-                  setValue("");
+                  cambiarFoto("");
                   setAviso(null);
                   setError(null);
                 }}

@@ -139,13 +139,17 @@ export default async function PaginasPage() {
                   />
                   <div className="sm:col-span-2">
                     <CampoImagen
-                      label="Foto de cabecera"
+                      label="Imagen de fondo de la cabecera"
                       name="cover"
                       altName="cover_alt"
                       folder="cabeceras"
                       scope={bloque.clave}
                       defaultValue={datos.image?.src}
                       defaultAlt={datos.image?.alt}
+                      defaultMovil={datos.image?.srcMovil}
+                      defaultWidth={datos.image?.width}
+                      defaultHeight={datos.image?.height}
+                      hint="Va de fondo, a todo el ancho, detrás del título, con un velo azul encima para que el texto se lea. Usa una foto apaisada (horizontal), de 1920 px de ancho o más, sin textos ni logos; el título ocupa la izquierda, así que lo importante de la foto luce mejor al centro o a la derecha. Si la dejas vacía, la cabecera usa el degradado azul de la marca."
                     />
                   </div>
                 </div>

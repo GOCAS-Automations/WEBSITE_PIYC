@@ -137,9 +137,11 @@ export function EnlacePrimario({
   className?: string;
 }) {
   return (
-    <Link prefetch={false} href={href} className={`${botonPrimario} ${className}`}>
+    <Link prefetch={false} href={href} className={`${botonPrimario} relative ${className}`}>
       {children}
-      <PuntoDeCarga className="ml-0.5" />
+      {/* Superpuesto en el relleno derecho: si ocupara su propio espacio, la
+          cápsula quedaría con un hueco vacío a la derecha mientras no carga. */}
+      <PuntoDeCarga className="absolute inset-y-0 right-1.5 my-auto" />
     </Link>
   );
 }
