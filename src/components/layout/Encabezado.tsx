@@ -14,23 +14,16 @@
 
 import Image from "next/image";
 import { getContacto } from "@/lib/content";
-import {
-  MENSAJES_WHATSAPP,
-  correoPrincipal,
-  enlaceWhatsAppDe,
-  telefonoPrincipal,
-} from "@/lib/contacto";
+import { correoPrincipal, telefonoPrincipal } from "@/lib/contacto";
 import { NavegacionPrincipal } from "./NavegacionPrincipal";
 
 export async function Encabezado() {
   const contacto = await getContacto();
-  const hrefWhatsApp = enlaceWhatsAppDe(contacto, MENSAJES_WHATSAPP.general);
   const telefono = telefonoPrincipal(contacto);
   const correo = correoPrincipal(contacto);
 
   return (
     <NavegacionPrincipal
-      hrefWhatsApp={hrefWhatsApp}
       telefono={telefono?.label}
       correo={correo}
     >

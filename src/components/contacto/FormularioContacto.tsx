@@ -231,7 +231,9 @@ export function FormularioContacto({
           />
         </div>
 
-        <div className="flex flex-col gap-4 sm:col-span-2 sm:flex-row sm:items-center">
+        {/* `pb-16 sm:pb-0`: el flotante de WhatsApp ahora se ve siempre, y en
+            móvil se sentaba justo encima de este botón. */}
+        <div className="flex flex-col gap-4 pb-16 sm:col-span-2 sm:flex-row sm:items-center sm:pb-0">
           <button
             type="submit"
             disabled={enviando}

@@ -42,6 +42,26 @@ export function IconoInstagram(props: PropsIcono) {
   );
 }
 
+/** Persona: acción «Mi cuenta» del encabezado. */
+export function IconoUsuario(props: PropsIcono) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" {...base} {...props}>
+      <circle cx="12" cy="8" r="3.5" />
+      <path d="M4.5 20c0-3.6 3.4-6 7.5-6s7.5 2.4 7.5 6" />
+    </svg>
+  );
+}
+
+/** Sobre: acción «Contáctenos» del encabezado. */
+export function IconoSobre(props: PropsIcono) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" {...base} {...props}>
+      <rect x="3" y="5" width="18" height="14" rx="2.5" />
+      <path d="M3.5 7.5 12 13l8.5-5.5" />
+    </svg>
+  );
+}
+
 export function IconoUbicacion(props: PropsIcono) {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" {...base} {...props}>

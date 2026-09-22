@@ -23,7 +23,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { navegacionPrincipal } from "@/data/navegacion";
-import { IconoCerrar, IconoMenu, IconoWhatsApp } from "@/components/ui/iconos";
+import { IconoCerrar, IconoMenu, IconoSobre, IconoUsuario } from "@/components/ui/iconos";
 
 function esActivo(pathname: string, href: string) {
   if (href === "/") return pathname === "/";
@@ -39,12 +39,10 @@ const UMBRAL_COMPACTA = 24;
  * Client Component— no tiene que importar la capa de contenido.
  */
 export function NavegacionPrincipal({
-  hrefWhatsApp,
   telefono,
   correo,
   children,
 }: {
-  hrefWhatsApp: string;
   telefono?: string;
   correo?: string;
   /** El logo, renderizado en el servidor. */
@@ -165,16 +163,25 @@ export function NavegacionPrincipal({
             </ul>
           </nav>
 
+          {/* Acciones: «Mi cuenta» (portal del equipo) y «Contáctenos» (la
+              página de contacto, no WhatsApp: el flotante y los CTA de cada
+              franja ya cubren ese canal). Decisión de Cesar, 22-sep-2026. */}
           <div className="ml-auto flex items-center gap-2 lg:ml-0">
-            <a
-              href={hrefWhatsApp}
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              href="/mi-cuenta"
+              className="pulsable hidden h-10 items-center gap-2 rounded-capsula bg-relleno px-3 text-sm font-semibold text-azul-800 hover:bg-relleno-medio sm:inline-flex sm:px-4"
+            >
+              <IconoUsuario className="size-4.5" />
+              Mi cuenta
+            </Link>
+
+            <Link
+              href="/contacto"
               className="pulsable inline-flex h-10 items-center gap-2 rounded-capsula bg-verde-500 px-3 text-sm font-semibold text-azul-950 hover:bg-verde-400 sm:px-4"
             >
-              <IconoWhatsApp className="size-4.5" />
-              <span className="sr-only sm:not-sr-only">WhatsApp</span>
-            </a>
+              <IconoSobre className="size-4.5" />
+              <span className="sr-only sm:not-sr-only">Contáctenos</span>
+            </Link>
 
             <button
               ref={botonRef}
@@ -222,6 +229,16 @@ export function NavegacionPrincipal({
                 })}
               </ul>
             </nav>
+            {/* En móvil la cápsula solo tiene sitio para «Contáctenos» y el
+                menú, así que «Mi cuenta» vive aquí. */}
+            <Link
+              href="/mi-cuenta"
+              onClick={() => setAbierto(false)}
+              className="pulsable mt-1 flex items-center gap-2 rounded-control bg-relleno px-4 py-3.5 text-[17px] font-medium text-azul-800 hover:bg-relleno-medio sm:hidden"
+            >
+              <IconoUsuario className="size-5" />
+              Mi cuenta
+            </Link>
             {telefono || correo ? (
               <p className="mt-2 rounded-control bg-relleno px-4 py-3 text-[13px] leading-snug text-acero-600">
                 {[telefono, correo].filter(Boolean).join(" · ")}

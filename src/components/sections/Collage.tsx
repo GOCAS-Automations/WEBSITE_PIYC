@@ -37,7 +37,10 @@ import { ContentImage } from "@/components/ui/ContentImage";
 export function Collage({
   fotos,
   /** Medida del marco. Mismo lenguaje que `proporcion` de `ContentImage`. */
-  proporcion = "aspect-[4/3] sm:aspect-[16/10] lg:aspect-auto lg:h-full lg:min-h-[26rem]",
+  // Marco alto: con dos columnas dentro, cada ventana queda VERTICAL en todos
+  // los anchos (decisión de Cesar, 22-sep-2026). Antes el marco era apaisado y
+  // desde `lg` las fotos se apilaban, así que salían horizontales.
+  proporcion = "aspect-[4/5] sm:aspect-[9/10] lg:aspect-auto lg:h-full lg:min-h-[30rem]",
   /** Clases de la celda de la rejilla que lo contiene: columnas, orden… */
   className = "",
 }: {
@@ -64,7 +67,7 @@ export function Collage({
     >
       <div
         className={`grid h-full gap-1.5 ${
-          dos ? "grid-cols-[1.4fr_1fr] lg:grid-cols-1 lg:grid-rows-[1.45fr_1fr]" : ""
+          dos ? "grid-cols-[1.25fr_1fr]" : ""
         }`}
       >
         {usadas.map((foto, indice) => (
