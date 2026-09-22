@@ -153,20 +153,20 @@ export const serviciosEstaticos: Servicio[] = [
       "Entrega con planos actualizados a lo realmente construido",
     ],
     images: {
-      cover: `${BUCKET}/tableros-de-control/tablero-doble-puerta-terminado.webp`,
+      cover: `${BUCKET}/tableros-de-control/tablero-doble-puerta-terminado-900.webp`,
       coverAlt: "Tablero de doble puerta terminado, con rejillas de ventilación y visor, listo para despacho",
       gallery: [
         {
-          src: `${BUCKET}/tableros-de-control/tablero-doble-puerta-terminado.webp`,
+          src: `${BUCKET}/tableros-de-control/tablero-doble-puerta-terminado-900.webp`,
           alt: "Tablero de doble puerta terminado, con rejillas de ventilación y visor, listo para despacho",
-          width: 1440,
-          height: 1920,
+          width: 900,
+          height: 1200,
         },
         {
-          src: `${BUCKET}/tableros-de-control/tablero-plc-modular-reles.webp`,
+          src: `${BUCKET}/tableros-de-control/tablero-plc-modular-reles-900.webp`,
           alt: "Tablero de gran formato con PLC modular, bancos de relés de interposición y borneras, con los planos abiertos durante el montaje",
-          width: 1440,
-          height: 1920,
+          width: 900,
+          height: 1200,
         },
       ],
     },
@@ -199,14 +199,14 @@ export const serviciosEstaticos: Servicio[] = [
       "Tableros de lectura en pantalla de planta, computador o dispositivo móvil",
     ],
     images: {
-      cover: `${BUCKET}/telemetria/tablero-pared-sala-proceso.webp`,
+      cover: `${BUCKET}/telemetria/tablero-pared-sala-proceso-900.webp`,
       coverAlt: "Tablero rotulado montado en pared junto al visor de la sala de proceso, con la canalización llevada al equipo",
       gallery: [
         {
-          src: `${BUCKET}/telemetria/tablero-pared-sala-proceso.webp`,
+          src: `${BUCKET}/telemetria/tablero-pared-sala-proceso-900.webp`,
           alt: "Tablero rotulado montado en pared junto al visor de la sala de proceso, con la canalización llevada al equipo",
-          width: 1126,
-          height: 1920,
+          width: 900,
+          height: 1535,
         },
       ],
     },
@@ -239,14 +239,14 @@ export const serviciosEstaticos: Servicio[] = [
       "Conexión cifrada sobre red de planta, red celular o VPN; sin exponer el PLC a internet",
     ],
     images: {
-      cover: `${BUCKET}/telecontrol/tablero-variadores-velocidad.webp`,
+      cover: `${BUCKET}/telecontrol/tablero-variadores-velocidad-900.webp`,
       coverAlt: "Interior de un tablero con variadores de velocidad de distintas potencias, PLC modular y protecciones",
       gallery: [
         {
-          src: `${BUCKET}/telecontrol/tablero-variadores-velocidad.webp`,
+          src: `${BUCKET}/telecontrol/tablero-variadores-velocidad-900.webp`,
           alt: "Interior de un tablero con variadores de velocidad de distintas potencias, PLC modular y protecciones",
-          width: 1440,
-          height: 1920,
+          width: 900,
+          height: 1200,
         },
       ],
     },
@@ -280,14 +280,14 @@ export const serviciosEstaticos: Servicio[] = [
       "Acompañamiento posterior al arranque para afinar el sistema en producción",
     ],
     images: {
-      cover: `${BUCKET}/proyectos-llave-en-mano/linea-empaque-planta.webp`,
+      cover: `${BUCKET}/proyectos-llave-en-mano/linea-empaque-planta-900.webp`,
       coverAlt: "Línea de transporte y empaque montada dentro de una planta, con el área aislada durante la obra",
       gallery: [
         {
-          src: `${BUCKET}/proyectos-llave-en-mano/linea-empaque-planta.webp`,
+          src: `${BUCKET}/proyectos-llave-en-mano/linea-empaque-planta-900.webp`,
           alt: "Línea de transporte y empaque montada dentro de una planta, con el área aislada durante la obra",
-          width: 1920,
-          height: 934,
+          width: 900,
+          height: 438,
         },
       ],
     },
@@ -367,14 +367,14 @@ export const serviciosEstaticos: Servicio[] = [
       "Monitoreo remoto del cuarto frío con aviso al responsable (ver telemetría)",
     ],
     images: {
-      cover: `${BUCKET}/refrigeracion-industrial/montaje-techo-sala-paneles.webp`,
+      cover: `${BUCKET}/refrigeracion-industrial/montaje-techo-sala-paneles-900.webp`,
       coverAlt: "Dos técnicos sobre un andamio instalan equipos en el techo de una sala con paneles aislantes y difusores",
       gallery: [
         {
-          src: `${BUCKET}/refrigeracion-industrial/montaje-techo-sala-paneles.webp`,
+          src: `${BUCKET}/refrigeracion-industrial/montaje-techo-sala-paneles-900.webp`,
           alt: "Dos técnicos sobre un andamio instalan equipos en el techo de una sala con paneles aislantes y difusores",
-          width: 1920,
-          height: 1440,
+          width: 900,
+          height: 675,
         },
       ],
     },

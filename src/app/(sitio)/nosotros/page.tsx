@@ -112,6 +112,10 @@ export default async function Nosotros() {
                     alt={quienesSomos.image.alt}
                     width={quienesSomos.image.width}
                     height={quienesSomos.image.height}
+                    // Lighthouse móvil la toma como LCP (más grande que la
+                    // foto de cabecera, que tiene tope de 26rem): cargada
+                    // `lazy` dejaba la página en 88–89 de rendimiento.
+                    prioritaria
                     proporcion="aspect-[4/3]"
                     className="mx-auto max-w-[min(100%,28rem)] lg:mx-0 lg:ml-auto"
                     pie={quienesSomos.image.alt}

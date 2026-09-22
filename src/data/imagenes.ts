@@ -4,6 +4,8 @@
  * Fotos reales de PIYC tomadas en obra, del Drive del cliente (carpeta
  * «9. FOTOS»), procesadas a WebP (≤ 250 KB, lado mayor ≤ 1920 px, con la
  * orientación EXIF ya aplicada) y subidas al bucket público `site-images`.
+ * Las que pasaban de 1000 px de ancho se sirven en versión `-900.webp`: ninguna
+ * se pinta a más de 432 px (`docs/CONTENIDO.md` §2).
  *
  * ⚠ Regla de reparto: una misma foto vive en UNA sola sección del sitio. Si
  * aparece dos veces en esta lista, algo se duplicó. Las capturas de HMI, SCADA
@@ -27,38 +29,38 @@ export type FotoGeneral = {
 
 export const imagenesGenerales: FotoGeneral[] = [
   {
-    url: "https://bzrjeduxjkwvtdaohjrh.supabase.co/storage/v1/object/public/site-images/cabeceras/cuarto-electrico-tableros.webp",
+    url: "https://bzrjeduxjkwvtdaohjrh.supabase.co/storage/v1/object/public/site-images/cabeceras/cuarto-electrico-tableros-900.webp",
     alt: "Cuarto eléctrico con una fila de tableros de control y fuerza montados contra la pared; uno de ellos abierto durante el cableado",
-    width: 1920,
-    height: 943,
+    width: 900,
+    height: 442,
     uso: "cabeceras/ — Cabecera de /nosotros.",
   },
   {
-    url: "https://bzrjeduxjkwvtdaohjrh.supabase.co/storage/v1/object/public/site-images/cabeceras/interior-tablero-plc-red.webp",
+    url: "https://bzrjeduxjkwvtdaohjrh.supabase.co/storage/v1/object/public/site-images/cabeceras/interior-tablero-plc-red-900.webp",
     alt: "Interior de un tablero en acero inoxidable con PLC modular, switches de red industrial, protecciones y borneras cableadas",
-    width: 1920,
-    height: 933,
+    width: 900,
+    height: 437,
     uso: "cabeceras/ — Cabecera de /servicios.",
   },
   {
-    url: "https://bzrjeduxjkwvtdaohjrh.supabase.co/storage/v1/object/public/site-images/cabeceras/montaje-interno-tablero.webp",
+    url: "https://bzrjeduxjkwvtdaohjrh.supabase.co/storage/v1/object/public/site-images/cabeceras/montaje-interno-tablero-900.webp",
     alt: "Vista cenital del montaje interno de un tablero: PLC, switch de red, fuente de 24 V, protecciones y borneras numeradas sobre riel",
-    width: 1920,
-    height: 1081,
+    width: 900,
+    height: 507,
     uso: "cabeceras/ — Cabecera de /proyectos.",
   },
   {
-    url: "https://bzrjeduxjkwvtdaohjrh.supabase.co/storage/v1/object/public/site-images/inicio/skid-proceso-inoxidable.webp",
+    url: "https://bzrjeduxjkwvtdaohjrh.supabase.co/storage/v1/object/public/site-images/inicio/skid-proceso-inoxidable-900.webp",
     alt: "Skid de proceso en acero inoxidable con su panel de control, tuberías sanitarias y bomba, instalado en una sala de producción",
-    width: 1440,
-    height: 1920,
+    width: 900,
+    height: 1200,
     uso: "inicio/ — Bloque «Qué hacemos» de la portada.",
   },
   {
-    url: "https://bzrjeduxjkwvtdaohjrh.supabase.co/storage/v1/object/public/site-images/nosotros/equipo-planta-alimentos.webp",
+    url: "https://bzrjeduxjkwvtdaohjrh.supabase.co/storage/v1/object/public/site-images/nosotros/equipo-planta-alimentos-900.webp",
     alt: "Dos técnicos con traje y cofia de planta revisan el programa en un portátil apoyado sobre el tablero, dentro de una sala de producción",
-    width: 1440,
-    height: 1920,
+    width: 900,
+    height: 1200,
     uso: "nosotros/ — Bloque «Quiénes somos».",
   },
   {
@@ -97,24 +99,24 @@ export const imagenesGenerales: FotoGeneral[] = [
     uso: "nosotros/ — Galería «Nuestro trabajo», posición 5.",
   },
   {
-    url: "https://bzrjeduxjkwvtdaohjrh.supabase.co/storage/v1/object/public/site-images/nosotros/tablero-doble-puerta-armado.webp",
+    url: "https://bzrjeduxjkwvtdaohjrh.supabase.co/storage/v1/object/public/site-images/nosotros/tablero-doble-puerta-armado-900.webp",
     alt: "Tablero de doble puerta recién armado, con contactores, fuentes y borneras ordenadas por nivel",
-    width: 1440,
-    height: 1920,
+    width: 900,
+    height: 1200,
     uso: "nosotros/ — Galería «Nuestro trabajo», posición 6.",
   },
   {
-    url: "https://bzrjeduxjkwvtdaohjrh.supabase.co/storage/v1/object/public/site-images/nosotros/gabinete-fuerza-armado.webp",
+    url: "https://bzrjeduxjkwvtdaohjrh.supabase.co/storage/v1/object/public/site-images/nosotros/gabinete-fuerza-armado-900.webp",
     alt: "Gabinete de fuerza abierto con seccionador, interruptores de caja moldeada y equipo de respaldo en la base",
-    width: 1041,
-    height: 1920,
+    width: 900,
+    height: 1660,
     uso: "nosotros/ — Galería «Nuestro trabajo», posición 7.",
   },
   {
-    url: "https://bzrjeduxjkwvtdaohjrh.supabase.co/storage/v1/object/public/site-images/nosotros/tablero-inox-plc-siemens.webp",
+    url: "https://bzrjeduxjkwvtdaohjrh.supabase.co/storage/v1/object/public/site-images/nosotros/tablero-inox-plc-siemens-900.webp",
     alt: "Tablero en acero inoxidable con PLC compacto, switch de red y borneras; guantes dieléctricos colgados en la puerta",
-    width: 1080,
-    height: 1920,
+    width: 900,
+    height: 1600,
     uso: "nosotros/ — Galería «Nuestro trabajo», posición 8.",
   },
   {
@@ -139,17 +141,17 @@ export const imagenesGenerales: FotoGeneral[] = [
     uso: "servicios/automatizacion-procesos-industriales/ — Galería del servicio.",
   },
   {
-    url: "https://bzrjeduxjkwvtdaohjrh.supabase.co/storage/v1/object/public/site-images/servicios/tableros-de-control/tablero-doble-puerta-terminado.webp",
+    url: "https://bzrjeduxjkwvtdaohjrh.supabase.co/storage/v1/object/public/site-images/servicios/tableros-de-control/tablero-doble-puerta-terminado-900.webp",
     alt: "Tablero de doble puerta terminado, con rejillas de ventilación y visor, listo para despacho",
-    width: 1440,
-    height: 1920,
+    width: 900,
+    height: 1200,
     uso: "servicios/tableros-de-control/ — Portada del servicio y primera de su galería.",
   },
   {
-    url: "https://bzrjeduxjkwvtdaohjrh.supabase.co/storage/v1/object/public/site-images/servicios/tableros-de-control/tablero-plc-modular-reles.webp",
+    url: "https://bzrjeduxjkwvtdaohjrh.supabase.co/storage/v1/object/public/site-images/servicios/tableros-de-control/tablero-plc-modular-reles-900.webp",
     alt: "Tablero de gran formato con PLC modular, bancos de relés de interposición y borneras, con los planos abiertos durante el montaje",
-    width: 1440,
-    height: 1920,
+    width: 900,
+    height: 1200,
     uso: "servicios/tableros-de-control/ — Galería del servicio.",
   },
   {
@@ -167,24 +169,24 @@ export const imagenesGenerales: FotoGeneral[] = [
     uso: "servicios/diseno-ingenieria-electrica/ — Galería del servicio.",
   },
   {
-    url: "https://bzrjeduxjkwvtdaohjrh.supabase.co/storage/v1/object/public/site-images/servicios/telemetria/tablero-pared-sala-proceso.webp",
+    url: "https://bzrjeduxjkwvtdaohjrh.supabase.co/storage/v1/object/public/site-images/servicios/telemetria/tablero-pared-sala-proceso-900.webp",
     alt: "Tablero rotulado montado en pared junto al visor de la sala de proceso, con la canalización llevada al equipo",
-    width: 1126,
-    height: 1920,
+    width: 900,
+    height: 1535,
     uso: "servicios/telemetria/ — Portada del servicio y primera de su galería.",
   },
   {
-    url: "https://bzrjeduxjkwvtdaohjrh.supabase.co/storage/v1/object/public/site-images/servicios/telecontrol/tablero-variadores-velocidad.webp",
+    url: "https://bzrjeduxjkwvtdaohjrh.supabase.co/storage/v1/object/public/site-images/servicios/telecontrol/tablero-variadores-velocidad-900.webp",
     alt: "Interior de un tablero con variadores de velocidad de distintas potencias, PLC modular y protecciones",
-    width: 1440,
-    height: 1920,
+    width: 900,
+    height: 1200,
     uso: "servicios/telecontrol/ — Portada del servicio y primera de su galería.",
   },
   {
-    url: "https://bzrjeduxjkwvtdaohjrh.supabase.co/storage/v1/object/public/site-images/servicios/proyectos-llave-en-mano/linea-empaque-planta.webp",
+    url: "https://bzrjeduxjkwvtdaohjrh.supabase.co/storage/v1/object/public/site-images/servicios/proyectos-llave-en-mano/linea-empaque-planta-900.webp",
     alt: "Línea de transporte y empaque montada dentro de una planta, con el área aislada durante la obra",
-    width: 1920,
-    height: 934,
+    width: 900,
+    height: 438,
     uso: "servicios/proyectos-llave-en-mano/ — Portada del servicio y primera de su galería.",
   },
   {
@@ -202,10 +204,10 @@ export const imagenesGenerales: FotoGeneral[] = [
     uso: "servicios/aplicaciones-industriales/ — Galería del servicio.",
   },
   {
-    url: "https://bzrjeduxjkwvtdaohjrh.supabase.co/storage/v1/object/public/site-images/servicios/refrigeracion-industrial/montaje-techo-sala-paneles.webp",
+    url: "https://bzrjeduxjkwvtdaohjrh.supabase.co/storage/v1/object/public/site-images/servicios/refrigeracion-industrial/montaje-techo-sala-paneles-900.webp",
     alt: "Dos técnicos sobre un andamio instalan equipos en el techo de una sala con paneles aislantes y difusores",
-    width: 1920,
-    height: 1440,
+    width: 900,
+    height: 675,
     uso: "servicios/refrigeracion-industrial/ — Portada del servicio y primera de su galería.",
   },
 ];

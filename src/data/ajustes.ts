@@ -87,10 +87,10 @@ export const homeEstatico: AjustesHome = {
     title: "Ingeniería que se queda funcionando",
     body: "PIYC trabaja sobre plantas en producción: procesos que no pueden parar más de lo planeado y equipos que tienen que seguir operando cuando el proyecto termina. Por eso el trabajo empieza en el sitio —levantando lo que hay, midiendo cargas reales y entendiendo la secuencia— antes de proponer un solo equipo.\n\nCubrimos el ciclo completo: el diseño eléctrico y el P&ID, el tablero armado según ese plano, la programación del PLC y la supervisión HMI/SCADA, el montaje electromecánico y la puesta en marcha con el proceso corriendo. Al cerrar entregamos planos as-built, programas documentados y capacitación, porque un sistema que solo puede mantener quien lo instaló es un problema aplazado.",
     image: {
-      src: `${BUCKET}/inicio/skid-proceso-inoxidable.webp`,
+      src: `${BUCKET}/inicio/skid-proceso-inoxidable-900.webp`,
       alt: "Skid de proceso en acero inoxidable con su panel de control, tuberías sanitarias y bomba, instalado en una sala de producción",
-      width: 1440,
-      height: 1920,
+      width: 900,
+      height: 1200,
     },
     ctaEtiqueta: "Conocer a PIYC",
   },
@@ -182,10 +182,10 @@ export const nosotrosEstatico: AjustesNosotros = {
     subtitle:
       "PROGRAMACIÓN INDUSTRIAL Y CONTROL S.A.S. —PIYC— desarrolla proyectos de ingeniería, montaje y mantenimiento de equipos eléctricos y electrónicos para la industria del Valle del Cauca.",
     image: {
-      src: `${BUCKET}/cabeceras/cuarto-electrico-tableros.webp`,
+      src: `${BUCKET}/cabeceras/cuarto-electrico-tableros-900.webp`,
       alt: "Cuarto eléctrico con una fila de tableros de control y fuerza montados contra la pared; uno de ellos abierto durante el cableado",
-      width: 1920,
-      height: 943,
+      width: 900,
+      height: 442,
     },
   },
   quienesSomos: {
@@ -194,10 +194,10 @@ export const nosotrosEstatico: AjustesNosotros = {
     // Texto de PIYC (documento «4. QUIÉNES SOMOS», versión pulida).
     body: "Somos una empresa integrada por ingenieros altamente calificados, especializados en el desarrollo de proyectos de ingeniería, montaje y mantenimiento de equipos eléctricos y electrónicos. Nos dedicamos a la automatización de equipos, así como a la ejecución de obras eléctricas y electrónicas. Nuestro enfoque abarca desde la automatización y el control hasta el desarrollo de equipos de óptima calidad.\n\nOfrecemos servicios de alta calidad para dar soluciones asertivas, reduciendo el riesgo y dando la seguridad de que nuestra propuesta es la mejor, brindando tranquilidad y respaldo a cada cliente en su proceso de producción.",
     image: {
-      src: `${BUCKET}/nosotros/equipo-planta-alimentos.webp`,
+      src: `${BUCKET}/nosotros/equipo-planta-alimentos-900.webp`,
       alt: "Dos técnicos con traje y cofia de planta revisan el programa en un portátil apoyado sobre el tablero, dentro de una sala de producción",
-      width: 1440,
-      height: 1920,
+      width: 900,
+      height: 1200,
     },
   },
   // ⚠ Textos intercambiados respecto al documento original de PIYC por decisión
@@ -261,22 +261,22 @@ export const nosotrosEstatico: AjustesNosotros = {
       height: 1920,
     },
     {
-      src: `${BUCKET}/nosotros/tablero-doble-puerta-armado.webp`,
+      src: `${BUCKET}/nosotros/tablero-doble-puerta-armado-900.webp`,
       alt: "Tablero de doble puerta recién armado, con contactores, fuentes y borneras ordenadas por nivel",
-      width: 1440,
-      height: 1920,
+      width: 900,
+      height: 1200,
     },
     {
-      src: `${BUCKET}/nosotros/gabinete-fuerza-armado.webp`,
+      src: `${BUCKET}/nosotros/gabinete-fuerza-armado-900.webp`,
       alt: "Gabinete de fuerza abierto con seccionador, interruptores de caja moldeada y equipo de respaldo en la base",
-      width: 1041,
-      height: 1920,
+      width: 900,
+      height: 1660,
     },
     {
-      src: `${BUCKET}/nosotros/tablero-inox-plc-siemens.webp`,
+      src: `${BUCKET}/nosotros/tablero-inox-plc-siemens-900.webp`,
       alt: "Tablero en acero inoxidable con PLC compacto, switch de red y borneras; guantes dieléctricos colgados en la puerta",
-      width: 1080,
-      height: 1920,
+      width: 900,
+      height: 1600,
     },
     {
       src: `${BUCKET}/nosotros/tablero-fuerza-barraje.webp`,
@@ -300,10 +300,10 @@ export const paginasEstatico: AjustesPaginas = {
     intro:
       "La agrupación en cuatro líneas es una forma de leer el portafolio, no un compartimento: la mayoría de los proyectos toca varias a la vez —un tablero nuevo viene con su diseño eléctrico, y una automatización termina con telemetría.",
     image: {
-      src: `${BUCKET}/cabeceras/interior-tablero-plc-red.webp`,
+      src: `${BUCKET}/cabeceras/interior-tablero-plc-red-900.webp`,
       alt: "Interior de un tablero en acero inoxidable con PLC modular, switches de red industrial, protecciones y borneras cableadas",
-      width: 1920,
-      height: 933,
+      width: 900,
+      height: 437,
     },
     // FAQ redactada por el equipo de la web. Sin precios, tiempos ni garantías:
     // nada de eso está confirmado por PIYC (regla: no prometer lo que no se sabe).
@@ -347,10 +347,10 @@ export const paginasEstatico: AjustesPaginas = {
     intro:
       "Cada caso describe la situación de partida, lo que se hizo y cómo quedó el proceso después. Las cifras que aparecen son las que midió el mismo proceso del cliente.",
     image: {
-      src: `${BUCKET}/cabeceras/montaje-interno-tablero.webp`,
+      src: `${BUCKET}/cabeceras/montaje-interno-tablero-900.webp`,
       alt: "Vista cenital del montaje interno de un tablero: PLC, switch de red, fuente de 24 V, protecciones y borneras numeradas sobre riel",
-      width: 1920,
-      height: 1081,
+      width: 900,
+      height: 507,
     },
     cta: {
       title: "¿Tiene un proyecto parecido?",

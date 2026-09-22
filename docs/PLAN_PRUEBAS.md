@@ -270,3 +270,97 @@ Cosas detectadas que no se arreglaron en esta pasada, con el motivo:
    servicios de PIYC» de `/proyectos/[slug]`. `AjustesHome` no tiene campos para
    ellos. Cerrarlo pide ampliar el tipo, la migración de `site_settings` y las
    pantallas del panel: es trabajo de funcionalidad, no de pulido.
+
+## 11. Pasada final — 22-sep-2026
+
+Contra el build de producción en `localhost:4000` (`npm run build && npx next
+start -p 4000`). Nada automatizado contra producción. Pasos de publicación en
+`docs/DESPLIEGUE.md`.
+
+### 11.1 Imágenes
+
+Se midió el ancho pintado de cada imagen en 1440/1024/768/390: **ninguna foto
+se pinta a más de 432 px CSS** (cabeceras 400, «Quiénes somos» y portada 432,
+tarjetas 376, carrusel 356) y se servían a 1920 px. Las 14 fotos de obra de
+≥ 1000 px de ancho se regeneraron desde el original a **900 px** (`…-900.webp`),
+se actualizaron base (`site_settings`, `site_services`, incluida la `cover` en
+texto plano), `src/data/*`, semillas e inventario (`docs/CONTENIDO.md` §2), y
+las 14 originales se borraron del bucket. Ejemplo: cabecera de `/nosotros`
+1920×943 · 85 KB → 900×442 · 28 KB. Las de casos (capturas del PPTX, ≤ 1134 px)
+no se tocaron.
+
+### 11.2 Lighthouse móvil
+
+| Ruta | Rend. | Acc. | B.P. | SEO | LCP | CLS |
+| --- | --- | --- | --- | --- | --- | --- |
+| `/` | 97 | 100 | 100 | 100 | 2,6 s | 0 |
+| `/nosotros` | 93 (95 · 90) | 100 | 100 | 100 | 3,2 s | 0 |
+| `/servicios` | 94 | 100 | 100 | 100 | 3,1 s | 0 |
+| `/servicios/telemetria` | 96 | 100 | 100 | 100 | 2,9 s | 0 |
+| `/proyectos/pasteurizador-alival` | 94 | 100 | 100 | 100 | 3,0 s | 0 |
+| `/contacto` | 97 | 100 | 100 | 100 | 2,7 s | 0 |
+
+`/nosotros` estaba en 86–89: el LCP móvil **no era la cabecera sino la foto de
+«Quiénes somos»**, que iba con `loading="lazy"` (insight «LCP request
+discovery»). Con `prioritaria` quedó en 90–95 en tres corridas seguidas.
+
+### 11.3 Panel, roles y jornadas
+
+| # | Prueba | Resultado |
+| --- | --- | --- |
+| F.1 | Admin sube una imagen al hero (Contenido → Inicio, archivo real al bucket) con su texto alternativo y guarda | Cumple: guardado en 1,6 s; `/` pinta la foto con `fetchpriority="high"` en lugar del diagrama |
+| F.2 | Quitar la imagen y guardar | Cumple: vuelve el diagrama del PLC |
+| F.3 | Editar un título de sección nuevo («Textos de las páginas» → título del formulario de `/contacto`) y revertir | Cumple: aparece en `/contacto` y al revertir desaparece |
+| F.4 | Empleado: ingresa, no ve «Ir al panel», `/admin` lo devuelve a `/mi-cuenta` | Cumple |
+| F.5 | Coordinador: el alta de cuentas solo ofrece `coordinador` y `empleado` (el admin ve los tres) | Cumple |
+| F.6 | Jornada: empleado registra 8:00–17:00 → coordinador la ve pendiente y la aprueba → desglose congelado | Cumple |
+| F.7 | CSV | Cumple: `text/csv`, `sep=;`, 31 columnas, presencia 9 − almuerzo 1 = 8 ordinarias diurnas, revisor y fecha |
+| F.8 | Formulario de contacto | Cumple: `/api/contacto` 200 y abre WhatsApp al +57 321 761 7958 (número de `site_settings`, no del payload) |
+
+Limpieza verificada con una segunda consulta: 0 jornadas, 0 filas en
+`site_mensajes`, imagen de prueba borrada del bucket, `home.hero.image` en
+`null` y ningún texto «QA» en los ajustes.
+
+### 11.4 Revisión visual y accesibilidad
+
+- 9 rutas (7 + ficha sin foto + 404) × 1440/1024/768/390 con capturas.
+- **axe: 0 violaciones** en 9 rutas × escritorio/móvil. Foco visible con teclado
+  en todo (azul 700; verde 400 sobre fondos oscuros). Consola sin errores ni
+  avisos de CSP (el único 404 es el de la propia página 404).
+- Nav flotante: no se cruza con el `h1` en ninguna ruta ni ancho. Grupos de
+  botones parejos (la 404: tres botones de 184×48). Hoja del menú móvil, pie y
+  mapa de `/contacto` (`output=embed`, sin bloqueo de CSP) correctos. Logo SVG
+  nítido en nav, pie y login.
+- La ficha sin foto (aires acondicionados) pinta el gráfico de respaldo en su
+  marco azul noche con la cartela: se lee intencional.
+- **Rastro de Jorge Castillo: 0.** Ni `+57 310 637 3483` ni
+  `jorge.castillo@piycsas.com` en el HTML servido (incluido el JSON-LD) de las
+  9 rutas, `sitemap.xml` ni `robots.txt`. El correo visible es
+  `fabian.gaviria@piycsas.com`.
+
+Defectos corregidos:
+
+1. **Fotos verticales descabezadas en el carrusel y los recuadros 4:3**: con el
+   recorte centrado se perdía la cabeza de los técnicos y el remate de los
+   tableros. `ContentImage` sube el punto de corte al 30 % del alto cuando una
+   foto vertical (alto ≥ 1,2 × ancho) va recortada en un recuadro propio.
+2. **LCP perezoso en `/nosotros`** (ver 11.2).
+
+Falsos positivos descartados, para no volver a perseguirlos: el
+`documentElement.scrollWidth` de `/nosotros` crece con el carril del carrusel,
+pero `window.scrollX` no se mueve (ya documentado en `CarrilDeFotos.tsx`); y las
+imágenes `lazy` que no llegan a entrar en vista (fin del carrusel, logo del pie)
+aparecen «sin cargar» en una captura de página completa, no en el navegador.
+
+### 11.5 Queda abierto
+
+- ~~`/favicon.ico` respondía 404~~ — resuelto: `src/app/favicon.ico` (16/32/48 px) generado desde el isotipo SVG.
+  `apple-icon.png`; los navegadores actuales no lo piden). Se cierra con un
+  `src/app/favicon.ico`.
+- En la ficha sin foto, la columna derecha queda vacía bajo la tarjeta
+  «Resumen». No está roto; se llena en cuanto PIYC mande fotos de refrigeración
+  y aires (`docs/CONTENIDO.md` §2.4).
+- Las imágenes subidas desde el panel no guardan ancho ni alto, así que el
+  `<img>` sale con las medidas por defecto de `ContentImage` (1200×900). No
+  causa saltos de diseño porque se pintan dentro de un recuadro de proporción
+  fija, pero conviene leer las medidas del archivo al subirlo.

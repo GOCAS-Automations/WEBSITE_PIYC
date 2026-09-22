@@ -73,9 +73,21 @@ export function ContentImage({
   const anchoFinal = width ?? 1200;
   const altoFinal = height ?? Math.round(anchoFinal / PROPORCION_POR_DEFECTO);
 
+  // Una foto VERTICAL metida en un recuadro apaisado se recorta por arriba y
+  // por abajo, y con el recorte centrado lo primero que se pierde es la cabeza
+  // de quien trabaja o el remate del tablero — justo el sujeto. Se sube el
+  // punto de corte al 30 % del alto, que es donde cae el sujeto en las fotos de
+  // obra de PIYC. Solo aplica al recorte (`cover`) dentro de un recuadro de
+  // medida propia (`proporcion`): sin recuadro no hay recorte que corregir.
+  const recorteAlto =
+    ajuste === "cover" && proporcion && height && width && height >= width * 1.2
+      ? "object-[center_30%]"
+      : "";
+
   const clasesImagen = [
     ajuste === "cover" ? "object-cover" : "object-contain",
     proporcion ? "absolute inset-0 size-full" : "h-auto w-full",
+    recorteAlto,
     className,
   ]
     .filter(Boolean)

@@ -53,7 +53,9 @@ Al guardar, el sitio público se refresca solo: casi siempre el cambio se ve al 
 
 Se edita en bloques, en el mismo orden en que se ven en la portada:
 
-- **Primera pantalla**: línea pequeña, titular, frase de apoyo y los dos botones.
+- **Primera pantalla**: línea pequeña, titular, frase de apoyo, el texto y el destino de los dos botones, y la **Imagen principal de la portada**.
+
+  La **Imagen principal de la portada** es la foto grande del recuadro de la derecha, lo primero que se ve al abrir el sitio. Se llena como cualquier campo de foto: **Subir imagen** y después la **Descripción de la imagen (texto alternativo)**, obligatoria en cuanto hay foto. Si se deja vacía —botón **Quitar**—, la portada vuelve a mostrar el esquema eléctrico animado que trae de fábrica. La foto se recorta a 4:3: conviene una apaisada, con lo importante al centro.
 - **Qué hace PIYC**: línea pequeña, título, texto, foto y el texto del enlace que lleva a Nosotros.
 - **Franja de servicios** y **Franja de casos de éxito**: la línea pequeña, el título, el párrafo de entrada y el texto del enlace «ver todos» de cada una. El enlace siempre lleva a Servicios o a Proyectos; lo que se cambia aquí es cómo se llama. Si lo dejas vacío, el enlace no aparece.
 - **Cómo trabajamos**: la franja del proceso, con sus pasos.
@@ -63,7 +65,9 @@ Se edita en bloques, en el mismo orden en que se ven en la portada:
 
 ### Página Nosotros
 
-Bloques: **Cabecera de la página**, **Quiénes somos** (con su línea pequeña), **Misión y visión**, **Entradilla de los valores** (línea pequeña, título y frase), **Galería** (su línea pequeña, su título y las fotos) y **Franja de cierre**.
+Bloques: **Cabecera de la página**, **Quiénes somos** (con su línea pequeña), **Misión y visión**, **Entradilla de los valores** (línea pequeña, título y frase), **Galería** (línea pequeña, título, texto de entrada y el campo **Fotos de la página Nosotros**) y **Franja de cierre**.
+
+La galería de Nosotros **no se pinta en cuadrícula: es un carrusel**. Las fotos van en una tira horizontal que el visitante arrastra con el dedo o mueve con dos flechas, y que siempre deja la siguiente a medio ver. Por eso el orden importa: **la primera foto de la lista es la que todo el mundo ve**.
 
 <!-- captura: pantalla de edición de la página Nosotros -->
 
@@ -87,8 +91,8 @@ Todo lo que no es una ficha de servicio ni de proyecto, agrupado por página:
 - **Cabecera** de Servicios, Proyectos y Contacto: línea pequeña, título, frase de apoyo, párrafo de entrada y foto.
 - **Franja de cierre** de Servicios y de Proyectos: el título y el texto (los dos botones son siempre los mismos).
 - **Preguntas frecuentes** de Servicios y de Contacto: se agregan y se borran una por una. Se pintan como acordeón al final de la página y Google las puede mostrar en los resultados, así que no prometas plazos, precios ni garantías que PIYC no haya confirmado. Si borras todas, el bloque desaparece.
-- **Textos del formulario** de Contacto: el párrafo que va encima (qué pasa al enviar) y la nota de abajo (qué se hace con los datos).
-- **Textos que se repiten en todas las fichas**: la frase que aparece bajo los datos de un caso cuando tiene servicios asociados, el cierre de la ficha de un caso y el texto del cierre de la ficha de un servicio. No son de una ficha concreta —salen igual en todas—, por eso se editan aquí y no dentro de cada una.
+- **Textos del formulario** de Contacto: el párrafo que va encima (qué pasa al enviar), la nota de abajo (qué se hace con los datos) y los **títulos de los tres bloques** de esa página: el del bloque de datos, el del formulario y el del mapa.
+- **Textos que se repiten en todas las fichas**: la frase que aparece bajo los datos de un caso con servicios asociados, los cierres de la ficha de un caso y de la de un servicio, y **los títulos que encabezan cada parte**: el del cuerpo y el de la galería de un caso, y los de alcance, «Qué incluye», galería, casos relacionados y «Otros servicios» de un servicio. No son de una ficha concreta —salen igual en todas—, por eso se editan aquí y no dentro de cada una.
 - **Página «no encontrada»**: lo que ve alguien que entra a un enlace que ya no existe.
 
 ### Datos de contacto y buscadores
@@ -118,6 +122,10 @@ En cuanto hay una foto cargada, el campo **Descripción de la imagen (texto alte
 
 - Describe en pocas palabras lo que se ve, no lo que quieres vender. Ejemplo: «Tablero de control ensamblado en el taller de PIYC».
 - Evita frases como «imagen» o «foto 1»: no dicen nada.
+
+### Las fotos que hoy le faltan al sitio
+
+El sitio usa **26 fotos propias de PIYC**, repartidas de modo que ninguna se repita. Pero **no hay ninguna foto de aires acondicionados y solo hay una de refrigeración**: esas dos líneas se están mostrando con fotos de otros trabajos. Cuando PIYC las tome, se suben en Contenido del sitio → Servicios → el servicio, en **Foto de portada** y **Galería**, con **Subir imagen** y su descripción. Las fotos de banco de imágenes no se publican.
 
 ### Si pegas la dirección de una foto de otro sitio
 
