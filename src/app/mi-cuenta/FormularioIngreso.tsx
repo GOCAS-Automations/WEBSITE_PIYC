@@ -25,6 +25,7 @@
  * para quien quisiera probar contraseñas.
  */
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { getBrowserSupabase } from "@/lib/supabase/client";
@@ -217,6 +218,15 @@ export function FormularioIngreso() {
         ¿Olvidaste tu contraseña? Pídele a tu coordinador que la restablezca
         desde el panel: te entregará una nueva y podrás cambiarla al ingresar.
       </p>
+
+      {/* Quien llega aquí por error necesita una salida (Cesar, 22-sep-2026). */}
+      <Link
+        href="/"
+        className="mx-auto flex w-fit items-center gap-2 rounded-capsula px-4 py-2 text-sm font-semibold text-azul-700 hover:bg-relleno"
+      >
+        <IconoFlecha className="h-4 w-4 rotate-180" />
+        Volver al sitio
+      </Link>
     </form>
   );
 }

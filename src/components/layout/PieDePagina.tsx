@@ -87,7 +87,9 @@ export async function PieDePagina() {
   return (
     // `pt-*`: el pie se separa solo de lo que tenga encima, sea el panel de
     // cierre o una sección blanca (en /contacto termina en las preguntas).
-    <footer className="sobre-oscuro fondo-noche text-acero-200">
+    // `mt-*`: la franja del pie necesita aire respecto a lo que tenga encima
+    // —el panel de cierre quedaba pegado a ella—; el margen deja ver el lienzo.
+    <footer className="sobre-oscuro fondo-noche mt-12 text-acero-200 lg:mt-16">
       {/* Franja a sangre, no tarjeta flotante (Cesar, 22-sep-2026): el pie
           cierra la página de borde a borde y el contenido conserva los mismos
           márgenes laterales que el resto del sitio. */}
