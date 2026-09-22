@@ -181,11 +181,13 @@ export const nosotrosEstatico: AjustesNosotros = {
     title: "Ingenieros que trabajan dentro de la planta, no sobre el catálogo",
     subtitle:
       "PROGRAMACIÓN INDUSTRIAL Y CONTROL S.A.S. —PIYC— desarrolla proyectos de ingeniería, montaje y mantenimiento de equipos eléctricos y electrónicos para la industria del Valle del Cauca.",
+    // Fondo a sangre de la cabecera: 1920 px + variante de 900 para el celular.
     image: {
-      src: `${BUCKET}/cabeceras/cuarto-electrico-tableros-900.webp`,
-      alt: "Cuarto eléctrico con una fila de tableros de control y fuerza montados contra la pared; uno de ellos abierto durante el cableado",
-      width: 900,
-      height: 442,
+      src: `${BUCKET}/cabeceras/montaje-interno-tablero.webp`,
+      srcMovil: `${BUCKET}/cabeceras/montaje-interno-tablero-900.webp`,
+      alt: "Vista cenital del montaje interno de un tablero: PLC, switch de red, fuente de 24 V, protecciones y borneras numeradas sobre riel",
+      width: 1920,
+      height: 1081,
     },
   },
   quienesSomos: {
@@ -193,11 +195,15 @@ export const nosotrosEstatico: AjustesNosotros = {
     title: "Quiénes somos",
     // Texto de PIYC (documento «4. QUIÉNES SOMOS», versión pulida).
     body: "Somos una empresa integrada por ingenieros altamente calificados, especializados en el desarrollo de proyectos de ingeniería, montaje y mantenimiento de equipos eléctricos y electrónicos. Nos dedicamos a la automatización de equipos, así como a la ejecución de obras eléctricas y electrónicas. Nuestro enfoque abarca desde la automatización y el control hasta el desarrollo de equipos de óptima calidad.\n\nOfrecemos servicios de alta calidad para dar soluciones asertivas, reduciendo el riesgo y dando la seguridad de que nuestra propuesta es la mejor, brindando tranquilidad y respaldo a cada cliente en su proceso de producción.",
+    // Recorte 4:5 de la foto del técnico cableando (antes, 1.ª de la galería).
+    // La de los dos técnicos con traje de planta se retiró por decisión de
+    // Cesar (22-sep-2026) y no se usa en ninguna parte (docs/CONTENIDO.md §2.2).
     image: {
-      src: `${BUCKET}/nosotros/equipo-planta-alimentos-900.webp`,
-      alt: "Dos técnicos con traje y cofia de planta revisan el programa en un portátil apoyado sobre el tablero, dentro de una sala de producción",
-      width: 900,
-      height: 1200,
+      src: `${BUCKET}/nosotros/tecnico-cableando-tablero-4x5.webp`,
+      srcMovil: `${BUCKET}/nosotros/tecnico-cableando-tablero-4x5-900.webp`,
+      alt: "Técnico con overol y cofia trabaja en el cableado interno de un tablero de control dentro de una planta de alimentos",
+      width: 1184,
+      height: 1480,
     },
   },
   // ⚠ Textos intercambiados respecto al documento original de PIYC por decisión
@@ -228,11 +234,16 @@ export const nosotrosEstatico: AjustesNosotros = {
   },
   // Galería «Nuestro trabajo»: fotos del propio equipo de PIYC en obra
   // (Drive del cliente, carpeta «9. FOTOS»; catálogo en docs/CONTENIDO.md §2).
-  // El orden cuenta la historia: primero la gente, después el trabajo terminado.
+  // El orden cuenta la historia: primero el trabajo en marcha, después el
+  // terminado. Abre la puesta en marcha y no la foto de la chaqueta de PIYC
+  // (447 px): si el diseño pinta grande la primera, esa se vería borrosa.
+  // Tres fotos salieron el 22-sep-2026 para no repetirse: el técnico cableando
+  // pasó a «Quiénes somos», el tablero de doble puerta a la cabecera de
+  // /contacto y el tablero inox con PLC compacto a la portada de automatización.
   galeria: [
     {
-      src: `${BUCKET}/nosotros/tecnico-cableando-tablero.webp`,
-      alt: "Técnico con overol y cofia trabaja en el cableado interno de un tablero de control dentro de una planta de alimentos",
+      src: `${BUCKET}/nosotros/puesta-en-marcha-variadores.webp`,
+      alt: "Puesta en marcha de un tablero en acero inoxidable con tres variadores de velocidad, con el portátil y el terminal de pruebas sobre la mesa",
       width: 888,
       height: 1920,
     },
@@ -249,34 +260,16 @@ export const nosotrosEstatico: AjustesNosotros = {
       height: 1920,
     },
     {
-      src: `${BUCKET}/nosotros/puesta-en-marcha-variadores.webp`,
-      alt: "Puesta en marcha de un tablero en acero inoxidable con tres variadores de velocidad, con el portátil y el terminal de pruebas sobre la mesa",
-      width: 888,
-      height: 1920,
-    },
-    {
       src: `${BUCKET}/nosotros/tablero-plc-modular-portatil.webp`,
       alt: "Tablero con PLC modular, protecciones y borneras, con un portátil conectado durante la programación",
       width: 933,
       height: 1920,
     },
     {
-      src: `${BUCKET}/nosotros/tablero-doble-puerta-armado-900.webp`,
-      alt: "Tablero de doble puerta recién armado, con contactores, fuentes y borneras ordenadas por nivel",
-      width: 900,
-      height: 1200,
-    },
-    {
       src: `${BUCKET}/nosotros/gabinete-fuerza-armado-900.webp`,
       alt: "Gabinete de fuerza abierto con seccionador, interruptores de caja moldeada y equipo de respaldo en la base",
       width: 900,
       height: 1660,
-    },
-    {
-      src: `${BUCKET}/nosotros/tablero-inox-plc-siemens-900.webp`,
-      alt: "Tablero en acero inoxidable con PLC compacto, switch de red y borneras; guantes dieléctricos colgados en la puerta",
-      width: 900,
-      height: 1600,
     },
     {
       src: `${BUCKET}/nosotros/tablero-fuerza-barraje.webp`,
@@ -300,10 +293,11 @@ export const paginasEstatico: AjustesPaginas = {
     intro:
       "La agrupación en cuatro líneas es una forma de leer el portafolio, no un compartimento: la mayoría de los proyectos toca varias a la vez —un tablero nuevo viene con su diseño eléctrico, y una automatización termina con telemetría.",
     image: {
-      src: `${BUCKET}/cabeceras/interior-tablero-plc-red-900.webp`,
+      src: `${BUCKET}/cabeceras/interior-tablero-plc-red.webp`,
+      srcMovil: `${BUCKET}/cabeceras/interior-tablero-plc-red-900.webp`,
       alt: "Interior de un tablero en acero inoxidable con PLC modular, switches de red industrial, protecciones y borneras cableadas",
-      width: 900,
-      height: 437,
+      width: 1920,
+      height: 933,
     },
     // FAQ redactada por el equipo de la web. Sin precios, tiempos ni garantías:
     // nada de eso está confirmado por PIYC (regla: no prometer lo que no se sabe).
@@ -347,10 +341,11 @@ export const paginasEstatico: AjustesPaginas = {
     intro:
       "Cada caso describe la situación de partida, lo que se hizo y cómo quedó el proceso después. Las cifras que aparecen son las que midió el mismo proceso del cliente.",
     image: {
-      src: `${BUCKET}/cabeceras/montaje-interno-tablero-900.webp`,
-      alt: "Vista cenital del montaje interno de un tablero: PLC, switch de red, fuente de 24 V, protecciones y borneras numeradas sobre riel",
-      width: 900,
-      height: 507,
+      src: `${BUCKET}/cabeceras/cuarto-electrico-tableros.webp`,
+      srcMovil: `${BUCKET}/cabeceras/cuarto-electrico-tableros-900.webp`,
+      alt: "Cuarto eléctrico con una fila de tableros de control y fuerza montados contra la pared; uno de ellos abierto durante el cableado",
+      width: 1920,
+      height: 943,
     },
     cta: {
       title: "¿Tiene un proyecto parecido?",
@@ -362,6 +357,13 @@ export const paginasEstatico: AjustesPaginas = {
     title: "Cuéntenos qué necesita su planta",
     subtitle:
       "Escríbanos por WhatsApp o déjenos los datos del proyecto en el formulario. Respondemos con las preguntas técnicas que hagan falta antes de proponer nada.",
+    image: {
+      src: `${BUCKET}/cabeceras/tablero-doble-puerta-armado-apaisada.webp`,
+      srcMovil: `${BUCKET}/cabeceras/tablero-doble-puerta-armado-apaisada-900.webp`,
+      alt: "Tablero de doble puerta abierto y recién armado, con contactores, protecciones y fuentes ordenados por nivel",
+      width: 1920,
+      height: 1080,
+    },
     introFormulario:
       "Al enviar, se abre WhatsApp con el mensaje ya escrito para que solo tenga que darle enviar. No enviamos correos automáticos.",
     notaFormulario:

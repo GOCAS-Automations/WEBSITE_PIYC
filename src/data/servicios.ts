@@ -26,9 +26,14 @@
  * -----
  * Las URL apuntan al bucket público `site-images`, carpeta `servicios/<slug>/`
  * (inventario en `src/data/imagenes.ts` y `docs/CONTENIDO.md` §2).
- * `refrigeracion-industrial` y `aires-acondicionados` **no tienen ninguna foto**
- * — el PPTX de casos de éxito es todo automatización. La página los resuelve
- * con su gráfico propio; no se les pone una foto de otro servicio.
+ * `aires-acondicionados` **no tiene ninguna foto** y `refrigeracion-industrial`
+ * tiene una sola: el Drive no trae más. La página los resuelve con su gráfico
+ * propio; no se les pone una foto de otro servicio.
+ *
+ * `cover` = primera foto de `gallery`, y siempre **apaisada**: es el fondo de
+ * la cabecera de la ficha. Va a 1920 px (o al ancho que dé el original) con su
+ * variante de 900 px en `srcMovil`. Las demás fotos de la galería siguen
+ * verticales, a ~900 px.
  */
 
 import type { LineaServicio, Servicio } from "@/lib/content-types";
@@ -60,9 +65,16 @@ export const serviciosEstaticos: Servicio[] = [
       "Puesta en marcha en sitio, pruebas con el operario y entrega de programas documentados",
     ],
     images: {
-      cover: `${BUCKET}/automatizacion-procesos-industriales/tablero-inox-plc-borneras.webp`,
-      coverAlt: "Tablero de automatización en acero inoxidable con PLC compacto, fuente de 24 V y borneras identificadas una a una",
+      cover: `${BUCKET}/automatizacion-procesos-industriales/tablero-inox-plc-compacto-apaisada.webp`,
+      coverAlt: "Tablero en acero inoxidable con PLC compacto, switch de red, protecciones y borneras cableadas",
       gallery: [
+        {
+          src: `${BUCKET}/automatizacion-procesos-industriales/tablero-inox-plc-compacto-apaisada.webp`,
+          srcMovil: `${BUCKET}/automatizacion-procesos-industriales/tablero-inox-plc-compacto-apaisada-900.webp`,
+          alt: "Tablero en acero inoxidable con PLC compacto, switch de red, protecciones y borneras cableadas",
+          width: 1836,
+          height: 1033,
+        },
         {
           src: `${BUCKET}/automatizacion-procesos-industriales/tablero-inox-plc-borneras.webp`,
           alt: "Tablero de automatización en acero inoxidable con PLC compacto, fuente de 24 V y borneras identificadas una a una",
@@ -106,14 +118,15 @@ export const serviciosEstaticos: Servicio[] = [
       "Memorias de cálculo y actualización de planos as-built al cierre del proyecto",
     ],
     images: {
-      cover: `${BUCKET}/diseno-ingenieria-electrica/tablero-potencia-interruptores.webp`,
-      coverAlt: "Interior de un tablero de potencia con seccionador de entrada e interruptores de caja moldeada sobre el barraje",
+      cover: `${BUCKET}/diseno-ingenieria-electrica/tablero-potencia-interruptores-apaisada.webp`,
+      coverAlt: "Interior de un tablero de potencia con el seccionador de entrada y cuatro interruptores de caja moldeada",
       gallery: [
         {
-          src: `${BUCKET}/diseno-ingenieria-electrica/tablero-potencia-interruptores.webp`,
-          alt: "Interior de un tablero de potencia con seccionador de entrada e interruptores de caja moldeada sobre el barraje",
-          width: 865,
-          height: 1920,
+          src: `${BUCKET}/diseno-ingenieria-electrica/tablero-potencia-interruptores-apaisada.webp`,
+          srcMovil: `${BUCKET}/diseno-ingenieria-electrica/tablero-potencia-interruptores-apaisada-900.webp`,
+          alt: "Interior de un tablero de potencia con el seccionador de entrada y cuatro interruptores de caja moldeada",
+          width: 1920,
+          height: 1080,
         },
         {
           src: `${BUCKET}/diseno-ingenieria-electrica/tableros-cuarto-electrico.webp`,
@@ -153,18 +166,19 @@ export const serviciosEstaticos: Servicio[] = [
       "Entrega con planos actualizados a lo realmente construido",
     ],
     images: {
-      cover: `${BUCKET}/tableros-de-control/tablero-doble-puerta-terminado-900.webp`,
-      coverAlt: "Tablero de doble puerta terminado, con rejillas de ventilación y visor, listo para despacho",
+      cover: `${BUCKET}/tableros-de-control/tablero-plc-modular-reles-apaisada.webp`,
+      coverAlt: "Tablero de gran formato abierto, con PLC modular, bancos de relés de interposición y protecciones",
       gallery: [
+        {
+          src: `${BUCKET}/tableros-de-control/tablero-plc-modular-reles-apaisada.webp`,
+          srcMovil: `${BUCKET}/tableros-de-control/tablero-plc-modular-reles-apaisada-900.webp`,
+          alt: "Tablero de gran formato abierto, con PLC modular, bancos de relés de interposición y protecciones",
+          width: 1920,
+          height: 1080,
+        },
         {
           src: `${BUCKET}/tableros-de-control/tablero-doble-puerta-terminado-900.webp`,
           alt: "Tablero de doble puerta terminado, con rejillas de ventilación y visor, listo para despacho",
-          width: 900,
-          height: 1200,
-        },
-        {
-          src: `${BUCKET}/tableros-de-control/tablero-plc-modular-reles-900.webp`,
-          alt: "Tablero de gran formato con PLC modular, bancos de relés de interposición y borneras, con los planos abiertos durante el montaje",
           width: 900,
           height: 1200,
         },
@@ -199,14 +213,15 @@ export const serviciosEstaticos: Servicio[] = [
       "Tableros de lectura en pantalla de planta, computador o dispositivo móvil",
     ],
     images: {
-      cover: `${BUCKET}/telemetria/tablero-pared-sala-proceso-900.webp`,
+      cover: `${BUCKET}/telemetria/tablero-pared-sala-proceso-apaisada.webp`,
       coverAlt: "Tablero rotulado montado en pared junto al visor de la sala de proceso, con la canalización llevada al equipo",
       gallery: [
         {
-          src: `${BUCKET}/telemetria/tablero-pared-sala-proceso-900.webp`,
+          src: `${BUCKET}/telemetria/tablero-pared-sala-proceso-apaisada.webp`,
+          srcMovil: `${BUCKET}/telemetria/tablero-pared-sala-proceso-apaisada-900.webp`,
           alt: "Tablero rotulado montado en pared junto al visor de la sala de proceso, con la canalización llevada al equipo",
-          width: 900,
-          height: 1535,
+          width: 1920,
+          height: 1080,
         },
       ],
     },
@@ -239,14 +254,15 @@ export const serviciosEstaticos: Servicio[] = [
       "Conexión cifrada sobre red de planta, red celular o VPN; sin exponer el PLC a internet",
     ],
     images: {
-      cover: `${BUCKET}/telecontrol/tablero-variadores-velocidad-900.webp`,
+      cover: `${BUCKET}/telecontrol/tablero-variadores-velocidad-apaisada.webp`,
       coverAlt: "Interior de un tablero con variadores de velocidad de distintas potencias, PLC modular y protecciones",
       gallery: [
         {
-          src: `${BUCKET}/telecontrol/tablero-variadores-velocidad-900.webp`,
+          src: `${BUCKET}/telecontrol/tablero-variadores-velocidad-apaisada.webp`,
+          srcMovil: `${BUCKET}/telecontrol/tablero-variadores-velocidad-apaisada-900.webp`,
           alt: "Interior de un tablero con variadores de velocidad de distintas potencias, PLC modular y protecciones",
-          width: 900,
-          height: 1200,
+          width: 1920,
+          height: 1080,
         },
       ],
     },
@@ -280,14 +296,15 @@ export const serviciosEstaticos: Servicio[] = [
       "Acompañamiento posterior al arranque para afinar el sistema en producción",
     ],
     images: {
-      cover: `${BUCKET}/proyectos-llave-en-mano/linea-empaque-planta-900.webp`,
+      cover: `${BUCKET}/proyectos-llave-en-mano/linea-empaque-planta.webp`,
       coverAlt: "Línea de transporte y empaque montada dentro de una planta, con el área aislada durante la obra",
       gallery: [
         {
-          src: `${BUCKET}/proyectos-llave-en-mano/linea-empaque-planta-900.webp`,
+          src: `${BUCKET}/proyectos-llave-en-mano/linea-empaque-planta.webp`,
+          srcMovil: `${BUCKET}/proyectos-llave-en-mano/linea-empaque-planta-900.webp`,
           alt: "Línea de transporte y empaque montada dentro de una planta, con el área aislada durante la obra",
-          width: 900,
-          height: 438,
+          width: 1920,
+          height: 934,
         },
       ],
     },
@@ -320,14 +337,15 @@ export const serviciosEstaticos: Servicio[] = [
       "Entrega documentada, con programas abiertos y sin candados de fabricante",
     ],
     images: {
-      cover: `${BUCKET}/aplicaciones-industriales/tablero-servodrives.webp`,
-      coverAlt: "Tablero de control con PLC, arrancadores y servoaccionamientos montados sobre la placa de fondo",
+      cover: `${BUCKET}/aplicaciones-industriales/tablero-servodrives-apaisada.webp`,
+      coverAlt: "Tablero de control abierto con PLC, arrancadores y servoaccionamientos montados sobre la placa de fondo",
       gallery: [
         {
-          src: `${BUCKET}/aplicaciones-industriales/tablero-servodrives.webp`,
-          alt: "Tablero de control con PLC, arrancadores y servoaccionamientos montados sobre la placa de fondo",
-          width: 864,
-          height: 1920,
+          src: `${BUCKET}/aplicaciones-industriales/tablero-servodrives-apaisada.webp`,
+          srcMovil: `${BUCKET}/aplicaciones-industriales/tablero-servodrives-apaisada-900.webp`,
+          alt: "Tablero de control abierto con PLC, arrancadores y servoaccionamientos montados sobre la placa de fondo",
+          width: 1468,
+          height: 826,
         },
         {
           src: `${BUCKET}/aplicaciones-industriales/gabinete-terminado-taller.webp`,
@@ -367,14 +385,15 @@ export const serviciosEstaticos: Servicio[] = [
       "Monitoreo remoto del cuarto frío con aviso al responsable (ver telemetría)",
     ],
     images: {
-      cover: `${BUCKET}/refrigeracion-industrial/montaje-techo-sala-paneles-900.webp`,
+      cover: `${BUCKET}/refrigeracion-industrial/montaje-techo-sala-paneles.webp`,
       coverAlt: "Dos técnicos sobre un andamio instalan equipos en el techo de una sala con paneles aislantes y difusores",
       gallery: [
         {
-          src: `${BUCKET}/refrigeracion-industrial/montaje-techo-sala-paneles-900.webp`,
+          src: `${BUCKET}/refrigeracion-industrial/montaje-techo-sala-paneles.webp`,
+          srcMovil: `${BUCKET}/refrigeracion-industrial/montaje-techo-sala-paneles-900.webp`,
           alt: "Dos técnicos sobre un andamio instalan equipos en el techo de una sala con paneles aislantes y difusores",
-          width: 900,
-          height: 675,
+          width: 1920,
+          height: 1440,
         },
       ],
     },
