@@ -76,7 +76,10 @@ const contentSecurityPolicy = [
   // Cali) y el facade de YouTube sin cookies.
   "frame-src https://www.youtube-nocookie.com https://www.google.com https://maps.google.com",
 
-  "media-src 'self'",
+  // El video de fondo del hero del inicio se sube al bucket `site-images`
+  // (`home.hero.fondo.video.src`): sin Supabase aquí, la CSP lo bloquea y la
+  // portada se queda solo con el póster.
+  `media-src 'self' ${SUPABASE_HTTPS}`,
   "worker-src 'self' blob:",
   "manifest-src 'self'",
 
@@ -135,6 +138,12 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   // No anunciar la versión del framework.
   poweredByHeader: false,
+
+  // `nodemailer` usa APIs de Node (sockets, TLS, requires dinámicos) que el
+  // bundler de Server Components no sabe empaquetar: se deja como dependencia
+  // externa para que se cargue con el `require` nativo. Lo usa el aviso por
+  // correo del formulario de contacto (`src/app/api/contacto/correo.ts`).
+  serverExternalPackages: ["nodemailer"],
 
   images: {
     /**

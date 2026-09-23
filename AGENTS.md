@@ -50,9 +50,9 @@ Uso: el azul domina y el verde se dosifica (nunca fondo de sección ni de bloque
 
 - Razón social: PROGRAMACIÓN INDUSTRIAL Y CONTROL SAS · NIT 901.161.923 · nombre comercial PIYC.
 - Eslogan: «Tu socio confiable en soluciones industriales» · dominio `piycsas.com`.
-- Ciudad: Cali. Dirección oficial (la de Google): Cl. 33 #5-76, Comuna 4, Cali, Valle del Cauca.
+- Ciudad: Cali. Dirección oficial (la de Google): Cl. 33 #5-76, **Local 2**, Comuna 4, Cali, Valle del Cauca — en esa dirección hay dos locales.
 - Horario de atención: lunes a viernes, 8:00 a. m. – 5:00 p. m.; sábados y domingos, cerrado (`ajustes.contact.horario`: `label` y `schema` dicen lo mismo).
-- WhatsApp y teléfono público, único, destino del formulario de contacto: +57 321 761 7958. El celular personal del fundador **no se publica**: un solo canal, el de la empresa.
+- Teléfonos públicos: **+57 321 761 7958** (línea de la empresa y **destino del formulario**) y **+57 310 637 3483** (Jorge Castillo, fundador; PIYC pidió publicarlo el 23-sep-2026). El correo visible sigue siendo uno solo.
 - Correo visible en el sitio: fabian.gaviria@piycsas.com.
 - Instagram: https://www.instagram.com/piyc_sas/
 
@@ -65,7 +65,7 @@ Cuatro migraciones, no más (detalle y motivo en `docs/PLAN_INICIAL_PIYC.md` §7
 - `0003_mensajes.sql` — `site_mensajes`. Una sola política: `SELECT` para `is_manager()`. Nunca `INSERT` para `anon` — se inserta desde el servidor con la clave service-role.
 - `0004_jornadas_revision.sql` — cierra los dos hallazgos de QA sobre `jornadas`: el trigger `jornadas_proteger_revision` impide en la base que una sesión cambie el estado, el revisor o el desglose de su propia jornada (nadie se revisa a sí mismo, ni un admin; la service-role sigue libre), y la política `jornadas_insert_manager` deja que un manager registre jornadas de otra cuenta **activa** con su propia sesión, siempre `pendiente` y sin desglose — así el panel ya no necesita la clave de servicio para eso.
 
-Variables de entorno en Vercel: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` (solo servidor), `NEXT_PUBLIC_SITE_URL`, `CONTACT_IP_SALT` (sal del hash de IP del formulario; cadena aleatoria larga). `SUPABASE_ACCESS_TOKEN` es personal, solo local (CLI / Management API) — nunca en Vercel ni en el repo.
+Variables de entorno en Vercel: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` (solo servidor), `NEXT_PUBLIC_SITE_URL`, `CONTACT_IP_SALT` (sal del hash de IP del formulario) y, para el aviso por correo del formulario, `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `CONTACT_FROM`, `CONTACT_TO` (detalle y qué pedirle al proveedor en `docs/DESPLIEGUE.md` §4). `SUPABASE_ACCESS_TOKEN` es personal, solo local (CLI / Management API) — nunca en Vercel ni en el repo.
 
 `src/lib/content.ts` cae a `src/data/*` si faltan las env vars o falla la consulta: el sitio público nunca queda en blanco por un problema de base de datos. `undefined` ≠ vacío: columna ausente → respaldo estático; columna presente y vacía → decisión del panel, se respeta. Toda server action valida el rol **en el servidor** y llama `revalidatePath`.
 
@@ -75,8 +75,8 @@ Variables de entorno en Vercel: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABAS
 2. La navegación del panel necesita tres piezas juntas: `src/app/admin/loading.tsx`, el componente `PuntoDeCarga` y `prefetch={false}` en todos los `<Link>` de `/admin` (rutas `force-dynamic`). Sin las tres, el panel se siente trabado.
 3. RLS de `profiles` solo deja a cada quien leer su propia fila. Cualquier pantalla que muestre compañeros necesita completar con la clave de servicio, y **solo** nombre, apodo y cargo.
 4. Un valor exportado desde un módulo `"use client"` no se puede leer en el servidor. Las constantes compartidas viven en `src/lib/*-types.ts`.
-5. **El formulario de contacto no envía correo.** El servidor registra el lead en `site_mensajes` (service-role) y el cliente abre `wa.me` con el mensaje prearmado. El número destino sale SIEMPRE de `site_settings`, nunca del payload — tomarlo del formulario convierte el sitio en un relay abierto.
-6. Rechazar ≠ eliminar. Decirlo en la interfaz cada vez que se toque esa pantalla. Eliminar lleva doble confirmación.
+5. **El formulario de contacto abre WhatsApp; el correo es un aviso, no el canal.** El servidor registra el lead en `site_mensajes` (service-role), devuelve el enlace de `wa.me` y **después** —dentro de `after()`— manda un aviso por SMTP si están las variables; si faltan o el envío falla, el visitante ni se entera. El número destino y el correo destino salen SIEMPRE de los ajustes o del entorno, **nunca del payload**: tomarlos del formulario convierte el sitio en un relay abierto.
+6. Rechazar ≠ eliminar, y **en el panel las jornadas ya no se eliminan** (PIYC, 23-sep-2026): la acción se quitó de la interfaz, aunque la RLS lo siga permitiendo. Lo que se corrige, se corrige; lo que no sirve, se rechaza con nota.
 7. Anti-spam sin terceros: honeypot + 3 segundos mínimos (contra el reloj del visitante, nunca el del servidor) + longitudes máximas + tope por IP. Sin captcha.
 8. Nunca exponer una función service-role a `anon`. La clave anónima es pública.
 9. `0` nunca se muestra como dato. Si el contador o la métrica no tienen valor, no se pinta la tarjeta.

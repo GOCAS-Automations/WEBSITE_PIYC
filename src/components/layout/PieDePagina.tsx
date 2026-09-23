@@ -64,7 +64,14 @@ function CeldaContacto({
   );
 }
 
-const CLASE_ENLACE = "transition-colors hover:text-blanco hover:underline underline-offset-2";
+/**
+ * `inline-block py-1`: sin eso, un teléfono del pie mide 19 px de alto y falla
+ * el criterio de tamaño de objetivo táctil (24 × 24 px) en cuanto hay dos
+ * números seguidos — que es el caso desde que el pie lista más de un WhatsApp.
+ * El relleno vertical los lleva a 27 px sin tocar el ritmo del bloque.
+ */
+const CLASE_ENLACE =
+  "inline-block py-1 transition-colors hover:text-blanco hover:underline underline-offset-2";
 
 export async function PieDePagina() {
   const contacto = await getContacto();

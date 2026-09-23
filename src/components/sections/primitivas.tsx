@@ -264,22 +264,34 @@ export function GrupoDeBotones({
   );
 }
 
-/** Botón primario: azul de marca, cápsula con sombra suave. */
+/**
+ * Botón primario: azul de marca, cápsula con sombra suave.
+ *
+ * `tono="oscuro"` es el del hero del inicio, sobre la foto a sangre: ahí el
+ * azul de marca se pierde contra el velo azul noche, así que la cápsula se
+ * invierte —blanca con texto `azul-950` (17:1)—, que es además el gesto iOS.
+ */
 export function BotonPrimario({
   href,
   children,
+  tono = "claro",
   tamano = "normal",
   className = "",
 }: {
   href: string;
   children: ReactNode;
+  tono?: "claro" | "oscuro";
   tamano?: TamanoBoton;
   className?: string;
 }) {
+  const clasesTono =
+    tono === "oscuro"
+      ? "bg-blanco text-azul-950 hover:bg-acero-100"
+      : "bg-azul-700 text-blanco hover:bg-azul-600";
   return (
     <Link
       href={href}
-      className={`${clasesBoton(tamano)} bg-azul-700 text-blanco shadow-tarjeta hover:bg-azul-600 ${className}`}
+      className={`${clasesBoton(tamano)} ${clasesTono} shadow-tarjeta ${className}`}
     >
       {children}
       <IconoFlecha className="size-4.5 shrink-0 transition-transform duration-300 ease-ios group-hover:translate-x-1" />

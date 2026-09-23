@@ -49,7 +49,8 @@ export const dynamic = "force-dynamic";
  * normal: funciona aunque falle el JavaScript y no necesita un componente de
  * cliente.
  *
- * REGLA 6, que aquí se aplica más que en ningún lado: **rechazar ≠ eliminar**.
+ * REGLA 6, que aquí se aplica más que en ningún lado: rechazar conserva el
+ * registro. Desde sept-2026 el panel ya no elimina jornadas.
  * Se dice en esta pantalla y se vuelve a decir en la ficha de cada jornada.
  */
 export default async function JornadasPage({
@@ -90,18 +91,15 @@ export default async function JornadasPage({
         }
       />
 
-      {params.eliminada !== undefined && (
-        <AyudaSeccion tono="aviso" title="Jornada eliminada" className="mb-5">
-          El registro se borró definitivamente y también desapareció del portal
-          de la persona.
-        </AyudaSeccion>
-      )}
-
+      {/*
+        Ya no hay aviso de «Jornada eliminada»: el panel no borra jornadas
+        (decisión de PIYC, sept-2026). Se quitó también el parámetro
+        ?eliminada=1 que lo disparaba.
+      */}
       <AyudaSeccion className="mb-5">
-        <strong>Rechazar no es eliminar.</strong> Rechazar devuelve la jornada a
-        la persona con una nota para que la corrija, y el registro se conserva.
-        Eliminar borra la fila y no se puede deshacer: se usa solo para pruebas o
-        duplicados. Al <strong>aprobar</strong>, el desglose de horas queda
+        <strong>Una jornada registrada no se borra.</strong> Rechazar la devuelve
+        a la persona con una nota para que la corrija, y el registro se conserva
+        siempre (regla 6). Al <strong>aprobar</strong>, el desglose de horas queda
         congelado y ya no cambia aunque después se corrija el horario del mes.
       </AyudaSeccion>
 

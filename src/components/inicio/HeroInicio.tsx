@@ -1,233 +1,222 @@
 /**
  * HERO DE INICIO
  * ==============
- * Estructura aprobada: texto a la izquierda, panel del diagrama de escalera a
- * la derecha y las cuatro líneas de servicio abajo.
+ * **Fondo a sangre** —imagen o video— con velo azul noche encima y, sobre él,
+ * el `<h1>`, el eslogan, la frase de apoyo y los dos CTA alineados a la
+ * izquierda. Debajo, fuera ya del fondo oscuro, la franja de las cuatro líneas
+ * de servicio sobre el lienzo.
  *
- * Sistema v3: el panel del PLC pasó de ser un recuadro de plano técnico a un
- * **widget** de esquinas continuas, fondo azul noche con luces difusas y
- * fichas redondeadas en el pie. Sigue siendo lo que separa a PIYC del hero
- * centrado con foto a sangre de GPI (regla 13 de AGENTS.md), pero ahora en
- * clave iOS. El hero **no lleva foto**: las disponibles son pequeñas y
- * estiradas se ven blandas (`docs/CONTENIDO.md` §2.4).
+ * POR QUÉ CAMBIÓ (reunión con PIYC, sep-2026)
+ * -------------------------------------------
+ * Antes el hero era texto a la izquierda y un widget con el diagrama de
+ * escalera (o una foto) a la derecha. A PIYC no le gustaba esa pieza: pidieron
+ * «una imagen de fondo, como en las otras páginas del sitio, y que se pueda
+ * cambiar por un video desde el panel». El diagrama se eliminó.
  *
- * Todo el texto llega por props desde `site_settings.home`.
+ * Es el mismo lenguaje de `CabeceraInterna` —mismo velo, mismo viraje al azul
+ * de marca, texto abajo a la izquierda— pero con el peso de una portada: más
+ * alto, `h1` más grande y botones. Lo que separa a PIYC de GPI (regla 13) no
+ * es ya la ausencia de foto sino el color (azul dominante, verde al 10 %), la
+ * retícula (texto a la izquierda, no centrado) y la tipografía.
+ *
+ * CONTRASTE
+ * ---------
+ * El velo (`velo-cabecera`) está medido para el peor caso —una foto blanca—:
+ * bajo el texto nunca baja de ~75 % de azul noche, lo que da ≥ 7:1 con blanco
+ * y ≥ 5:1 con `acero-100`/`acero-200`.
+ *
+ * LA LCP ES EL PÓSTER, NO EL VIDEO
+ * --------------------------------
+ * Con imagen, la foto es la LCP: `<img>` real con `fetchpriority="high"`, sin
+ * `lazy`, con medidas y `srcset` cuando hay `srcMovil` (`FotoDeFondo`). Con
+ * video se pinta **ese mismo `<img>` con el póster** y el `<video>` va encima,
+ * con `preload="metadata"`, para que el video no le pelee la red a la LCP.
+ * Con `prefers-reduced-motion` el `<video>` se oculta (`motion-reduce:hidden`)
+ * y se queda el póster.
+ *
+ * Todo el texto y el fondo llegan por props desde `site_settings.home`.
  */
 
 import Link from "next/link";
 import type { AjustesHome, LineaServicio } from "@/lib/content-types";
+import type { FondoDelHero } from "@/lib/content";
 import {
   BotonPrimario,
   BotonWhatsApp,
+  Contenedor,
   GrupoDeBotones,
+  Rotulo,
 } from "@/components/sections/primitivas";
-import { ContentImage } from "@/components/ui/ContentImage";
+import { FotoDeFondo } from "@/components/ui/ContentImage";
 import { IconoFlecha } from "@/components/ui/iconos";
-import { DiagramaEscalera } from "./DiagramaEscalera";
-
-const cartela = [
-  { dato: "Esquema", valor: "Ilustrativo" },
-  { dato: "Norma", valor: "IEC 61131-3" },
-  { dato: "Lenguaje", valor: "Escalera (LD)" },
-  { dato: "Rev.", valor: "A · 01/01" },
-] as const;
 
 export function HeroInicio({
   hero,
+  fondo,
   eslogan,
   lineas,
   hrefWhatsApp,
 }: {
   hero: AjustesHome["hero"];
+  /** Imagen o video de fondo ya resueltos (`fondoDelHero`). `null` = degradado. */
+  fondo: FondoDelHero;
   eslogan?: string;
   lineas: readonly LineaServicio[];
   hrefWhatsApp: string;
 }) {
   const ctaPrimario = hero?.ctaPrimario;
   const ctaSecundario = hero?.ctaSecundario;
-  // Imagen principal de la portada. Ausente = se conserva el diagrama.
-  // Una imagen sin `alt` no se pinta: entraría al sitio sin texto alternativo.
-  const imagen = hero?.image?.src && hero.image.alt ? hero.image : null;
-  // El rótulo del marco cuando hay foto sale del propio `alt`, recortado, para
-  // que no haya un texto fijo en código que el panel no pueda cambiar.
-  const rotuloImagen = imagen
-    ? imagen.alt.length > 48
-      ? `${imagen.alt.slice(0, 47).trimEnd()}…`
-      : imagen.alt
-    : "";
+  // Con video, el póster hace de imagen de fondo: es la LCP y lo que queda
+  // cuando el visitante pide menos movimiento.
+  const imagenDeFondo =
+    fondo === null ? null : fondo.tipo === "imagen" ? fondo.imagen : fondo.poster;
 
   return (
-    <section aria-labelledby="titulo-inicio" className="fondo-plano">
-      <div className="mx-auto grid max-w-sitio gap-10 px-4 pb-14 pt-[calc(var(--alto-nav)+1rem)] sm:px-6 lg:grid-cols-12 lg:items-center lg:gap-12 lg:px-8 lg:pb-20 lg:pt-[calc(var(--alto-nav)+2.5rem)]">
-        {/* Texto */}
-        <div className="animate-aparecer lg:col-span-7">
-          {hero?.eyebrow ? (
-            <p className="inline-flex items-center gap-2 rounded-capsula bg-material px-3.5 py-1.5 text-[13px] font-medium text-azul-800 shadow-sutil ring-1 ring-separador">
-              <span aria-hidden="true" className="size-2 shrink-0 rounded-capsula bg-verde-500" />
-              <span>{hero.eyebrow}</span>
-            </p>
-          ) : null}
+    <>
+      <section
+        aria-labelledby="titulo-inicio"
+        className="sobre-oscuro relative isolate overflow-hidden bg-azul-950"
+      >
+        {imagenDeFondo ? (
+          <>
+            <FotoDeFondo imagen={imagenDeFondo} prioritaria className="-z-20" />
+            {fondo?.tipo === "video" ? (
+              // Sin sonido, sin controles y en bucle: es textura, no un reproductor.
+              // `aria-hidden` + el póster ya descrito por el `<img>` de abajo evitan
+              // anunciarlo dos veces.
+              <video
+                aria-hidden="true"
+                tabIndex={-1}
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="metadata"
+                poster={fondo.poster.src}
+                className="absolute inset-0 -z-20 size-full object-cover motion-reduce:hidden"
+              >
+                <source src={fondo.src} />
+              </video>
+            ) : null}
+            {/* Viraje al azul de marca: la capa toma el tono de `azul-700` y deja
+                la luminosidad de la foto (`mix-blend-color`). Es lo que hace que
+                la portada se lea PIYC —azul— a primera vista (regla 13). */}
+            <div
+              aria-hidden="true"
+              className="absolute inset-0 -z-10 bg-azul-700 opacity-75 mix-blend-color"
+            />
+          </>
+        ) : (
+          // Sin fondo definido: degradado de marca con la retícula tenue. Tiene
+          // que leerse como una decisión, no como una imagen que no cargó.
+          <div
+            aria-hidden="true"
+            className="fondo-noche reticula-cabecera absolute inset-0 -z-20"
+          />
+        )}
+        <div
+          aria-hidden="true"
+          className={`absolute inset-0 -z-10 ${imagenDeFondo ? "velo-cabecera" : ""}`}
+        />
 
-          <h1
-            id="titulo-inicio"
-            className="mt-6 text-balance text-[2.5rem] font-bold leading-[1.02] text-azul-950 sm:text-[3.5rem] lg:text-[4rem]"
-          >
-            {hero?.title ?? "Automatización industrial e ingeniería eléctrica"}
-          </h1>
+        <Contenedor className="flex min-h-[30rem] flex-col pb-14 pt-[calc(var(--alto-nav)+2rem)] sm:min-h-[34rem] lg:min-h-[40rem] lg:pb-20 lg:pt-[calc(var(--alto-nav)+3rem)]">
+          <div className="animate-aparecer mt-auto max-w-[56rem]">
+            {hero?.eyebrow ? <Rotulo tono="oscuro">{hero.eyebrow}</Rotulo> : null}
 
-          {eslogan ? (
-            <p className="mt-5 text-[1.375rem] font-medium leading-snug text-azul-700 sm:text-[1.5rem]">
-              {eslogan}
-            </p>
-          ) : null}
+            <h1
+              id="titulo-inicio"
+              className={`text-balance text-[2.5rem] font-semibold leading-[1.03] text-blanco sm:text-[3.375rem] lg:text-[4rem] ${
+                hero?.eyebrow ? "mt-5" : ""
+              }`}
+            >
+              {hero?.title ?? "Automatización industrial e ingeniería eléctrica"}
+            </h1>
 
-          {hero?.subtitle ? (
-            <p className="mt-5 max-w-[58ch] text-[1.0625rem] leading-[1.65] text-acero-600 sm:text-[1.125rem]">
-              {hero.subtitle}
-            </p>
-          ) : null}
-
-          {/* Los dos CTA son un grupo: mismo alto siempre y, apilados en
-              móvil, mismo ancho (`GrupoDeBotones`). */}
-          <GrupoDeBotones className="mt-9">
-            {ctaPrimario ? (
-              <BotonPrimario href={ctaPrimario.href} tamano="grande">
-                {ctaPrimario.etiqueta}
-              </BotonPrimario>
+            {eslogan ? (
+              <p className="mt-5 max-w-[46ch] text-[1.25rem] font-medium leading-snug text-acero-100 sm:text-[1.5rem]">
+                {eslogan}
+              </p>
             ) : null}
 
-            {/* `href: "whatsapp"` es el convenio del ajuste para «usa el número
-                de contacto», sin que el panel tenga que escribir la URL. */}
-            {ctaSecundario && hrefWhatsApp ? (
-              <BotonWhatsApp
-                href={ctaSecundario.href === "whatsapp" ? hrefWhatsApp : ctaSecundario.href}
-                tamano="grande"
-              >
-                {ctaSecundario.etiqueta}
-              </BotonWhatsApp>
+            {hero?.subtitle ? (
+              <p className="mt-4 max-w-[58ch] text-[1.0625rem] leading-[1.65] text-acero-200 sm:text-[1.125rem]">
+                {hero.subtitle}
+              </p>
             ) : null}
-          </GrupoDeBotones>
-        </div>
 
-        {/* Widget de la derecha: la foto que el panel haya puesto o, si no hay
-            ninguna, el diagrama de escalera como respaldo. Los dos comparten el
-            mismo marco redondeado azul noche, para que cambiar de uno a otro no
-            altere el ritmo de la portada. */}
-        <figure className="animate-aparecer lg:col-span-5 lg:[animation-delay:120ms]">
-          <div className="sobre-oscuro overflow-hidden rounded-panel fondo-noche shadow-elevada ring-1 ring-separador-claro">
-            <div className="flex items-center justify-between gap-4 px-5 py-4">
-              {/* Con foto, el rótulo repite el texto alternativo: se oculta a
-                  los lectores de pantalla para no leerlo dos veces. */}
-              <span
-                aria-hidden={imagen ? "true" : undefined}
-                className="truncate text-[13px] font-medium text-acero-300"
-              >
-                {imagen ? rotuloImagen : "PLC-01 · Lógica de control"}
-              </span>
-              {imagen ? null : (
-                <span className="inline-flex shrink-0 items-center gap-2 rounded-capsula bg-relleno-claro px-2.5 py-1 text-[12px] font-semibold text-verde-300">
-                  <span
-                    aria-hidden="true"
-                    className="size-1.5 rounded-capsula bg-verde-400 animate-parpadeo"
-                  />
-                  En marcha
-                </span>
-              )}
-            </div>
+            {/* Los dos CTA son un grupo: mismo alto siempre y, apilados en
+                móvil, mismo ancho (`GrupoDeBotones`). */}
+            <GrupoDeBotones className="mt-9">
+              {ctaPrimario ? (
+                <BotonPrimario href={ctaPrimario.href} tono="oscuro" tamano="grande">
+                  {ctaPrimario.etiqueta}
+                </BotonPrimario>
+              ) : null}
 
-            {imagen ? (
-              // Es la imagen LCP de la portada: `prioritaria` le pone
-              // `fetchpriority="high"`, `loading="eager"` y las medidas
-              // explícitas que evitan el salto de layout.
-              <div className="px-3 pb-3">
-                <ContentImage
-                  src={imagen.src}
-                  alt={imagen.alt}
-                  width={imagen.width}
-                  height={imagen.height}
-                  srcMovil={imagen.srcMovil}
-                  sizes="(min-width: 1024px) 40vw, 100vw"
-                  prioritaria
-                  proporcion="aspect-[4/3]"
-                  claseContenedor="rounded-tarjeta bg-azul-950/55 ring-1 ring-separador-claro"
-                />
-              </div>
-            ) : (
-              <>
-                <div className="px-3">
-                  <div className="rounded-tarjeta bg-azul-950/55 p-4 ring-1 ring-separador-claro">
-                    <DiagramaEscalera className="block h-auto w-full font-sans" />
-                  </div>
-                </div>
-
-                <figcaption className="px-3 py-3">
-                  <dl className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-                    {cartela.map((celda) => (
-                      <div
-                        key={celda.dato}
-                        className="rounded-chip bg-relleno-claro px-3 py-2.5"
-                      >
-                        <dt className="text-[11px] font-medium text-acero-300">{celda.dato}</dt>
-                        <dd className="mt-0.5 text-[13px] font-medium text-acero-100">
-                          {celda.valor}
-                        </dd>
-                      </div>
-                    ))}
-                  </dl>
-                </figcaption>
-              </>
-            )}
+              {/* `href: "whatsapp"` es el convenio del ajuste para «usa el número
+                  de contacto», sin que el panel tenga que escribir la URL. */}
+              {ctaSecundario && hrefWhatsApp ? (
+                <BotonWhatsApp
+                  href={ctaSecundario.href === "whatsapp" ? hrefWhatsApp : ctaSecundario.href}
+                  tamano="grande"
+                >
+                  {ctaSecundario.etiqueta}
+                </BotonWhatsApp>
+              ) : null}
+            </GrupoDeBotones>
           </div>
-        </figure>
-      </div>
+        </Contenedor>
+      </section>
 
       {/* LÍNEAS DE SERVICIO
-          Una sola tarjeta que ocupa exactamente el ancho del contenedor (su
-          borde derecho es el margen derecho del contenido) partida en celdas
-          por filetes (`gap-px` sobre fondo `separador`). Dos columnas desde
-          `lg` y una debajo: así cada frase corta cabe en UNA línea en
-          escritorio y tableta — en cuatro columnas no cabían 45 caracteres y
-          se partían en dos (Cesar, sep-2026). Nombre y frase salen del panel
-          (`home.lineasServicio`). */}
+          Una sola tarjeta que ocupa exactamente el ancho del contenedor
+          partida en celdas por filetes (`gap-px` sobre fondo `separador`). Dos
+          columnas desde `lg` y una debajo: así cada frase corta cabe en UNA
+          línea en escritorio y tableta (Cesar, sep-2026). Nombre y frase salen
+          del panel (`home.lineasServicio`). */}
       {lineas.length > 0 ? (
-        <div className="mx-auto max-w-sitio px-4 pb-14 sm:px-6 lg:px-8 lg:pb-20">
-          <h2 className="sr-only">Líneas de servicio</h2>
-          <ul
-            data-franja-lineas=""
-            className="grid gap-px overflow-hidden rounded-tarjeta bg-separador shadow-tarjeta ring-1 ring-separador lg:grid-cols-2"
-          >
-            {lineas.map((linea, indice) => (
-              <li
-                key={linea.id}
-                className="group relative flex items-center gap-4 bg-blanco px-5 py-4 transition-colors duration-300 ease-ios hover:bg-lienzo-alto sm:px-6 sm:py-5"
-              >
-                <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-capsula bg-relleno text-[13px] font-semibold tabular-nums text-azul-700 transition-colors duration-300 ease-ios group-hover:bg-azul-700 group-hover:text-blanco">
-                  {String(indice + 1).padStart(2, "0")}
-                </span>
-                <div className="min-w-0 flex-1">
-                  <h3 className="text-[1.0625rem] font-semibold leading-snug text-azul-950">
-                    <Link
-                      href={`/servicios#${linea.id}`}
-                      className="after:absolute after:inset-0 after:content-['']"
-                    >
-                      {linea.titulo}
-                    </Link>
-                  </h3>
-                  {linea.resumenCorto ? (
-                    <p
-                      data-resumen-linea=""
-                      className="mt-0.5 text-[14px] leading-snug text-acero-600"
-                    >
-                      {linea.resumenCorto}
-                    </p>
-                  ) : null}
-                </div>
-                <IconoFlecha className="hidden size-4.5 shrink-0 text-azul-700 transition-transform duration-300 ease-ios group-hover:translate-x-1 sm:block" />
-              </li>
-            ))}
-          </ul>
-        </div>
+        <section aria-labelledby="titulo-lineas" className="bg-lienzo">
+          <Contenedor className="py-12 lg:py-16">
+            <h2 id="titulo-lineas" className="sr-only">
+              Líneas de servicio
+            </h2>
+            <ul
+              data-franja-lineas=""
+              className="grid gap-px overflow-hidden rounded-tarjeta bg-separador shadow-tarjeta ring-1 ring-separador lg:grid-cols-2"
+            >
+              {lineas.map((linea, indice) => (
+                <li
+                  key={linea.id}
+                  className="group relative flex items-center gap-4 bg-blanco px-5 py-4 transition-colors duration-300 ease-ios hover:bg-lienzo-alto sm:px-6 sm:py-5"
+                >
+                  <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-capsula bg-relleno text-[13px] font-semibold tabular-nums text-azul-700 transition-colors duration-300 ease-ios group-hover:bg-azul-700 group-hover:text-blanco">
+                    {String(indice + 1).padStart(2, "0")}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="text-[1.0625rem] font-semibold leading-snug text-azul-950">
+                      <Link
+                        href={`/servicios#${linea.id}`}
+                        className="after:absolute after:inset-0 after:content-['']"
+                      >
+                        {linea.titulo}
+                      </Link>
+                    </h3>
+                    {linea.resumenCorto ? (
+                      <p
+                        data-resumen-linea=""
+                        className="mt-0.5 text-[14px] leading-snug text-acero-600"
+                      >
+                        {linea.resumenCorto}
+                      </p>
+                    ) : null}
+                  </div>
+                  <IconoFlecha className="hidden size-4.5 shrink-0 text-azul-700 transition-transform duration-300 ease-ios group-hover:translate-x-1 sm:block" />
+                </li>
+              ))}
+            </ul>
+          </Contenedor>
+        </section>
       ) : null}
-    </section>
+    </>
   );
 }

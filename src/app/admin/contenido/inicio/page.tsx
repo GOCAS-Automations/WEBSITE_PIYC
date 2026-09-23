@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { requireContentEditor } from "@/lib/supabase/auth";
 import { getAjustes, listProyectos, listServicios } from "@/lib/admin/lecturas";
 import {
@@ -7,22 +6,25 @@ import {
   AyudaSeccion,
   CabeceraPanel,
   Campo,
+  Selector,
   Tarjeta,
   TituloTarjeta,
 } from "@/components/admin/ui";
 import { FormularioAdmin } from "@/components/admin/FormularioAdmin";
 import { CampoImagen } from "@/components/admin/CampoImagen";
 import { CampoLista } from "@/components/admin/CampoLista";
+import { CampoLogos } from "@/components/admin/CampoLogos";
 import { CampoParejas } from "@/components/admin/CampoParejas";
+import { CampoVideo } from "@/components/admin/CampoVideo";
 import {
   guardarInicioCierre,
+  guardarInicioClientes,
   guardarInicioDestacados,
   guardarInicioFranja,
   guardarInicioHero,
   guardarInicioIntro,
   guardarInicioLineas,
   guardarInicioProceso,
-  guardarInicioValores,
 } from "../actions";
 import { LARGO_RESUMEN_CORTO, RESUMENES_CORTOS_DE_LINEA } from "@/lib/content";
 import { lineasDeServicio } from "@/data/servicios";
@@ -73,6 +75,11 @@ export default async function InicioPage() {
     listProyectos(),
   ]);
   const home = ajustes.home;
+  const fondo = home.hero?.fondo;
+  // Respaldo del campo viejo: hasta sep-2026 la foto de la portada vivía en
+  // `hero.image` (el recuadro de la derecha). Se muestra en el campo nuevo
+  // para no obligar a volver a subirla.
+  const imagenFondo = fondo?.imagen ?? home.hero?.image;
 
   return (
     <>
@@ -151,21 +158,124 @@ export default async function InicioPage() {
                 defaultValue={home.hero?.ctaSecundario?.href}
                 placeholder="/servicios"
               />
+
+              {/* --- Fondo de la portada --------------------------- */}
+              <div className="sm:col-span-2">
+                <AyudaSeccion>
+                  La portada abre con una <strong>imagen o un video a pantalla completa</strong>,
+                  con un velo azul encima para que el texto siempre se lea. Elige abajo
+                  cuál de los dos se muestra: lo que no elijas se queda guardado por si
+                  quieres volver a cambiarlo.
+                </AyudaSeccion>
+              </div>
+              <Selector
+                label="Qué se ve de fondo"
+                name="fondo_tipo"
+                scope="hero"
+                defaultValue={fondo?.tipo === "video" ? "video" : "imagen"}
+                options={[
+                  { value: "imagen", label: "Una imagen" },
+                  { value: "video", label: "Un video" },
+                ]}
+                hint="Si eliges video y no hay video cargado, la portada muestra la imagen."
+              />
               <div className="sm:col-span-2">
                 <CampoImagen
-                  label="Imagen principal de la portada"
-                  name="hero_imagen"
-                  altName="hero_imagen_alt"
+                  label="Imagen de fondo de la portada"
+                  name="fondo_imagen"
+                  altName="fondo_imagen_alt"
                   folder="inicio"
                   scope="hero"
-                  defaultValue={home.hero?.image?.src}
-                  defaultAlt={home.hero?.image?.alt}
-                  defaultMovil={home.hero?.image?.srcMovil}
-                  defaultWidth={home.hero?.image?.width}
-                  defaultHeight={home.hero?.image?.height}
-                  hint="Es la foto grande del recuadro de la derecha, lo primero que se ve al abrir el sitio. Si la dejas vacía (botón «Quitar»), la portada vuelve a mostrar el esquema eléctrico animado que trae de fábrica. Se recorta a 4:3, así que elige una foto apaisada donde lo importante quede al centro."
+                  defaultValue={imagenFondo?.src}
+                  defaultAlt={imagenFondo?.alt}
+                  defaultMovil={imagenFondo?.srcMovil}
+                  defaultWidth={imagenFondo?.width}
+                  defaultHeight={imagenFondo?.height}
+                  hint="Lo primero que ve quien abre el sitio. Una foto apaisada y ancha, de obra, tablero o planta, con lo importante hacia la derecha: el texto va encima, a la izquierda. Si la quitas y tampoco hay video, la portada queda sobre el degradado azul de la marca."
                 />
               </div>
+              <div className="sm:col-span-2">
+                <CampoVideo
+                  label="Video de fondo — dirección del archivo"
+                  name="fondo_video"
+                  scope="hero"
+                  defaultValue={fondo?.video?.src}
+                  hint="Solo archivos .mp4 o .webm guardados en el almacenamiento del sitio o en Cloudinary. Corto (10–20 segundos), sin sonido y liviano: se reproduce solo, en bucle y sin controles. Un enlace de YouTube no sirve aquí."
+                />
+              </div>
+              <div className="sm:col-span-2">
+                <CampoImagen
+                  label="Póster del video (obligatorio si hay video)"
+                  name="fondo_poster"
+                  altName="fondo_poster_alt"
+                  folder="inicio"
+                  scope="hero"
+                  defaultValue={fondo?.video?.poster?.src}
+                  defaultAlt={fondo?.video?.poster?.alt}
+                  defaultMovil={fondo?.video?.poster?.srcMovil}
+                  defaultWidth={fondo?.video?.poster?.width}
+                  defaultHeight={fondo?.video?.poster?.height}
+                  hint="El primer fotograma. Es lo que se ve mientras el video carga y lo único que ven quienes pidieron menos movimiento en su celular o computador. Lo mejor es una captura del propio video."
+                />
+              </div>
+            </div>
+          </FormularioAdmin>
+        </Tarjeta>
+
+        {/* --- Logos de clientes ------------------------------------ */}
+        <Tarjeta>
+          <TituloTarjeta
+            title="Clientes"
+            description="La franja de logos con la que cierra la portada, justo antes de la última llamada a la acción. Es la prueba de que PIYC ya trabajó con empresas conocidas."
+          />
+          <AyudaSeccion className="mb-5">
+            Cada logo <strong>lleva al caso de éxito de ese cliente</strong>: escribe en
+            «Dirección del caso» el slug del proyecto, tal como aparece en su ficha. Si lo
+            dejas vacío, o si ese proyecto todavía no está publicado, el logo se ve igual
+            pero sin enlace — nunca manda a una página que no existe.
+            {proyectos.length > 0 && (
+              <>
+                {" "}
+                <strong>Proyectos disponibles:</strong>{" "}
+                <span className="font-mono text-xs">
+                  {proyectos.map((p) => p.slug).join(" · ")}
+                </span>
+              </>
+            )}
+          </AyudaSeccion>
+          <FormularioAdmin action={guardarInicioClientes}>
+            <div className="space-y-4">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Campo
+                  label="Línea pequeña de arriba"
+                  name="eyebrow"
+                  scope="clientes"
+                  defaultValue={home.clientes?.eyebrow}
+                  placeholder="Confían en nosotros"
+                />
+                <Campo
+                  label="Título"
+                  name="title"
+                  scope="clientes"
+                  defaultValue={home.clientes?.title}
+                  placeholder="Empresas que ya trabajan con PIYC"
+                />
+                <AreaTexto
+                  label="Párrafo de entrada"
+                  name="intro"
+                  scope="clientes"
+                  rows={2}
+                  defaultValue={home.clientes?.intro}
+                  className="sm:col-span-2"
+                />
+              </div>
+              <CampoLogos
+                label="Logos"
+                folder="inicio"
+                defaultValue={home.clientes?.logos}
+                slugsDisponibles={proyectos.map((p) => p.slug)}
+                hint="Sube el logo en PNG con fondo transparente o en WebP. En la portada se ven en gris y recuperan el color al pasar el puntero. Con las flechas cambias el orden; si quitas todos, la franja desaparece del sitio."
+              />
             </div>
           </FormularioAdmin>
         </Tarjeta>
@@ -365,50 +475,10 @@ export default async function InicioPage() {
           </FormularioAdmin>
         </Tarjeta>
 
-        {/* --- Entradilla de los valores en la portada --------------- */}
-        <Tarjeta>
-          <TituloTarjeta
-            title="Entradilla de los valores en la portada"
-            description="El rótulo, el título y la frase que presentan los cuatro valores en el inicio. Son textos distintos de los de la página Nosotros."
-          />
-          <AyudaSeccion className="mb-5">
-            Los valores en sí —nombre, descripción e icono— se editan en{" "}
-            <Link
-              prefetch={false}
-              href="/admin/contenido/valores"
-              className="font-semibold text-azul-700 underline"
-            >
-              Valores corporativos
-            </Link>
-            , y se usan tanto aquí como en Nosotros.
-          </AyudaSeccion>
-          <FormularioAdmin action={guardarInicioValores}>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <Campo
-                label="Línea pequeña de arriba"
-                name="eyebrow"
-                scope="valores-inicio"
-                defaultValue={home.seccionValores?.eyebrow}
-                placeholder="Lo que sostiene el trabajo"
-              />
-              <Campo
-                label="Título"
-                name="title"
-                scope="valores-inicio"
-                defaultValue={home.seccionValores?.title}
-                placeholder="Nuestros valores"
-              />
-              <AreaTexto
-                label="Frase de presentación"
-                name="intro"
-                scope="valores-inicio"
-                rows={2}
-                defaultValue={home.seccionValores?.intro}
-                className="sm:col-span-2"
-              />
-            </div>
-          </FormularioAdmin>
-        </Tarjeta>
+        {/* Los valores salieron de la portada (reunión con PIYC, sep-2026):
+            se quedan solo en la página Nosotros, y sus textos se editan en
+            «Valores corporativos» y en «Página Nosotros». Por eso aquí ya no
+            hay tarjeta de entradilla de valores. */}
 
         {/* --- Destacados ------------------------------------------- */}
         <Tarjeta>

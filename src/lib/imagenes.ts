@@ -66,3 +66,29 @@ export function esImagenOptimizable(src: string | null | undefined): boolean {
     ({ host, ruta }) => host.test(url.hostname) && url.pathname.startsWith(ruta),
   );
 }
+
+/* ===================================================================== */
+/* Video de fondo del hero                                                */
+/* ===================================================================== */
+
+/**
+ * Formatos que el sitio sirve como fondo del hero. Son los dos que reproducen
+ * todos los navegadores actuales sin plugin ni transcodificación.
+ */
+export const EXTENSIONES_VIDEO = [".mp4", ".webm"] as const;
+
+/**
+ * ¿Puede el sitio reproducir este video de fondo?
+ *
+ * Mismos hosts que las imágenes (`media-src` de la CSP es la misma lista que
+ * `img-src`) más la extensión: un enlace de YouTube o de Drive **no** sirve
+ * aquí —son páginas, no archivos— y quedaría en un hueco negro. Lo usan la
+ * server action del panel y el aviso del formulario, para que la regla se
+ * escriba una sola vez.
+ */
+export function esVideoPermitido(src: string | null | undefined): boolean {
+  if (!src) return false;
+  const sinConsulta = src.split(/[?#]/)[0]?.toLowerCase() ?? "";
+  const extensionValida = EXTENSIONES_VIDEO.some((ext) => sinConsulta.endsWith(ext));
+  return extensionValida && esImagenOptimizable(src);
+}

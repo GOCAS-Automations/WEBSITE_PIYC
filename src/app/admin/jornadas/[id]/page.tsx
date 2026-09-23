@@ -27,7 +27,6 @@ import { AccionesRevision } from "@/components/jornadas/AccionesRevision";
 import { FormularioJornada } from "@/components/jornadas/FormularioJornada";
 import {
   aprobarJornada,
-  eliminarJornadaComoManager,
   guardarJornadaComoManager,
   reabrirJornada,
   rechazarJornada,
@@ -41,8 +40,8 @@ export const dynamic = "force-dynamic";
  * ====================
  * Todo lo que hace falta para decidir: quién, cuándo, qué hizo, cómo se
  * reparten sus horas y con qué horario se calcularon. Debajo, las acciones de
- * revisión, con la diferencia entre **rechazar** y **eliminar** escrita al lado
- * de cada botón (regla 6).
+ * revisión. Desde sept-2026 aquí NO se elimina: la jornada se aprueba o se
+ * rechaza (regla 6), y rechazar conserva el registro.
  *
  * El desglose sale siempre de `obtenerDesglose()`: si la jornada está aprobada
  * muestra lo congelado; si no, lo recalcula con el horario vigente. Esta
@@ -276,7 +275,6 @@ export default async function JornadaDetallePage({
               aprobar={aprobarJornada}
               rechazar={rechazarJornada}
               reabrir={reabrirJornada}
-              eliminar={eliminarJornadaComoManager}
             />
           </Tarjeta>
         </aside>

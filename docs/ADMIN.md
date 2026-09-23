@@ -219,16 +219,13 @@ Abre la ficha de una jornada pendiente («Revisar») para ver el detalle complet
 
 3. **Corregir esta jornada**: el desplegable **Abrir el formulario de corrección** permite cambiar las horas desde la ficha y se guarda con **Guardar la corrección**. Al corregir, la jornada vuelve a quedar pendiente y hay que aprobarla de nuevo.
 
-**Rechazar no es eliminar.** El registro se conserva siempre; rechazar solo lo devuelve con una explicación. Eliminar sí borra la jornada de forma permanente.
+**Una jornada registrada no se borra desde el panel.** El registro se conserva siempre; rechazar solo lo devuelve con una explicación para que la persona lo corrija. No existe un botón de eliminar jornadas: es una decisión de PIYC, porque el registro de horas es el soporte de lo que se paga.
 
 Una jornada ya revisada (aprobada o rechazada) se puede **volver a dejar pendiente** con el botón correspondiente, si hubo un error en la revisión. Al reabrir una aprobada se borra su cálculo congelado y hay que aprobarla de nuevo para que vuelva a quedar fija.
 
-### Eliminar (doble confirmación)
+### ¿Y si una jornada está mal o sobra?
 
-1. En la ficha de la jornada, pulsa **Quiero eliminarla**: aparece el botón rojo de verdad.
-2. Pulsa **Sí, eliminar definitivamente** y confirma en el aviso del navegador. Solo entonces se borra.
-
-El registro desaparece para todos, también del portal de la persona, y **no se puede deshacer**. Se usa solo para registros de prueba o duplicados; para pedir una corrección, se rechaza.
+No se elimina: se **rechaza** con una nota, y la persona la corrige y la vuelve a registrar. Si quedó un duplicado, se rechaza con la nota correspondiente y ahí queda, marcado como rechazado, sin sumar en los totales aprobados.
 
 ### Por qué una jornada aprobada no cambia
 

@@ -330,6 +330,59 @@ export type EncabezadoFranja = {
   ctaEtiqueta?: string;
 };
 
+/**
+ * FONDO A SANGRE DEL HERO DEL INICIO
+ * ==================================
+ * La portada abre con una imagen o un video de fondo bajo el velo azul noche,
+ * en el mismo lenguaje que `CabeceraInterna` (pedido de PIYC, sep-2026: fuera
+ * el diagrama de escalera del recuadro de la derecha).
+ *
+ * `tipo` manda: con `"video"` se pinta el `<video>` y el póster hace de primer
+ * fotograma; con `"imagen"`, la imagen. Si la pieza que pide `tipo` no está,
+ * se cae a la otra y, si tampoco, al degradado de marca — nunca a una caja
+ * rota. Todo es opcional para que el ajuste sea aditivo: un `home` guardado
+ * antes de este campo sigue siendo válido.
+ */
+export type FondoHero = {
+  tipo: "imagen" | "video";
+  /** Foto a sangre. Es la LCP del sitio cuando `tipo` es `"imagen"`. */
+  imagen?: ImagenContenido;
+  video?: {
+    /** URL del `.mp4` o `.webm` (bucket `site-images` o host permitido). */
+    src: string;
+    /**
+     * Primer fotograma. **Obligatorio en la práctica**: es lo que se ve
+     * mientras el video carga y lo único que se ve con
+     * `prefers-reduced-motion`. Sin póster, el video no se pinta.
+     */
+    poster?: ImagenContenido;
+  };
+};
+
+/**
+ * Un logo de la franja de clientes del final de la portada.
+ *
+ * `proyectoSlug` apunta al caso de éxito publicado de ese cliente. Si el slug
+ * no existe entre los proyectos publicados, el logo se pinta **sin enlace**:
+ * un logo sin caso es mejor que un 404.
+ */
+export type LogoCliente = {
+  /** Nombre del cliente. Da el texto accesible del enlace. */
+  nombre: string;
+  logo: ImagenContenido;
+  /** Slug del caso en `/proyectos/{slug}`. Vacío o ausente = logo sin enlace. */
+  proyectoSlug?: string;
+};
+
+/** Franja de logos de clientes, al final de la portada (antes del cierre). */
+export type FranjaClientes = {
+  eyebrow?: string;
+  title?: string;
+  intro?: string;
+  /** Sin logos = la franja no se pinta. */
+  logos: LogoCliente[];
+};
+
 export type AjustesHome = {
   hero?: {
     /** Línea corta sobre el título («Cali, Valle del Cauca»). */
@@ -340,10 +393,15 @@ export type AjustesHome = {
     ctaPrimario?: EnlaceContenido;
     ctaSecundario?: EnlaceContenido;
     /**
-     * Imagen principal de la portada, dentro del marco de la derecha.
-     * **Ausente = se pinta el diagrama de escalera** (el respaldo en código).
-     * Es la imagen LCP del sitio: se sirve sin `lazy`, con `fetchpriority` alto
-     * y con medidas explícitas.
+     * Fondo a sangre de la portada: imagen o video, editable desde el panel.
+     * Ausente = se intenta con `image` (el campo viejo) y, sin ella, queda el
+     * degradado de marca.
+     */
+    fondo?: FondoHero;
+    /**
+     * ⚠ CAMPO VIEJO (hasta sep-2026 era la foto del recuadro de la derecha).
+     * Se sigue leyendo como respaldo del fondo para no perder la foto ya
+     * guardada; el panel escribe `fondo` y deja de escribir este campo.
      */
     image?: ImagenContenido;
   };
@@ -368,9 +426,18 @@ export type AjustesHome = {
   seccionServicios?: EncabezadoFranja;
   /** Lo mismo para la franja de casos de éxito. */
   seccionProyectos?: EncabezadoFranja;
-  /** Rótulo, título e intro del bloque de valores **en la portada**. Los de
-   *  `/nosotros` viven en `AjustesNosotros.valores`: son dos textos distintos. */
+  /**
+   * ⚠ SIN USO desde sep-2026: los valores salieron de la portada y se quedaron
+   * solo en `/nosotros` (`AjustesNosotros.valores`). El campo sigue declarado
+   * porque el respaldo estático lo trae y el JSON guardado lo conserva, pero
+   * ni el sitio lo pinta ni el panel lo edita.
+   */
   seccionValores?: { eyebrow?: string; title?: string; intro?: string };
+  /**
+   * Franja de logos de clientes al final de la portada. Cada logo enlaza al
+   * caso de éxito de ese cliente. Ausente o sin logos = no se pinta.
+   */
+  clientes?: FranjaClientes;
   /**
    * Nombre y frase corta de cada una de las cuatro líneas de servicio (franja
    * bajo el hero). El nombre se usa también en `/servicios` y en las fichas.

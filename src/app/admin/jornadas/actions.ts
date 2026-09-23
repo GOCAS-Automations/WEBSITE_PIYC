@@ -3,7 +3,7 @@
 /**
  * SERVER ACTIONS — Revisión de jornadas (/admin/jornadas)
  * =======================================================
- * Aprobar, rechazar, reabrir, eliminar y registrar una jornada a nombre de otra
+ * Aprobar, rechazar, reabrir y registrar una jornada a nombre de otra
  * persona. Todo exige rol de **manager** (admin | coordinador) con la cuenta
  * activa: se comprueba aquí, en el servidor, además de las políticas RLS de las
  * migraciones 0002 y 0004. Desde la 0004 la base también impide que alguien
@@ -23,12 +23,12 @@
  * recalcularla. La restricción `jornadas_snapshot_solo_aprobada` de la base lo
  * exige también a ese nivel.
  *
- * RECHAZAR ≠ ELIMINAR (regla 6): rechazar conserva el registro y lo devuelve con
- * una nota; eliminar lo borra. Los mensajes de estas acciones lo repiten.
+ * RECHAZAR CONSERVA EL REGISTRO (regla 6): lo devuelve con una nota para que la
+ * persona lo corrija. Desde sept-2026 el panel ya no elimina jornadas —no hay
+ * acción de borrado aquí—, así que rechazar es la única vía de corrección.
  */
 
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import { getManagerOrNull, type Session } from "@/lib/supabase/auth";
 import { getContextoJornadas } from "@/lib/jornadas-lecturas";
 import {
@@ -282,43 +282,20 @@ export async function reabrirJornada(
 }
 
 /* ------------------------------------------------------------------ */
-/* Eliminar                                                            */
+/* Eliminar: ya no existe                                              */
 /* ------------------------------------------------------------------ */
 
-/**
- * Elimina una jornada definitivamente, en cualquier estado. Es la herramienta
- * para limpiar registros de prueba o duplicados. NO es lo mismo que rechazar:
- * la interfaz lo advierte y pide doble confirmación (regla 6).
+/*
+ * AQUÍ VIVÍA `eliminarJornadaComoManager`. Se quitó en sept-2026 por decisión
+ * de PIYC: una jornada es el soporte de lo que se paga, así que desde el panel
+ * se aprueba o se rechaza, pero no se borra. Rechazar conserva el registro
+ * (regla 6) y es la vía para pedir una corrección.
+ *
+ * LA BASE NO CAMBIÓ: la política RLS que permite a un manager borrar sigue en
+ * la migración 0002, intacta. Si algún día hay que limpiar una fila de prueba,
+ * se hace desde Supabase, no desde la interfaz. Volver a ofrecerlo en el panel
+ * es escribir de nuevo esta acción, no tocar migraciones.
  */
-export async function eliminarJornadaComoManager(
-  _prev: ActionState,
-  formData: FormData,
-): Promise<ActionState> {
-  const session = await getManagerOrNull();
-  if (!session) return SIN_PERMISO;
-
-  const id = text(formData, "id");
-  if (!id) return fail("Falta el identificador de la jornada.");
-
-  // `select("id")` distingue «no existe / sin permiso» de un borrado real: sin
-  // él, eliminar cero filas se vería como un éxito.
-  const { data, error } = await session.supabase
-    .from("jornadas")
-    .delete()
-    .eq("id", id)
-    .select("id");
-
-  if (error) return fail(error.message);
-  if (!data || data.length === 0)
-    return fail(
-      "No se pudo eliminar: esa jornada ya no existe o tu cuenta no tiene permiso. Recarga la página.",
-    );
-
-  revalidar();
-  // La ficha de la que se dispara esta acción deja de existir: quedarse en ella
-  // mostraría un 404. Se vuelve al listado, que es donde hay algo que hacer.
-  redirect("/admin/jornadas?eliminada=1");
-}
 
 /* ------------------------------------------------------------------ */
 /* Registrar o editar a nombre de una persona                          */

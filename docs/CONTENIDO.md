@@ -406,6 +406,58 @@ ve la chaqueta de PIYC puesta. Va en la galería de nosotros, que la pinta chica
   sacarle fotogramas con Edge y no decodificó; con `ffmpeg` saldrían tres o
   cuatro imágenes nuevas de obra. Queda como pendiente.
 
+### 2.5 Logos de clientes — tercer origen (23-sep-2026)
+
+Un origen aparte de los dos anteriores: **material de marca de terceros**, no
+fotos de PIYC. Vive en el bucket bajo `clientes/` y se referencia desde
+`site_settings.home.clientes`, la franja del final de la portada donde cada
+logo lleva al caso de éxito de ese cliente.
+
+Solo entran clientes con **caso publicado**. Hoy son tres; si mañana se publica
+un caso de otro cliente, su logo entra por la misma puerta y con el mismo
+tratamiento.
+
+| Cliente | Archivo en el bucket | De dónde salió | Peso |
+| --- | --- | --- | --- |
+| JGB | `clientes/logo-jgb.webp` | SVG del encabezado de su sitio oficial: `jgb.com.co/wp-content/uploads/2025/08/logo_principal.svg` | 8,3 KB |
+| Alival | `clientes/logo-alival.webp` | `alival.com.co/wp-content/uploads/2023/02/logo-alival.webp` (la pieza de mayor resolución, 341×139) | 11,0 KB |
+| B. Altman | `clientes/logo-b-altman.webp` | `b-altman.com/wp-content/uploads/2020/07/logo-b-altman.jpg` (1134×454, a color) | 13,9 KB |
+
+**Licencia y origen.** Los tres se descargaron del **sitio oficial de cada
+empresa**; no hay capturas de pantalla ni archivos de bancos de logos. Son
+marcas registradas de sus dueños y se usan aquí como referencia nominativa de
+una relación comercial real —cada uno enlaza al caso que PIYC ejecutó para esa
+empresa—, sin afirmar alianza, patrocinio ni respaldo. Si alguno pide que lo
+bajen, se borra el archivo del bucket y se saca su entrada de
+`home.clientes`: la franja se pinta con los que queden.
+
+**Normalización** (misma receta para los tres, con `sharp`):
+
+1. Recorte al contenido (`trim`), para que el margen no dependa del archivo de
+   origen.
+2. Escalado a un **lienzo común de 320×120 px** con fondo transparente,
+   centrado, con margen de 24 px a los lados y 16 px arriba y abajo.
+3. **Alto óptico parejo**, no alto literal: el óvalo de JGB va al 94 % de la
+   caja y el lockup de B. Altman al 90 %, porque una marca compacta al mismo
+   alto que un logotipo largo se ve más grande de lo que es.
+4. WebP sin pérdida, con transparencia. Ninguno se deformó ni se recortó por
+   dentro.
+
+Dos ajustes que conviene saber:
+
+- **Alival** solo publica su logo a color en 153×63 px, muy poco para la
+  franja. La pieza de 341×139 es el **mismo trazo** pero en blanco (para fondo
+  oscuro), así que se usó su canal alfa y se le devolvió el azul corporativo
+  `rgb(0, 58, 143)` **medido en la versión a color del propio sitio**. No es un
+  recoloreado: es el mismo logo, en su color, al doble de resolución.
+- **B. Altman** solo lo publica a color sobre fondo blanco (JPEG). Se le sacó
+  el blanco a transparencia por distancia al blanco, que deja intactas las
+  tintas (azul y naranja) y solo ablanda el borde. Se descartó la versión en
+  blanco con transparencia porque trae el sello «50 años», que es una marca de
+  aniversario y no el logo corporativo.
+
+---
+
 ---
 
 ## 3. Servicios

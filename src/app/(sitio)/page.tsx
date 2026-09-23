@@ -3,13 +3,19 @@
  *
  * Sistema v3: el ritmo ya no lo hacen los fondos alternados sino las
  * superficies. Todo se apoya en el mismo lienzo gris-azulado y lo que cambia
- * es qué flota encima: tarjetas blancas (servicios, casos, proceso) y dos
- * paneles azul noche (valores y cierre). Es el patrón «grouped» de iOS.
+ * es qué flota encima: tarjetas blancas (servicios, casos, proceso) y el panel
+ * azul noche del cierre. Es el patrón «grouped» de iOS.
+ *
+ * Abre con el hero de fondo a sangre (imagen o video del panel) y cierra con
+ * la franja de logos de clientes. Los valores ya no van aquí: viven solo en
+ * `/nosotros` (reunión con PIYC, sep-2026).
  */
 
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
+  fondoDelHero,
+  franjaDeClientes,
   getContacto,
   getHome,
   getLineasDeServicio,
@@ -17,15 +23,14 @@ import {
   getSeo,
   getServicios,
   getServiciosPorSlug,
-  getValores,
   enParrafos,
 } from "@/lib/content";
 import { MENSAJES_WHATSAPP, enlaceWhatsAppDe } from "@/lib/contacto";
 import { metadataDePagina, metadatosPagina } from "@/lib/seo";
 import { HeroInicio } from "@/components/inicio/HeroInicio";
+import { FranjaClientes } from "@/components/inicio/FranjaClientes";
 import { FranjaProceso } from "@/components/inicio/FranjaProceso";
 import { FranjaCta } from "@/components/sections/FranjaCta";
-import { Valores } from "@/components/sections/Valores";
 import { RejillaDeProyectos, RejillaDeServicios } from "@/components/sections/tarjetas";
 import {
   Contenedor,
@@ -54,10 +59,9 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Inicio() {
-  const [home, contacto, valores, todosLosServicios, proyectos, lineas] = await Promise.all([
+  const [home, contacto, todosLosServicios, proyectos, lineas] = await Promise.all([
     getHome(),
     getContacto(),
-    getValores(),
     getServicios(),
     getProyectos(),
     getLineasDeServicio(),
@@ -84,13 +88,13 @@ export default async function Inicio() {
   // que la sección no quede sin nombre.
   const seccionServicios = home.seccionServicios;
   const seccionProyectos = home.seccionProyectos;
-  const seccionValores = home.seccionValores;
   const notaCierre = home.cta?.nota;
 
   return (
     <main id="contenido">
       <HeroInicio
         hero={home.hero}
+        fondo={fondoDelHero(home.hero)}
         eslogan={contacto.tagline}
         lineas={lineas}
         hrefWhatsApp={hrefWhatsApp}
@@ -196,11 +200,12 @@ export default async function Inicio() {
 
       <FranjaProceso proceso={home.proceso} />
 
-      <Valores
-        valores={valores}
-        rotulo={seccionValores?.eyebrow}
-        titulo={seccionValores?.title}
-        intro={seccionValores?.intro}
+      {/* Prueba social: los logos de los clientes, cada uno hacia su caso de
+          éxito. Los valores salieron de la portada (reunión con PIYC,
+          sep-2026): se quedan solo en `/nosotros`. */}
+      <FranjaClientes
+        clientes={franjaDeClientes(home)}
+        slugsPublicados={new Set(proyectos.map((proyecto) => proyecto.slug))}
       />
 
       <FranjaCta

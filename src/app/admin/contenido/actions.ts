@@ -29,7 +29,7 @@ import { revalidatePath } from "next/cache";
 import { getContentEditorOrNull } from "@/lib/supabase/auth";
 import { slugify } from "@/lib/slug";
 import { youtubeId } from "@/lib/youtube";
-import { esImagenOptimizable } from "@/lib/imagenes";
+import { esImagenOptimizable, esVideoPermitido } from "@/lib/imagenes";
 import {
   bool,
   fail,
@@ -50,7 +50,9 @@ import type {
   AjustesPaginas,
   AjustesSeo,
   BloqueImagenes,
+  FondoHero,
   ImagenContenido,
+  LogoCliente,
   TextosLineaServicio,
   VideoContenido,
 } from "@/lib/content-types";
@@ -193,6 +195,29 @@ function imagenDeFormulario(
     text(formData, `${campo}_ancho`),
     text(formData, `${campo}_alto`),
   );
+}
+
+/**
+ * FONDO DEL HERO DEL INICIO (imagen o video).
+ *
+ * `fondo_tipo` decide qué pinta la portada; las dos piezas se guardan siempre
+ * las dos, para que cambiar de imagen a video y volver no borre la otra. Todo
+ * puede ir vacío: el hero cae entonces al degradado de marca.
+ */
+function fondoDeFormulario(formData: FormData): FondoHero {
+  const tipo = text(formData, "fondo_tipo") === "video" ? "video" : "imagen";
+  const fondo: FondoHero = { tipo };
+
+  const imagen = imagenDeFormulario(formData, "fondo_imagen", "fondo_imagen_alt");
+  if (imagen) fondo.imagen = imagen;
+
+  const src = text(formData, "fondo_video");
+  const poster = imagenDeFormulario(formData, "fondo_poster", "fondo_poster_alt");
+  if (src !== "" || poster) {
+    fondo.video = { src, ...(poster ? { poster } : {}) };
+  }
+
+  return fondo;
 }
 
 /** Slug propuesto desde el título si quien edita no escribió uno. */
@@ -461,6 +486,23 @@ export async function guardarInicioHero(
   _prev: ActionState,
   formData: FormData,
 ): Promise<ActionState> {
+  // El fondo se valida ANTES de escribir: un video que el sitio no puede
+  // reproducir deja la portada en un hueco negro, y eso no se descubre hasta
+  // verla publicada.
+  const fondo = fondoDeFormulario(formData);
+  if (fondo.tipo === "video" && fondo.video?.src) {
+    if (!esVideoPermitido(fondo.video.src)) {
+      return fail(
+        "El video de fondo tiene que ser un archivo .mp4 o .webm del almacenamiento del sitio (o de Cloudinary). Un enlace de YouTube, Drive o de una página web no sirve aquí: el sitio necesita el archivo.",
+      );
+    }
+    if (!fondo.video.poster) {
+      return fail(
+        "El video de fondo necesita una imagen de póster: es lo que se ve mientras el video carga y lo único que ven quienes piden menos movimiento en su dispositivo. Sube una foto en «Póster del video».",
+      );
+    }
+  }
+
   const estado = await actualizarAjuste<AjustesHome>("home", (home) => ({
     ...home,
     hero: {
@@ -475,8 +517,63 @@ export async function guardarInicioHero(
         etiqueta: text(formData, "cta2_etiqueta"),
         href: text(formData, "cta2_href"),
       },
-      // Sin imagen (`undefined`) la portada vuelve al diagrama de escalera.
-      image: imagenDeFormulario(formData, "hero_imagen", "hero_imagen_alt"),
+      fondo,
+      // El campo viejo (`image`, la foto del recuadro de la derecha) deja de
+      // escribirse: su contenido ya se lee como respaldo del fondo.
+    },
+  }));
+  if (estado.status === "success") revalidarSitio("/");
+  return estado;
+}
+
+/**
+ * FRANJA DE LOGOS DE CLIENTES DE LA PORTADA
+ * =========================================
+ * Textos + lista de logos. Cada fila viaja como campos repetidos en paralelo
+ * (`cliente_nombre`, `cliente_logo`, `cliente_logo_alt`, `cliente_slug` y los
+ * ocultos de medidas), igual que la galería: la acción los empareja por
+ * posición. Una fila sin logo o sin nombre se descarta — no aporta nada y
+ * dejaría un hueco en la franja.
+ *
+ * El `proyectoSlug` NO se valida contra la base aquí: se guarda tal cual y es
+ * la portada la que decide, contra los proyectos publicados, si el logo lleva
+ * enlace o no. Así se puede preparar la franja antes de publicar el caso.
+ */
+export async function guardarInicioClientes(
+  _prev: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  const valores = (clave: string) =>
+    formData.getAll(clave).map((v) => (typeof v === "string" ? v.trim() : ""));
+  const srcs = valores("cliente_logo");
+  const alineada = (lista: string[]) => (lista.length === srcs.length ? lista : []);
+  const nombres = alineada(valores("cliente_nombre"));
+  const alts = alineada(valores("cliente_logo_alt"));
+  const slugs = alineada(valores("cliente_slug"));
+  const moviles = alineada(valores("cliente_logo_movil"));
+  const anchos = alineada(valores("cliente_logo_ancho"));
+  const altos = alineada(valores("cliente_logo_alto"));
+
+  const logos: LogoCliente[] = srcs.flatMap((src, i) => {
+    const nombre = nombres[i] ?? "";
+    if (src === "" || nombre === "") return [];
+    const slug = slugify(slugs[i] ?? "");
+    return [
+      {
+        nombre: nombre.slice(0, 80),
+        logo: armarImagen(src, alts[i] ?? "", moviles[i], anchos[i], altos[i]),
+        ...(slug ? { proyectoSlug: slug } : {}),
+      },
+    ];
+  });
+
+  const estado = await actualizarAjuste<AjustesHome>("home", (home) => ({
+    ...home,
+    clientes: {
+      eyebrow: text(formData, "eyebrow"),
+      title: text(formData, "title"),
+      intro: text(formData, "intro"),
+      logos,
     },
   }));
   if (estado.status === "success") revalidarSitio("/");
@@ -563,22 +660,9 @@ export async function guardarInicioLineas(
   return estado;
 }
 
-/** Rótulo, título e introducción del bloque de valores **de la portada**. */
-export async function guardarInicioValores(
-  _prev: ActionState,
-  formData: FormData,
-): Promise<ActionState> {
-  const estado = await actualizarAjuste<AjustesHome>("home", (home) => ({
-    ...home,
-    seccionValores: {
-      eyebrow: text(formData, "eyebrow"),
-      title: text(formData, "title"),
-      intro: text(formData, "intro"),
-    },
-  }));
-  if (estado.status === "success") revalidarSitio("/");
-  return estado;
-}
+/* Los valores salieron de la portada (reunión con PIYC, sep-2026): se quedan
+   solo en `/nosotros`, cuyos textos vive en `AjustesNosotros.valores`. Por eso
+   ya no hay `guardarInicioValores`: `home.seccionValores` quedó sin uso. */
 
 export async function guardarInicioProceso(
   _prev: ActionState,

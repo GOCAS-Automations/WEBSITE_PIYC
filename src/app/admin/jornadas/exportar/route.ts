@@ -11,13 +11,43 @@
  *
  * FORMATO, PENSADO PARA QUE EXCEL EN ESPAÑOL LO ABRA BIEN
  * -------------------------------------------------------
- *   · **UTF-8 con BOM** — sin el BOM, Excel en Windows lee el archivo como
- *     ANSI y las tildes y las eñes salen rotas.
+ *   · **UTF-8 con BOM, y SIN la línea `sep=;`** — sin el BOM, Excel en
+ *     Windows lee el archivo como ANSI y las tildes y las eñes salen rotas;
+ *     con `sep=` delante, el BOM deja de servir. Las dos cosas juntas no
+ *     funcionan, y era justo la causa de las tildes rotas (ver abajo).
  *   · **Separador `;`** — en la configuración regional de Colombia la coma es
  *     el separador decimal, así que el separador de listas es el punto y coma.
- *     Se declara además con la línea `sep=;` de la primera fila.
+ *     Excel lo toma de la configuración regional de Windows, no del archivo.
  *   · **Coma decimal** — `8,5` y no `8.5`, para que Excel lo tome como número.
  *   · **Saltos de línea CRLF**, que es lo que espera Excel.
+ *
+ * POR QUÉ SE QUITÓ `sep=;` (las tildes rotas, reportado en sept-2026)
+ * ---------------------------------------------------------------------
+ * El archivo salía bien formado —UTF-8 de verdad, con el BOM al principio— y
+ * aun así Excel mostraba «Salió» como «SaliÃ³» y «Diseño» como «DiseÃ±o». El
+ * culpable no era la codificación del archivo sino la línea `sep=;`:
+ *
+ *   cuando Excel encuentra `sep=` en la primera línea de un .csv abierto con
+ *   doble clic, entra por la ruta de importación «con directiva de separador»,
+ *   y en esa ruta **descarta el BOM**: relee el archivo con la página de
+ *   códigos ANSI del sistema (Windows-1252 en un Windows en español). Cada
+ *   byte de un par UTF-8 se pinta entonces como un carácter suelto, y de ahí
+ *   el «Ã³», el «Ã±» y el «Â».
+ *
+ * O sea: en Excel, BOM y `sep=` son excluyentes. Hay que elegir uno.
+ *
+ * SE ELIGIÓ EL BOM, porque lo que se rompe sin él —tildes y eñes— está en los
+ * nombres de las personas, en la labor realizada y en las notas de revisión,
+ * es decir en casi todas las celdas con texto; mientras que lo único que
+ * aportaba `sep=` —decirle a Excel que el separador es `;`— ya lo resuelve la
+ * configuración regional: en es-CO (y en es-ES) el separador de listas de
+ * Windows **es** el punto y coma, así que Excel parte las columnas bien por su
+ * cuenta. Solo un Windows configurado en inglés abriría el archivo en una sola
+ * columna, y ahí el remedio es Datos → Texto en columnas, no romperle las
+ * tildes a todos los demás.
+ *
+ * El BOM tiene que ser el primer carácter del cuerpo, sin nada delante: si lo
+ * precediera cualquier otra cosa, Excel tampoco lo reconocería.
  *
  * INYECCIÓN DE FÓRMULAS: una celda que empiece por `=`, `+`, `-` o `@` la
  * ejecuta Excel al abrir el archivo. Como el texto lo escribe cualquiera desde
@@ -122,11 +152,9 @@ export async function GET(request: Request): Promise<Response> {
     "Nota de revisión",
   ];
 
-  const lineas: string[] = [
-    // Le dice a Excel cuál es el separador antes de leer la cabecera.
-    "sep=;",
-    fila(columnas.map((c) => celda(c))),
-  ];
+  // OJO: la primera línea es la CABECERA, no `sep=;`. Volver a meter esa
+  // directiva rompe las tildes en Excel (ver la nota del encabezado).
+  const lineas: string[] = [fila(columnas.map((c) => celda(c)))];
 
   /* ---------------- Una fila por jornada ---------------- */
   for (const j of jornadas) {

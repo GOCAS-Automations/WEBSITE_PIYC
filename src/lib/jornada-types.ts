@@ -30,7 +30,9 @@ export const ETIQUETA_ESTADO: Record<EstadoJornada, string> = {
  * que nadie confunda **rechazada** con **eliminada** (regla 6).
  */
 export const EXPLICACION_ESTADO: Record<EstadoJornada, string> = {
-  pendiente: "Registrada, esperando revisión. Todavía se puede editar o eliminar.",
+  // La frase la leen dos pantallas: el panel (que ya no elimina jornadas) y el
+  // portal del empleado. Por eso habla solo de editar: es cierto en las dos.
+  pendiente: "Registrada, esperando revisión. Todavía se puede editar.",
   aprobada:
     "Revisada y aceptada. Su desglose de horas quedó congelado y ya no cambia.",
   rechazada:

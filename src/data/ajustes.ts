@@ -36,21 +36,35 @@ export const contactEstatico: AjustesContact = {
   legalName: "Programación Industrial y Control S.A.S.",
   nit: "901.161.923",
   tagline: "Tu socio confiable en soluciones industriales",
+  // «Local 2» va dentro de `street` y de `full` (PIYC, reunión del 23-sep-2026):
+  // en esa dirección hay dos locales y el de PIYC es el segundo. `street` es lo
+  // que el JSON-LD emite como `streetAddress`, así que los dos campos lo dicen.
+  // El mapa NO depende de esto: sale del CID de la ficha (`src/lib/contacto.ts`).
   address: {
-    street: "Cl. 33 #5-76",
+    street: "Cl. 33 #5-76, Local 2",
     area: "Comuna 4",
     city: "Cali",
     region: "Valle del Cauca",
     country: "Colombia",
-    full: "Cl. 33 #5-76, Comuna 4, Cali, Valle del Cauca",
+    full: "Cl. 33 #5-76, Local 2, Comuna 4, Cali, Valle del Cauca",
   },
-  // Un solo número público y un solo correo público (decisión de Cesar,
-  // 21-sep-2026): el celular y el correo personales del fundador no se
-  // publican en el sitio. Si vuelve a hacer falta un segundo canal, se agrega
-  // desde el panel, no aquí.
-  phones: [{ label: "+57 321 761 7958", intl: "573217617958" }],
+  // Dos números públicos (PIYC, reunión del 23-sep-2026, revierte la decisión
+  // del 21-sep): el de la empresa y el de Jorge Castillo. El correo público
+  // sigue siendo uno solo. El primero de `phones` es el que se pinta en el nav
+  // y en el pie (`telefonoPrincipal`), y `whatsappFormulario` —destino del
+  // formulario, regla 5 de AGENTS.md— sigue siendo el de la empresa.
+  phones: [
+    { label: "+57 321 761 7958", intl: "573217617958" },
+    { label: "+57 310 637 3483", intl: "573106373483" },
+  ],
   whatsapp: [
     { label: "+57 321 761 7958", intl: "573217617958", person: null, principal: true },
+    {
+      label: "+57 310 637 3483",
+      intl: "573106373483",
+      person: "Jorge Castillo",
+      principal: false,
+    },
   ],
   primaryWhatsApp: "573217617958",
   whatsappFormulario: "573217617958",
@@ -158,6 +172,49 @@ export const homeEstatico: AjustesHome = {
     "pasteurizador-alival",
     "estacion-cargue-alival",
   ],
+  // Franja de logos al final de la portada (PIYC, reunión del 23-sep-2026).
+  // Solo clientes con un caso publicado: cada logo lleva a ese caso. Los tres
+  // archivos se normalizaron a un mismo lienzo de 320×120 con transparencia
+  // —recorte al contenido, alto óptico parejo, sin deformar ni recolorear— y
+  // su procedencia está en docs/CONTENIDO.md §«Logos de clientes».
+  clientes: {
+    eyebrow: "Clientes",
+    title: "Plantas que confiaron el proceso",
+    intro:
+      "Cada logo lleva al caso de éxito de ese cliente: qué se intervino, cómo se hizo y cómo quedó el proceso al entregarlo.",
+    logos: [
+      {
+        nombre: "JGB",
+        logo: {
+          src: `${BUCKET}/clientes/logo-jgb.webp`,
+          alt: "Logo de JGB, cliente de PIYC",
+          width: 320,
+          height: 120,
+        },
+        proyectoSlug: "preparacion-alcohol-jgb",
+      },
+      {
+        nombre: "Alival",
+        logo: {
+          src: `${BUCKET}/clientes/logo-alival.webp`,
+          alt: "Logo de Alival, cliente de PIYC",
+          width: 320,
+          height: 120,
+        },
+        proyectoSlug: "pasteurizador-alival",
+      },
+      {
+        nombre: "B. Altman",
+        logo: {
+          src: `${BUCKET}/clientes/logo-b-altman.webp`,
+          alt: "Logo de B. Altman, cliente de PIYC",
+          width: 320,
+          height: 120,
+        },
+        proyectoSlug: "ingenieria-control-b-altman",
+      },
+    ],
+  },
   cta: {
     title: "¿Tiene un proceso que automatizar o un tablero que rehacer?",
     body: "Cuéntenos qué necesita y con qué restricciones trabaja su planta. Respondemos por WhatsApp y, si hace falta, vamos a verlo en sitio.",
@@ -475,7 +532,7 @@ export const seoEstatico: AjustesSeo = {
     contacto: {
       title: "Contacto",
       description:
-        "Escríbanos por WhatsApp o déjenos los datos de su proyecto. Cl. 33 #5-76, Cali, Valle del Cauca. Automatización industrial e ingeniería eléctrica.",
+        "Escríbanos por WhatsApp o déjenos los datos de su proyecto. Cl. 33 #5-76, Local 2, Cali. Automatización industrial e ingeniería eléctrica.",
     },
   },
 };

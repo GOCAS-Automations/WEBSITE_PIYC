@@ -1,13 +1,23 @@
 /**
  * FORMULARIO DE CONTACTO — `POST /api/contacto`
  * =============================================
- * **Este endpoint NO envía correo** (regla 5 de AGENTS.md). Hace tres cosas:
+ * Hace cuatro cosas, en este orden:
  *
  *   1. Valida el payload y aplica el anti-spam (regla 7: honeypot + 3 s
  *      mínimos medidos contra el reloj del visitante + longitudes máximas +
  *      tope por IP con `ip_hash` salado). Sin captcha ni terceros.
  *   2. Registra el lead en `site_mensajes` con la clave service-role.
  *   3. Devuelve el enlace `wa.me` prearmado, que el cliente abre.
+ *   4. **Después de responder**, y solo si hay SMTP configurado, manda un
+ *      aviso por correo a quien atiende los mensajes (ver `./correo.ts`).
+ *
+ * EL CORREO ES UN AÑADIDO, NUNCA UN REQUISITO (pedido por PIYC en sept-2026).
+ * Sin las variables de `SMTP_*`, este endpoint se comporta exactamente como
+ * antes: lead + WhatsApp, sin errores ni avisos al visitante. Y va dentro de
+ * `after()`, así que un SMTP lento o caído no retrasa ni rompe la respuesta:
+ * el enlace de WhatsApp ya salió. La regla 5 sigue en pie donde importa —el
+ * número y el destinatario salen de los ajustes o del entorno, nunca del
+ * payload—; lo que cambia es que ahora el aviso también llega por correo.
  *
  * EL NÚMERO DESTINO SALE SIEMPRE DE `site_settings.contact.whatsappFormulario`.
  * Nunca del payload: tomarlo del formulario convertiría el sitio en un relay
@@ -24,10 +34,11 @@
 
 import { createHash } from "node:crypto";
 import { headers } from "next/headers";
-import { NextResponse } from "next/server";
+import { after, NextResponse } from "next/server";
 import { getServiceRoleSupabase } from "@/lib/supabase/admin";
 import { getContacto } from "@/lib/content";
-import { whatsappFormulario } from "@/lib/contacto";
+import { correoPrincipal, whatsappFormulario } from "@/lib/contacto";
+import { correoConfigurado, enviarAvisoDeLead } from "./correo";
 import { enlaceWhatsApp } from "@/lib/whatsapp";
 import {
   LIMITES_CONTACTO,
@@ -245,6 +256,22 @@ export async function POST(request: Request) {
       // Queda en el log del servidor.
       console.error("[contacto] no se pudo registrar el lead:", error);
     }
+  }
+
+  /* --- Aviso por correo (después de responder) ----------------------- */
+  // `after()` corre el callback cuando la respuesta ya salió: el visitante no
+  // espera al SMTP. Si no hay SMTP configurado ni siquiera se programa nada,
+  // para no cargar `nodemailer` en vano.
+  if (correoConfigurado()) {
+    after(async () => {
+      // El destinatario NO viene del payload: `CONTACT_TO` manda, y si no está,
+      // el correo publicado en los ajustes. Misma razón que el número de
+      // WhatsApp (regla 5).
+      await enviarAvisoDeLead(
+        { nombre, empresa, telefono, email, servicio, mensaje, destino, guardado },
+        correoPrincipal(contacto),
+      );
+    });
   }
 
   return respuesta({ ok: true, whatsappUrl, guardado }, 200);

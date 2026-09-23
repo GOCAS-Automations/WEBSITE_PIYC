@@ -37,8 +37,11 @@ import type {
   AjustesSeo,
   BloqueImagenes,
   ClaveAjustes,
+  FondoHero,
+  FranjaClientes,
   ImagenContenido,
   LineaServicio,
+  LogoCliente,
   Proyecto,
   Servicio,
   Valor,
@@ -499,6 +502,78 @@ export const getLineasDeServicio = cache(async (): Promise<LineaServicio[]> => {
   const home = await getHome();
   return aplicarTextosDeLinea(lineasDeServicio, home.lineasServicio);
 });
+
+/* ===================================================================== */
+/* Portada: fondo del hero y franja de clientes                           */
+/* ===================================================================== */
+
+/**
+ * Una imagen solo sirve si tiene `src` y `alt`: sin `alt` entraría al sitio sin
+ * texto alternativo, y eso no se publica.
+ */
+function imagenUtil(imagen: ImagenContenido | undefined): ImagenContenido | null {
+  return imagen?.src && imagen.alt ? imagen : null;
+}
+
+/** Lo que el hero necesita pintar: una foto, un video con póster, o nada. */
+export type FondoDelHero =
+  | { tipo: "imagen"; imagen: ImagenContenido }
+  | { tipo: "video"; src: string; poster: ImagenContenido }
+  | null;
+
+/**
+ * Resuelve el fondo a sangre de la portada desde `home.hero`.
+ *
+ *  - `fondo.tipo === "video"` y hay `src` **y** póster → video (el póster es el
+ *    primer fotograma y lo único que se ve con `prefers-reduced-motion`). Un
+ *    video sin póster no se pinta: dejaría un hueco negro mientras carga.
+ *  - Si no, la imagen de `fondo.imagen` y, como respaldo, la del campo viejo
+ *    `hero.image` (la foto del recuadro de la derecha de antes de sep-2026).
+ *  - Nada de eso → `null`, y el hero queda sobre el degradado de marca.
+ */
+export function fondoDelHero(hero: AjustesHome["hero"]): FondoDelHero {
+  const fondo: FondoHero | undefined = hero?.fondo;
+  const poster = imagenUtil(fondo?.video?.poster);
+  const src = fondo?.video?.src?.trim();
+
+  if (fondo?.tipo === "video" && src && poster) {
+    return { tipo: "video", src, poster };
+  }
+
+  const imagen = imagenUtil(fondo?.imagen) ?? imagenUtil(hero?.image) ?? poster;
+  return imagen ? { tipo: "imagen", imagen } : null;
+}
+
+/**
+ * Franja de logos de clientes de la portada (`home.clientes`), saneada.
+ *
+ * El JSON de la base no se da por bueno: solo pasan los logos con `src`, `alt`
+ * y nombre. **Respaldo estático vacío**: si no hay logos, devuelve `null` y la
+ * franja no se pinta. El `proyectoSlug` se valida contra los proyectos
+ * publicados en la página, no aquí.
+ */
+export function franjaDeClientes(home: AjustesHome): FranjaClientes | null {
+  const clientes = home.clientes;
+  if (!clientes || !Array.isArray(clientes.logos)) return null;
+
+  const logos: LogoCliente[] = clientes.logos.flatMap((cliente) => {
+    if (!esObjeto(cliente)) return [];
+    const nombre = typeof cliente.nombre === "string" ? cliente.nombre.trim() : "";
+    const logo = esObjeto(cliente.logo) ? (cliente.logo as unknown as ImagenContenido) : undefined;
+    const valido = imagenUtil(logo);
+    if (nombre === "" || !valido) return [];
+    const slug = typeof cliente.proyectoSlug === "string" ? cliente.proyectoSlug.trim() : "";
+    return [{ nombre, logo: valido, ...(slug ? { proyectoSlug: slug } : {}) }];
+  });
+
+  if (logos.length === 0) return null;
+  return {
+    eyebrow: clientes.eyebrow,
+    title: clientes.title,
+    intro: clientes.intro,
+    logos,
+  };
+}
 
 /** Primera foto de un servicio (galería o portada), o `null` si no tiene. */
 export function primeraFotoDe(images: BloqueImagenes): ImagenContenido | null {

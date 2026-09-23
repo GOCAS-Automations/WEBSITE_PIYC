@@ -1,16 +1,20 @@
 "use client";
 
 /**
- * APROBAR · RECHAZAR · REABRIR · ELIMINAR
- * =======================================
- * Las cuatro acciones de revisión de una jornada, en un solo bloque para que la
+ * APROBAR · RECHAZAR · REABRIR
+ * ============================
+ * Las tres acciones de revisión de una jornada, en un solo bloque para que la
  * diferencia entre ellas esté escrita justo donde se pulsa.
  *
- * **RECHAZAR NO ES ELIMINAR** (regla 6 de `AGENTS.md`). Rechazar devuelve la
- * jornada al empleado con una nota que él lee en su portal para corregirla; el
- * registro se conserva. Eliminar borra la fila y no se puede deshacer, por eso
- * lleva **doble confirmación**: primero hay que abrir el bloque de eliminación y
- * después aceptar el aviso del navegador.
+ * **NO SE ELIMINAN JORNADAS DESDE EL PANEL** (decisión de PIYC, reunión de
+ * sept-2026). El registro de horas es el soporte de lo que se paga: una vez
+ * creado, se aprueba o se rechaza, pero no desaparece. Lo que antes era el
+ * bloque «Eliminar el registro» se quitó de aquí; el permiso sigue existiendo en
+ * la base (RLS y migraciones intactas), solo que ninguna pantalla lo ofrece.
+ *
+ * **RECHAZAR ES LA HERRAMIENTA** (regla 6 de `AGENTS.md`): devuelve la jornada
+ * al empleado con una nota que él lee en su portal para corregirla, y el
+ * registro se conserva siempre.
  *
  * Al **aprobar**, el servidor congela el desglose. Volver a poner la jornada en
  * pendiente («Reabrir») es el único camino legítimo para recalcularla.
@@ -24,14 +28,12 @@ import { LIMITES_JORNADA, type EstadoJornada } from "@/lib/jornada-types";
 import {
   banner,
   botonOscuro,
-  botonPeligro,
-  botonPeligroFuerte,
   botonPrimario,
   botonSecundario,
   etiquetaCampo,
   inputClass,
 } from "@/components/admin/ui-base";
-import { IconoCheck, IconoPapelera } from "@/components/admin/iconos";
+import { IconoCheck } from "@/components/admin/iconos";
 
 type Accion = (state: ActionState, formData: FormData) => Promise<ActionState>;
 
@@ -54,22 +56,18 @@ export function AccionesRevision({
   aprobar,
   rechazar,
   reabrir,
-  eliminar,
 }: {
   id: string;
   estado: EstadoJornada;
   aprobar: Accion;
   rechazar: Accion;
   reabrir: Accion;
-  eliminar: Accion;
 }) {
   const [estadoAprobar, accionAprobar, aprobando] = useActionState(aprobar, idleState);
   const [estadoRechazar, accionRechazar, rechazando] = useActionState(rechazar, idleState);
   const [estadoReabrir, accionReabrir, reabriendo] = useActionState(reabrir, idleState);
-  const [estadoEliminar, accionEliminar, eliminando] = useActionState(eliminar, idleState);
 
   const [rechazoAbierto, setRechazoAbierto] = useState(false);
-  const [borradoAbierto, setBorradoAbierto] = useState(false);
 
   const pendiente = estado === "pendiente";
 
@@ -84,7 +82,6 @@ export function AccionesRevision({
       <Mensaje state={estadoAprobar} />
       <Mensaje state={estadoRechazar} />
       <Mensaje state={estadoReabrir} />
-      <Mensaje state={estadoEliminar} />
 
       {/* ---------------- Pendiente: aprobar o rechazar ---------------- */}
       {pendiente && (
@@ -115,9 +112,9 @@ export function AccionesRevision({
               ¿Hay algo que corregir?
             </p>
             <p className="mt-1 text-xs leading-relaxed text-acero-600">
-              <strong>Rechazar no es eliminar.</strong> La jornada se conserva y
+              <strong>Rechazar no borra nada.</strong> La jornada se conserva y
               vuelve al portal de la persona con tu nota, para que la registre
-              bien. Eliminar sí borra el registro, y está más abajo.
+              bien. Es la única forma de pedir una corrección.
             </p>
 
             {!rechazoAbierto ? (
@@ -202,58 +199,13 @@ export function AccionesRevision({
         </div>
       )}
 
-      {/* ---------------- Eliminar (doble confirmación) ---------------- */}
-      <div className="rounded-control bg-lienzo-alto p-4 ring-1 ring-separador">
-        <p className="text-sm font-semibold text-azul-950">Eliminar el registro</p>
-        <p className="mt-1 text-xs leading-relaxed text-acero-600">
-          Borra la jornada de la base de datos: desaparece también del portal de
-          la persona y <strong>no se puede deshacer</strong>. Úsalo solo para
-          registros de prueba o duplicados. Para pedir una corrección, rechaza.
-        </p>
-
-        {!borradoAbierto ? (
-          <button
-            type="button"
-            onClick={() => setBorradoAbierto(true)}
-            className={`${botonPeligro} mt-3`}
-          >
-            <IconoPapelera className="h-4 w-4" />
-            Quiero eliminarla
-          </button>
-        ) : (
-          <form
-            action={accionEliminar}
-            onSubmit={(event) => {
-              if (
-                !window.confirm(
-                  "Vas a ELIMINAR esta jornada definitivamente.\n\nEl registro desaparece para todos y no se puede recuperar.\n\nSi lo que quieres es pedir una corrección, cancela y usa «Rechazar con una nota»: así la persona la vuelve a registrar bien.\n\n¿Eliminar de todas formas?",
-                )
-              ) {
-                event.preventDefault();
-                setBorradoAbierto(false);
-              }
-            }}
-            className="mt-3 flex flex-wrap items-center gap-2"
-          >
-            <input type="hidden" name="id" value={id} />
-            <button
-              type="submit"
-              disabled={eliminando}
-              className={botonPeligroFuerte}
-            >
-              <IconoPapelera className="h-4 w-4" />
-              {eliminando ? "Eliminando…" : "Sí, eliminar definitivamente"}
-            </button>
-            <button
-              type="button"
-              onClick={() => setBorradoAbierto(false)}
-              className={botonSecundario}
-            >
-              Cancelar
-            </button>
-          </form>
-        )}
-      </div>
+      {/*
+        AQUÍ ESTABA «Eliminar el registro». Se quitó por decisión de PIYC
+        (reunión de sept-2026): una jornada registrada no se borra desde el
+        panel; se aprueba o se rechaza. El permiso sigue vivo en la base —RLS y
+        migraciones sin tocar—, así que si algún día hace falta limpiar una fila
+        de prueba se hace desde Supabase, no desde la interfaz.
+      */}
     </div>
   );
 }
