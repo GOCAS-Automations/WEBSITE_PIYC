@@ -413,25 +413,31 @@ fotos de PIYC. Vive en el bucket bajo `clientes/` y se referencia desde
 `site_settings.home.clientes`, la franja del final de la portada donde cada
 logo lleva al caso de éxito de ese cliente.
 
-Solo entran clientes con **caso publicado**. Hoy son tres; si mañana se publica
-un caso de otro cliente, su logo entra por la misma puerta y con el mismo
-tratamiento.
+Hoy son **cinco**. El `proyectoSlug` es opcional: el cliente que ya tiene caso
+publicado enlaza a él, y el que no —Nestlé y Litoplas, agregados el
+23-sep-2026 a pedido de PIYC— se pinta sin enlace hasta que PIYC le asigne uno
+desde el panel. Si mañana entra otro cliente, su logo pasa por la misma puerta
+y el mismo tratamiento.
 
 | Cliente | Archivo en el bucket | De dónde salió | Peso |
 | --- | --- | --- | --- |
 | JGB | `clientes/logo-jgb.webp` | SVG del encabezado de su sitio oficial: `jgb.com.co/wp-content/uploads/2025/08/logo_principal.svg` | 8,3 KB |
 | Alival | `clientes/logo-alival.webp` | `alival.com.co/wp-content/uploads/2023/02/logo-alival.webp` (la pieza de mayor resolución, 341×139) | 11,0 KB |
 | B. Altman | `clientes/logo-b-altman.webp` | `b-altman.com/wp-content/uploads/2020/07/logo-b-altman.jpg` (1134×454, a color) | 13,9 KB |
+| Nestlé | `clientes/logo-nestle.webp` | SVG del encabezado de su sitio oficial: `nestle.com.co/themes/custom/da_vinci_code/logo.svg` (vector, 1316×342) | 7,8 KB |
+| Litoplas | `clientes/logo-litoplas.webp` | `litoplas.com/wp-content/uploads/LOGO.png` (549×122, a color con transparencia) | 7,7 KB |
 
-**Licencia y origen.** Los tres se descargaron del **sitio oficial de cada
+**Licencia y origen.** Los cinco se descargaron del **sitio oficial de cada
 empresa**; no hay capturas de pantalla ni archivos de bancos de logos. Son
 marcas registradas de sus dueños y se usan aquí como referencia nominativa de
 una relación comercial real —cada uno enlaza al caso que PIYC ejecutó para esa
-empresa—, sin afirmar alianza, patrocinio ni respaldo. Si alguno pide que lo
+empresa—, sin afirmar alianza, patrocinio ni respaldo. Nestlé y Litoplas son
+clientes reales de PIYC sin caso publicado todavía: aparecen solo como logo,
+sin enlace. Si alguno pide que lo
 bajen, se borra el archivo del bucket y se saca su entrada de
 `home.clientes`: la franja se pinta con los que queden.
 
-**Normalización** (misma receta para los tres, con `sharp`):
+**Normalización** (misma receta para los cinco, con `sharp`):
 
 1. Recorte al contenido (`trim`), para que el margen no dependa del archivo de
    origen.
@@ -455,6 +461,18 @@ Dos ajustes que conviene saber:
   tintas (azul y naranja) y solo ablanda el borde. Se descartó la versión en
   blanco con transparencia porque trae el sello «50 años», que es una marca de
   aniversario y no el logo corporativo.
+- **Nestlé** publica el lockup completo —nido, logotipo y el eslogan «Good
+  food, Good life» al lado—. De ese vector oficial se tomó solo el **bloque
+  corporativo** (nido + logotipo, el tercio izquierdo hasta el espacio en
+  blanco que lo separa del eslogan): el eslogan es una frase de campaña que los
+  otros cuatro logos no llevan. No se recoloreó: queda el café `#63513D` que
+  trae el propio archivo. Al ser casi cuadrado, manda el alto (85×88 en la
+  caja) y es el más angosto de los cinco, como el óvalo de JGB.
+- **Litoplas** (empaques flexibles, Barranquilla) sí publica su logo a color
+  con transparencia, así que solo se recortó y escaló. Es el más alargado
+  (4,5:1), así que manda el ancho: se le dejó el **93 % del ancho útil**
+  (253×56) en vez del 100 %, porque a 272 px su logotipo en negrita pesaba
+  ópticamente más que el resto de la franja.
 
 ---
 

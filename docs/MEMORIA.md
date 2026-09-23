@@ -98,3 +98,8 @@ El proyecto de Supabase de PIYC es propio (creado por Cesar con los accesos que 
 **Decisiones:** el correo del formulario es **aviso**, no canal: primero el lead y WhatsApp, el correo después y sin bloquear. Destino, siempre de ajustes o entorno.
 **Tropiezos:** el CSV no fallaba por codificación sino por la línea `sep=;`: Excel entra por la ruta de importación con directiva de separador y **descarta el BOM**, releyendo en ANSI. BOM y `sep=` son excluyentes; en Windows es-CO el `;` ya es el separador de listas.
 **Pendiente:** credenciales SMTP (Workspace con contraseña de aplicación, o Resend/Brevo con DNS); decidir si el empleado sigue pudiendo borrar su jornada pendiente desde `/mi-cuenta`; indexar en Search Console.
+
+## 2026-09-23 (tarde) · Clientes y hero provisional
+
+**Hecho:** Nestlé y Litoplas se suman a la franja de clientes (cinco logos, de sus sitios oficiales, normalizados al mismo lienzo de 320×120); los dos nuevos van **sin caso**, así que se pintan sin enlace hasta que PIYC les asigne uno desde el panel. Los logos pasan a **color** —el gris los apagaba— con el puntero solo agrandándolos, y la fila quedó centrada. El hero del inicio sin fondo cargado muestra ahora la pantalla azul de marca con el logo y la cápsula «Imagen pendiente», el mismo marcador del resto del sitio, para que PIYC la reemplace por foto o video desde el panel.
+**Detalles:** el `intro` de la franja prometía que cada logo lleva a su caso; se reescribió porque ya no es cierto para todos. El logo de Nestlé se reescaló (contenido 85×88 → 100×104): su masa óptica quedaba por debajo de la de los otros cuatro.

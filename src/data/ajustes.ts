@@ -173,15 +173,16 @@ export const homeEstatico: AjustesHome = {
     "estacion-cargue-alival",
   ],
   // Franja de logos al final de la portada (PIYC, reunión del 23-sep-2026).
-  // Solo clientes con un caso publicado: cada logo lleva a ese caso. Los tres
-  // archivos se normalizaron a un mismo lienzo de 320×120 con transparencia
+  // El logo con `proyectoSlug` lleva al caso de ese cliente; el que no lo
+  // tiene se pinta sin enlace hasta que haya caso. Los cinco archivos se
+  // normalizaron a un mismo lienzo de 320×120 con transparencia
   // —recorte al contenido, alto óptico parejo, sin deformar ni recolorear— y
   // su procedencia está en docs/CONTENIDO.md §«Logos de clientes».
   clientes: {
     eyebrow: "Clientes",
     title: "Plantas que confiaron el proceso",
     intro:
-      "Cada logo lleva al caso de éxito de ese cliente: qué se intervino, cómo se hizo y cómo quedó el proceso al entregarlo.",
+      "Plantas de alimentos, empaques y manufactura que confiaron su proceso a PIYC. Donde hay caso publicado, el logo lleva a él.",
     logos: [
       {
         nombre: "JGB",
@@ -212,6 +213,26 @@ export const homeEstatico: AjustesHome = {
           height: 120,
         },
         proyectoSlug: "ingenieria-control-b-altman",
+      },
+      // Sin `proyectoSlug`: todavía no hay caso publicado con ellos, así que el
+      // logo se pinta sin enlace hasta que PIYC le asigne uno desde el panel.
+      {
+        nombre: "Nestlé",
+        logo: {
+          src: `${BUCKET}/clientes/logo-nestle.webp`,
+          alt: "Logo de Nestlé, cliente de PIYC",
+          width: 320,
+          height: 120,
+        },
+      },
+      {
+        nombre: "Litoplas",
+        logo: {
+          src: `${BUCKET}/clientes/logo-litoplas.webp`,
+          alt: "Logo de Litoplas, cliente de PIYC",
+          width: 320,
+          height: 120,
+        },
       },
     ],
   },

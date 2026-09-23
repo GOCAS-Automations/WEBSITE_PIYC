@@ -37,6 +37,7 @@
  * Todo el texto y el fondo llegan por props desde `site_settings.home`.
  */
 
+import Image from "next/image";
 import Link from "next/link";
 import type { AjustesHome, LineaServicio } from "@/lib/content-types";
 import type { FondoDelHero } from "@/lib/content";
@@ -107,12 +108,26 @@ export function HeroInicio({
             />
           </>
         ) : (
-          // Sin fondo definido: degradado de marca con la retícula tenue. Tiene
-          // que leerse como una decisión, no como una imagen que no cargó.
-          <div
-            aria-hidden="true"
-            className="fondo-noche reticula-cabecera absolute inset-0 -z-20"
-          />
+          // Sin fondo definido: pantalla azul de marca —la misma de los
+          // marcadores del resto del sitio— con el logo y la nota de que la
+          // imagen está pendiente. PIYC la reemplaza por su foto o su video
+          // desde el panel (Inicio → Primera pantalla).
+          <div aria-hidden="true" className="absolute inset-0 -z-20">
+            <div className="fondo-noche reticula-cabecera absolute inset-0" />
+            <div className="absolute inset-y-0 right-[6%] hidden flex-col items-center justify-center gap-4 opacity-70 lg:flex">
+              <Image
+                src="/brand/logo-piyc-oscuro.svg"
+                alt=""
+                width={452}
+                height={192}
+                unoptimized
+                className="h-16 w-auto"
+              />
+              <span className="rounded-capsula bg-relleno-claro px-3.5 py-1.5 text-[13px] font-medium text-acero-200">
+                Imagen pendiente
+              </span>
+            </div>
+          </div>
         )}
         <div
           aria-hidden="true"

@@ -84,7 +84,7 @@ export function FranjaClientes({
             logos una rejilla de cinco dejaba dos huecos y se leía como si
             faltaran clientes. Cada recuadro mide lo mismo, así que el alto
             óptico queda parejo aunque un logo sea cuadrado y otro apaisado. */}
-        <ul className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-6 sm:gap-x-10 lg:mt-12 lg:gap-x-14">
+        <ul className="mt-10 flex flex-wrap items-center justify-center gap-x-6 gap-y-6 sm:gap-x-10 lg:mt-12 lg:gap-x-14">
           {clientes.logos.map((cliente) => {
             const slug = cliente.proyectoSlug;
             const conCaso = Boolean(slug && slugsPublicados.has(slug));
@@ -100,13 +100,15 @@ export function FranjaClientes({
                     // El texto accesible manda sobre el `alt` del logo: quien
                     // navega con lector de pantalla oye a dónde lleva el enlace.
                     aria-label={`Ver el caso de PIYC con ${cliente.nombre}`}
-                    className="pulsable flex items-center justify-center rounded-tarjeta px-3 py-2 opacity-80 grayscale transition duration-300 ease-ios hover:opacity-100 hover:grayscale-0 focus-visible:opacity-100 focus-visible:grayscale-0"
+                    // Logos siempre a color (PIYC, 23-sep-2026: el gris los
+                    // hacía ver apagados). El puntero solo los agranda un poco.
+                    className="flex items-center justify-center rounded-tarjeta px-3 py-2 transition-transform duration-300 ease-ios hover:scale-105 focus-visible:scale-105 motion-reduce:transform-none"
                   >
                     <Logo {...cliente.logo} />
                   </Link>
                 ) : (
                   // Sin caso publicado: el logo se pinta igual, sin enlace.
-                  <div className="flex items-center justify-center px-3 py-2 opacity-80 grayscale">
+                  <div className="flex items-center justify-center px-3 py-2">
                     <Logo {...cliente.logo} />
                   </div>
                 )}
