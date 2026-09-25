@@ -89,6 +89,16 @@ export const contactEstatico: AjustesContact = {
 
 export const homeEstatico: AjustesHome = {
   hero: {
+    fondo: {
+      tipo: "imagen" as const,
+      imagen: {
+        src: `${BUCKET}/inicio/hero-linea-envasado.webp`,
+        alt: "Línea de envasado y dosificación en operación dentro de una sala de producción",
+        width: 1920,
+        height: 1080,
+        srcMovil: `${BUCKET}/inicio/hero-linea-envasado-900.webp`,
+      },
+    },
     eyebrow: "Ingeniería eléctrica · Automatización · Control",
     title: "Automatización industrial, tableros de control e ingeniería eléctrica en Cali",
     subtitle:
@@ -370,13 +380,6 @@ export const nosotrosEstatico: AjustesNosotros = {
       alt: "Tablero de fuerza abierto con barraje de cobre, interruptores automáticos y bloques de borneras",
       width: 933,
       height: 1920,
-    },
-    {
-      src: `${BUCKET}/nosotros/linea-envasado-sala-produccion.webp`,
-      alt: "Línea de envasado y dosificación en operación dentro de una sala de producción, con la máquina cerrada por sus guardas de seguridad",
-      width: 1920,
-      height: 1080,
-      srcMovil: `${BUCKET}/nosotros/linea-envasado-sala-produccion-900.webp`,
     },
   ],
 };

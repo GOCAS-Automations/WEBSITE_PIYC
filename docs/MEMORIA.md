@@ -103,3 +103,8 @@ El proyecto de Supabase de PIYC es propio (creado por Cesar con los accesos que 
 
 **Hecho:** Nestlé y Litoplas se suman a la franja de clientes (cinco logos, de sus sitios oficiales, normalizados al mismo lienzo de 320×120); los dos nuevos van **sin caso**, así que se pintan sin enlace hasta que PIYC les asigne uno desde el panel. Los logos pasan a **color** —el gris los apagaba— con el puntero solo agrandándolos, y la fila quedó centrada. El hero del inicio sin fondo cargado muestra ahora la pantalla azul de marca con el logo y la cápsula «Imagen pendiente», el mismo marcador del resto del sitio, para que PIYC la reemplace por foto o video desde el panel.
 **Detalles:** el `intro` de la franja prometía que cada logo lleva a su caso; se reescribió porque ya no es cierto para todos. El logo de Nestlé se reescaló (contenido 85×88 → 100×104): su masa óptica quedaba por debajo de la de los otros cuatro.
+
+## 2026-09-25 · Foto real en el hero
+
+**Hecho:** el hero del inicio deja de mostrar el marcador azul: lleva la toma apaisada de la línea de envasado (1920×1080 + variante de 900), que estaba en la galería de «Nuestro trabajo». Se copió a `inicio/hero-linea-envasado.webp`, salió de la galería —que vuelve a ocho— y se borraron los archivos viejos de `nosotros/`: una foto no se repite entre secciones. El marcador sigue en el código como respaldo para cuando no haya fondo cargado.
+**Ojo:** `SUPABASE_ACCESS_TOKEN` **venció** (era el personal de 7 días). La Management API ya no responde; los cambios de datos se hacen con la clave de servicio por PostgREST (`@supabase/supabase-js`), que es lo que usa el sitio. Para volver a correr SQL hace falta un token nuevo o el editor SQL del panel de Supabase.
