@@ -253,8 +253,19 @@ export async function POST(request: Request) {
       guardado = true;
     } catch (error) {
       // El lead NO se pierde por esto: se sigue devolviendo el enlace.
-      // Queda en el log del servidor.
-      console.error("[contacto] no se pudo registrar el lead:", error);
+      // Al log va SOLO el motivo, nunca el objeto de error completo: cuando
+      // Postgres rechaza una fila, su `details` trae el «Failing row contains
+      // (…)» con el nombre, el teléfono y el mensaje de quien escribió, y eso
+      // acabaría guardado en los registros de Vercel sin ninguna necesidad.
+      const motivo =
+        error && typeof error === "object" && "code" in error
+          ? `${String((error as { code?: unknown }).code ?? "")} ${String(
+              (error as { message?: unknown }).message ?? "",
+            )}`.trim()
+          : error instanceof Error
+            ? error.message
+            : "motivo desconocido";
+      console.error("[contacto] no se pudo registrar el lead:", motivo);
     }
   }
 

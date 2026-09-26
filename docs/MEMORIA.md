@@ -66,7 +66,7 @@ El proyecto de Supabase de PIYC es propio (creado por Cesar con los accesos que 
 - Reglas de jornada = las de GPI (ya coincidían campo por campo, incluido el umbral de almuerzo de 6 h). Se conservan las correcciones técnicas/legales de PIYC.
 - Horario oficial L–V 8:00 a. m.–5:00 p. m. (ficha de Google); en el panel hay dos campos: texto visible y «Horario para Google» (JSON-LD).
 - Las direcciones de El Porvenir del Drive no se usan.
-- Cuentas iniciales: `admin`, `jorge.castillo` (admin), `coordinador.prueba`, `empleado.prueba`. Contraseñas solo en `PIYC/material/credenciales-iniciales.txt` (fuera del repo); nunca en manuales. PIYC crea las demás.
+- Cuentas iniciales: las cuatro del arranque (dos de administración y dos de prueba). Sus nombres de usuario y contraseñas solo en `PIYC/material/credenciales-iniciales.txt` (fuera del repo); nunca en manuales. PIYC crea las demás.
 - Todo lo visual (textos, títulos, descripciones, imágenes) debe seguir siendo editable desde el panel.
 **Tropiezos:** `ui.tsx` (servidor) importaba cadenas de clase desde `ui-base.tsx` (`"use client"`) y recibía una referencia de cliente: un botón salía sin estilo. Las clases compartidas viven ahora en `src/components/admin/clases.ts` (módulo neutro) — es la regla 4. `backdrop-filter` no sobrevive a la impresión en PDF: en documentos se simula con blanco translúcido sobre degradado. Un reinicio del PC cortó dos agentes; se reanudaron con SendMessage sin perder trabajo.
 **Siguiente:** push (pendiente de autorización), fotos originales del Drive, logo vectorial (o redibujarlo en SVG), despliegue en Vercel con las 5 variables, borrar las cuentas `.prueba` antes de entregar.
@@ -108,3 +108,10 @@ El proyecto de Supabase de PIYC es propio (creado por Cesar con los accesos que 
 
 **Hecho:** el hero del inicio deja de mostrar el marcador azul: lleva la toma apaisada de la línea de envasado (1920×1080 + variante de 900), que estaba en la galería de «Nuestro trabajo». Se copió a `inicio/hero-linea-envasado.webp`, salió de la galería —que vuelve a ocho— y se borraron los archivos viejos de `nosotros/`: una foto no se repite entre secciones. El marcador sigue en el código como respaldo para cuando no haya fondo cargado.
 **Ojo:** `SUPABASE_ACCESS_TOKEN` **venció** (era el personal de 7 días). La Management API ya no responde; los cambios de datos se hacen con la clave de servicio por PostgREST (`@supabase/supabase-js`), que es lo que usa el sitio. Para volver a correr SQL hace falta un token nuevo o el editor SQL del panel de Supabase.
+
+## 2026-09-25 (tarde) · Auditoría de seguridad
+
+**Hecho:** auditoría completa (informe fuera del repo, ver `docs/SEGURIDAD.md`). Salió limpio lo esencial: ningún secreto en los 25 commits, la clave de servicio no llega al navegador, RLS probada rol por rol sin que pasara ninguna prueba de ataque —incluido el trigger de la 0004—, server actions validando rol en servidor, sin IDOR, las 7 cabeceras y la CSP en pie, `noindex` efectivo, registro público cerrado.
+**Corregido en caliente:** las cuatro contraseñas **rotadas** a aleatorias de 18 caracteres (las provisionales eran adivinables y el repositorio es público; era el hallazgo crítico), nombres de usuario fuera de esta bitácora, y el log de `/api/contacto` ya no vuelca el error de Postgres entero —su `details` llevaba nombre, teléfono y mensaje del visitante a los registros de Vercel—.
+**Queda abierto:** borrar las dos cuentas `.prueba` (decisión de Cesar); `CONTACT_IP_SALT` sin cargar en Vercel, así que el `ip_hash` usa la constante del repo y deja de despersonalizar; política de tratamiento de datos y autorización en el formulario (Ley 1581 de 2012); segundo acceso y 2FA en Vercel; `nodemailer` a actualizar antes de encender el SMTP.
+**Ojo:** el informe no va al repositorio mientras sea público: es un mapa de lo que falta cerrar.
