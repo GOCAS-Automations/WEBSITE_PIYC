@@ -122,3 +122,9 @@ El proyecto de Supabase de PIYC es propio (creado por Cesar con los accesos que 
 **Pendiente de Cesar:** correr `supabase/migrations/0005_consentimiento.sql` en el editor SQL de Supabase (el access token venció); hasta entonces el endpoint inserta el lead sin las dos columnas de consentimiento y deja aviso en el log. Cargar `CONTACT_IP_SALT` en Vercel.
 **Para PIYC:** confirmar el plazo de conservación de leads (dos años, propuesto), la transmisión internacional (alojamiento fuera de Colombia, ya declarada), y que asumen los plazos de ley para consultas y reclamos.
 **Tropiezos:** guardar la ficha propia siempre fallaba — el `<select>` de rol deshabilitado no envía valor y el servidor lo leía como «Empleado»; se arregló con un input oculto. Por coherencia, un coordinador tampoco crea ya coordinadores: crearía cuentas que luego no podría gestionar.
+
+## 2026-09-29 (tarde) · Migración 0005 aplicada y sal en Vercel
+
+**Hecho:** con el token nuevo se aplicó `0005_consentimiento.sql`: `site_mensajes` ya tiene `autorizacion_at` y `autorizacion_version`, así que el consentimiento queda registrado de verdad (el lead viejo, del 26-sep, las trae en null: es anterior a la casilla). `CONTACT_IP_SALT` creada en Vercel como variable **sensible** en producción, preview y desarrollo; el valor solo vive ahí. Falta un despliegue para que tome efecto (regla 11).
+**Aprobado por Cesar:** los plazos y textos de la política de tratamiento de datos quedan como se propusieron (conservación de leads: dos años desde el último contacto).
+**Dónde viven los datos:** Supabase en AWS **us-west-2** (Oregón) y el sitio servido desde Vercel `iad1` (Virginia). Ambos fuera de Colombia: es la transmisión internacional que declara la política.
