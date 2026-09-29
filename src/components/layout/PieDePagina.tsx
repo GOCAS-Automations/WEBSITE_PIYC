@@ -34,6 +34,7 @@ import {
   usuarioInstagram,
 } from "@/lib/contacto";
 import { enlaceWhatsApp } from "@/lib/whatsapp";
+import { RUTA_POLITICA_DATOS } from "@/lib/content-types";
 import { navegacionPrincipal } from "@/data/navegacion";
 import { IconoInstagram, IconoUbicacion, IconoWhatsApp } from "@/components/ui/iconos";
 import { IconoCorreo, IconoReloj } from "@/components/ui/iconos-servicio";
@@ -230,10 +231,27 @@ export async function PieDePagina() {
 
           {/* 3 · Línea legal */}
           <div className="mt-9 flex flex-col gap-4 border-t border-separador-claro pt-6 text-[13px] text-acero-300 md:flex-row md:items-center md:justify-between">
-            <p className="leading-snug">
-              © {anio} {contacto.legalName ?? "PIYC"}
-              {contacto.nit ? ` · NIT ${contacto.nit}` : ""}
-            </p>
+            {/* Línea legal + enlace a la política de tratamiento de datos.
+                La Ley 1581 de 2012 pide que la política esté publicada y sea
+                fácil de encontrar: el pie es donde se busca. */}
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-x-3">
+              <p className="leading-snug">
+                © {anio} {contacto.legalName ?? "PIYC"}
+                {contacto.nit ? ` · NIT ${contacto.nit}` : ""}
+              </p>
+              <span aria-hidden="true" className="hidden text-acero-600 sm:inline">
+                ·
+              </span>
+              <p className="leading-snug">
+                <Link
+                  href={RUTA_POLITICA_DATOS}
+                  prefetch={false}
+                  className={`text-acero-300 ${CLASE_ENLACE}`}
+                >
+                  Tratamiento de datos personales
+                </Link>
+              </p>
+            </div>
             <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
               {instagram ? (
                 <a

@@ -26,9 +26,11 @@
  * SEGURIDAD — SE VALIDA SIEMPRE EN EL SERVIDOR, EN CADA ACCIÓN
  * ------------------------------------------------------------
  *  1. Quien ejecuta tiene que ser manager activo (admin | coordinador).
- *  2. Un coordinador **no** crea administradores ni toca la cuenta de uno
- *     (`puedeGestionarRol()`). La Auth Admin API no sabe quién la llama y la
- *     service-role se salta la RLS: esta comprobación es la única barrera de
+ *  2. Un coordinador solo toca cuentas de EMPLEADO (`puedeGestionarCuenta()`):
+ *     sobre un administrador o sobre otro coordinador no edita, no desactiva,
+ *     no elimina y —sobre todo— no restablece la contraseña, porque eso es
+ *     poder entrar como esa persona. La Auth Admin API no sabe quién la llama y
+ *     la service-role se salta la RLS: esta comprobación es la única barrera de
  *     ese lado. En la base, el trigger `profiles_proteger` cubre el camino con
  *     sesión.
  *  3. Nadie se desactiva, se degrada ni se elimina a sí mismo: es como se acaba
@@ -43,7 +45,14 @@ import {
   getServiceRoleSupabase,
   isServiceRoleConfigured,
 } from "@/lib/supabase/admin";
-import { normalizeRole, puedeGestionarRol, type UserRole } from "@/lib/supabase/roles";
+import {
+  ETIQUETA_ROL,
+  motivoSinPermiso,
+  normalizeRole,
+  puedeAsignarRol,
+  puedeGestionarCuenta,
+  type UserRole,
+} from "@/lib/supabase/roles";
 import {
   AYUDA_USUARIO,
   emailDeUsuario,
@@ -107,13 +116,17 @@ async function usuarioOcupado(
 /**
  * Lee la cuenta afectada y comprueba que quien ejecuta puede gestionarla.
  * Devuelve la fila o el `CredentialState` de error, nunca ambas cosas.
+ *
+ * La cuenta propia siempre pasa —cada quien edita sus datos—; lo que no puede
+ * hacerse sobre uno mismo (cambiarse el rol, desactivarse, eliminarse) lo
+ * comprueba cada acción por separado.
  */
 async function cuentaGestionable(
   supabase: SupabaseClient,
-  actor: UserRole,
+  actor: { id: string; role: UserRole },
   id: string,
 ): Promise<
-  | { ok: true; fila: Record<string, unknown>; rol: UserRole }
+  | { ok: true; fila: Record<string, unknown>; rol: UserRole; esUnoMismo: boolean }
   | { ok: false; estado: CredentialState }
 > {
   const { data, error } = await supabase
@@ -126,15 +139,11 @@ async function cuentaGestionable(
     return { ok: false, estado: fail("No se encontró esa cuenta.") };
 
   const rol = normalizeRole((data as Record<string, unknown>).role);
-  if (!puedeGestionarRol(actor, rol))
-    return {
-      ok: false,
-      estado: fail(
-        "Solo un administrador puede modificar la cuenta de otro administrador.",
-      ),
-    };
+  const esUnoMismo = id === actor.id;
+  if (!esUnoMismo && !puedeGestionarCuenta(actor.role, rol))
+    return { ok: false, estado: fail(motivoSinPermiso(actor.role, rol)) };
 
-  return { ok: true, fila: data as Record<string, unknown>, rol };
+  return { ok: true, fila: data as Record<string, unknown>, rol, esUnoMismo };
 }
 
 /** El usuario con el que se identifica una fila de `profiles`. */
@@ -173,9 +182,12 @@ export async function crearCuenta(
     return fail(
       `La contraseña inicial debe tener al menos ${PASSWORD_MINIMO} caracteres. Déjala vacía si prefieres que el panel genere una.`,
     );
-  if (!puedeGestionarRol(session.profile.role, role))
+  if (!puedeAsignarRol(session.profile.role, role))
     return fail(
-      "Solo un administrador puede crear cuentas de administrador. Elige otro rol.",
+      `No puedes crear cuentas con el rol «${ETIQUETA_ROL[role]}». ${motivoSinPermiso(
+        session.profile.role,
+        role,
+      )}`,
     );
 
   if (await usuarioOcupado(session.supabase, usuario))
@@ -264,12 +276,19 @@ export async function actualizarCuenta(
   const id = text(formData, "id");
   if (!id) return fail("Falta el identificador de la cuenta.");
 
-  const encontrada = await cuentaGestionable(session.supabase, session.profile.role, id);
+  const encontrada = await cuentaGestionable(session.supabase, session.profile, id);
   if (!encontrada.ok) return encontrada.estado;
 
   const rolNuevo = normalizeRole(text(formData, "role"));
-  if (!puedeGestionarRol(session.profile.role, rolNuevo))
-    return fail("Solo un administrador puede asignar el rol de administrador.");
+  // Solo se valida cuando el rol CAMBIA: mantenerlo ya quedó autorizado al
+  // comprobar que la cuenta es gestionable (o que es la propia).
+  if (rolNuevo !== encontrada.rol && !puedeAsignarRol(session.profile.role, rolNuevo))
+    return fail(
+      `No puedes asignar el rol «${ETIQUETA_ROL[rolNuevo]}». ${motivoSinPermiso(
+        session.profile.role,
+        rolNuevo,
+      )}`,
+    );
 
   const fullName = text(formData, "full_name");
   if (fullName === "") return fail("El nombre completo es obligatorio.");
@@ -279,7 +298,7 @@ export async function actualizarCuenta(
     return fail("El correo de contacto no parece válido. Revísalo o déjalo vacío.");
 
   const active = bool(formData, "active");
-  const esUnoMismo = id === session.profile.id;
+  const esUnoMismo = encontrada.esUnoMismo;
 
   if (esUnoMismo && !active)
     return fail(
@@ -350,7 +369,7 @@ export async function alternarActiva(
   if (id === session.profile.id)
     return fail("No puedes desactivar ni reactivar tu propia cuenta.");
 
-  const encontrada = await cuentaGestionable(session.supabase, session.profile.role, id);
+  const encontrada = await cuentaGestionable(session.supabase, session.profile, id);
   if (!encontrada.ok) return encontrada.estado;
 
   const activa = text(formData, "active") === "true";
@@ -391,7 +410,7 @@ export async function restablecerPassword(
   const id = text(formData, "id");
   if (!id) return fail("Falta el identificador de la cuenta.");
 
-  const encontrada = await cuentaGestionable(session.supabase, session.profile.role, id);
+  const encontrada = await cuentaGestionable(session.supabase, session.profile, id);
   if (!encontrada.ok) return encontrada.estado;
 
   const admin = getServiceRoleSupabase();
@@ -433,7 +452,7 @@ export async function eliminarCuenta(
   if (!id) return fail("Falta el identificador de la cuenta.");
   if (id === session.profile.id) return fail("No puedes eliminar tu propia cuenta.");
 
-  const encontrada = await cuentaGestionable(session.supabase, session.profile.role, id);
+  const encontrada = await cuentaGestionable(session.supabase, session.profile, id);
   if (!encontrada.ok) return encontrada.estado;
 
   const esperado = usuarioDeFila(encontrada.fila).toLowerCase();

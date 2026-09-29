@@ -166,6 +166,8 @@ export type Database = {
       }
       site_mensajes: {
         Row: {
+          autorizacion_at: string | null
+          autorizacion_version: string | null
           canal: string
           created_at: string
           destino: string | null
@@ -179,6 +181,8 @@ export type Database = {
           telefono: string
         }
         Insert: {
+          autorizacion_at?: string | null
+          autorizacion_version?: string | null
           canal?: string
           created_at?: string
           destino?: string | null
@@ -192,6 +196,8 @@ export type Database = {
           telefono: string
         }
         Update: {
+          autorizacion_at?: string | null
+          autorizacion_version?: string | null
           canal?: string
           created_at?: string
           destino?: string | null

@@ -525,6 +525,53 @@ export type PreguntaFrecuente = {
 /** Franja de cierre de una página interna. Los botones son siempre los mismos. */
 export type CierrePagina = { title?: string; body?: string };
 
+/* --- Política de tratamiento de datos personales ---------------------- */
+
+/**
+ * RUTA DE LA POLÍTICA DE TRATAMIENTO DE DATOS
+ * ===========================================
+ * Una sola constante para el enlace del pie, el del formulario, el del portal
+ * del equipo y el sitemap: si algún día cambia el slug, cambia aquí.
+ * Sin tildes, como el resto de las rutas del sitio.
+ */
+export const RUTA_POLITICA_DATOS = "/tratamiento-de-datos";
+
+/** Una sección de la política: título y cuerpo en párrafos. */
+export type SeccionPolitica = { titulo: string; cuerpo: string };
+
+/**
+ * POLÍTICA DE TRATAMIENTO DE DATOS PERSONALES (Ley 1581 de 2012 y Decreto
+ * 1074 de 2015). Todo el texto es editable desde el panel; los datos del
+ * responsable **no se escriben aquí**: salen de `site_settings.contact` y se
+ * insertan en el cuerpo con marcadores (`{correo}`, `{telefono}`…). Ver
+ * `src/lib/politica-datos.ts`.
+ */
+export type PoliticaDatos = {
+  eyebrow?: string;
+  title?: string;
+  subtitle?: string;
+  /** Párrafo de entrada, sobre la primera sección. */
+  intro?: string;
+  /**
+   * Fecha de entrada en vigencia, en ISO (`AAAA-MM-DD`). Es uno de los
+   * contenidos mínimos que pide el Decreto 1074 de 2015, art. 2.2.2.25.3.1.
+   */
+  vigenteDesde?: string;
+  /**
+   * Versión de la política. Se guarda junto a cada autorización del formulario
+   * para poder probar **qué texto** aceptó quien escribió.
+   */
+  version?: string;
+  /** El cuerpo de la política, sección a sección. Vacío = no se pinta nada. */
+  secciones?: SeccionPolitica[];
+  /** Texto de la casilla de autorización del formulario de contacto. */
+  etiquetaCasilla?: string;
+  /** Texto del enlace a la política dentro de esa casilla. */
+  enlaceCasilla?: string;
+  /** Aviso del portal del equipo (`/mi-cuenta`). Vacío = no se pinta. */
+  avisoPortal?: string;
+};
+
 export type AjustesPaginas = {
   servicios?: CabeceraPagina & {
     /** Párrafo de entrada del hub, bajo el `<h1>`. */
@@ -575,6 +622,8 @@ export type AjustesPaginas = {
   };
   /** Página 404. */
   noEncontrada?: { title?: string; body?: string };
+  /** Política de tratamiento de datos personales (`/tratamiento-de-datos`). */
+  tratamientoDatos?: PoliticaDatos;
 };
 
 /* --- 5.5 `seo` — metadatos por ruta ----------------------------------- */
@@ -606,6 +655,7 @@ export type AjustesSeo = {
     servicios?: MetadatosPagina;
     proyectos?: MetadatosPagina;
     contacto?: MetadatosPagina;
+    tratamientoDatos?: MetadatosPagina;
   };
 };
 
@@ -665,6 +715,14 @@ export type PayloadContacto = {
   /** Título del servicio de interés, tal como lo eligió el visitante. */
   servicio?: string;
   mensaje: string;
+  /**
+   * AUTORIZACIÓN DE TRATAMIENTO DE DATOS (Ley 1581 de 2012, art. 9).
+   * Obligatoria y **validada en el servidor**: sin ella no se registra el lead
+   * ni se arma el enlace de WhatsApp. Una casilla que solo vive en el
+   * navegador no prueba nada. La versión de la política aceptada la pone el
+   * servidor desde los ajustes, nunca el cliente.
+   */
+  autorizacion?: boolean;
   /** Honeypot: debe llegar vacío. Si trae algo, es un bot. */
   sitioWeb?: string;
   /** Milisegundos desde que el visitante abrió el formulario (su propio reloj). */

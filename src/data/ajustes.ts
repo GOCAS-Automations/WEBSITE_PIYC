@@ -22,6 +22,7 @@ import type {
   AjustesNosotros,
   AjustesPaginas,
   AjustesSeo,
+  PoliticaDatos,
 } from "@/lib/content-types";
 
 const BUCKET =
@@ -385,6 +386,168 @@ export const nosotrosEstatico: AjustesNosotros = {
 };
 
 /* ===================================================================== */
+/* Política de tratamiento de datos personales                            */
+/* ===================================================================== */
+
+/**
+ * RESPALDO ESTÁTICO DE LA POLÍTICA DE TRATAMIENTO DE DATOS
+ * ========================================================
+ * Redactada para PIYC contra la **Ley 1581 de 2012** y el **Decreto 1074 de
+ * 2015** (art. 2.2.2.25.3.1, contenido mínimo de la política). No es copia de
+ * ninguna plantilla y solo describe lo que el sitio hace de verdad.
+ *
+ * NINGÚN DATO DE CONTACTO VA ESCRITO AQUÍ. La razón social, el NIT, la
+ * dirección, el teléfono, el correo y el horario entran por marcadores
+ * (`{razonSocial}`, `{nit}`, `{direccion}`, `{telefono}`, `{correo}`,
+ * `{horario}`, `{ciudad}`, `{sitio}`) que `src/lib/politica-datos.ts` sustituye
+ * con lo que haya en `site_settings.contact`. Si PIYC cambia de sede o de
+ * correo, la política cambia sola.
+ *
+ * Una línea que empieza por «- » se pinta como viñeta; una línea en blanco
+ * separa párrafos. Es todo lo que el formato entiende, a propósito.
+ *
+ * ⚠ PENDIENTE DE APROBACIÓN DE PIYC: el plazo de conservación de los leads
+ * (dos años desde el último contacto) es una decisión de negocio, no un
+ * mandato legal; y queda por confirmar con su contadora si PIYC supera los
+ * 100.000 UVT en activos, que es lo que obligaría a registrar las bases de
+ * datos ante la SIC (no aplica a la mayoría de empresas de este tamaño).
+ */
+function politicaDatosEstatica(): PoliticaDatos {
+  return {
+    eyebrow: "Datos personales",
+    title: "Política de tratamiento de datos personales",
+    subtitle:
+      "Qué datos suyos recogemos, para qué los usamos, cuánto los guardamos y cómo puede pedirnos que los conozcamos, corrijamos o eliminemos.",
+    vigenteDesde: "2026-09-29",
+    version: "1.0",
+    intro:
+      "Esta política se expide en cumplimiento de la Ley 1581 de 2012 y del Decreto 1074 de 2015, que son las normas que regulan la protección de datos personales en Colombia. Está escrita para que se entienda sin ser abogado: si algo no le queda claro, escríbanos y se lo explicamos.",
+    etiquetaCasilla: "Autorizo el tratamiento de mis datos personales conforme a la",
+    enlaceCasilla: "política de tratamiento de datos de PIYC",
+    avisoPortal:
+      "Los datos de su cuenta y el registro de sus jornadas se tratan conforme a la política de tratamiento de datos personales de PIYC.",
+    secciones: [
+      {
+        titulo: "Quién responde por sus datos",
+        cuerpo: `{razonSocial} —en adelante PIYC—, identificada con NIT {nit} y domiciliada en {direccion}, es la responsable del tratamiento de los datos personales que se recogen a través de este sitio web y de las herramientas internas de la empresa.
+
+La atención de peticiones, consultas y reclamos sobre datos personales está a cargo de la administración de PIYC, y el canal para dirigirse a ella es el correo {correo} y la línea {telefono}. El horario de atención es {horario}.`,
+      },
+      {
+        titulo: "Qué datos recogemos y por dónde",
+        cuerpo: `Recogemos únicamente los datos que usted nos entrega. No compramos bases de datos, no seguimos su navegación por otros sitios y no armamos perfiles suyos.
+
+Por el formulario de contacto de este sitio recogemos:
+- Su nombre.
+- La empresa en la que trabaja.
+- Su teléfono.
+- Su correo electrónico, que es opcional.
+- El servicio de interés, si escoge uno de la lista.
+- El mensaje que usted escriba.
+
+Junto a cada mensaje guardamos la fecha y la hora, el número de WhatsApp al que se dirigió la consulta y un valor derivado de su dirección IP mediante una función criptográfica con una clave que solo conoce nuestro servidor. Ese valor no permite reconstruir su dirección IP: sirve para limitar cuántos mensajes se pueden enviar por hora desde una misma conexión y frenar los envíos automatizados.
+
+Si prefiere escribirnos directamente por WhatsApp, esa conversación ocurre dentro de la aplicación y se rige además por las condiciones de su proveedor.
+
+De las personas que trabajan en PIYC tratamos, en el portal interno del equipo, el nombre, el documento de identidad, el cargo, el teléfono, el usuario de acceso y el registro de las jornadas trabajadas con sus horas y su estado de aprobación. Esa información la usa exclusivamente la empresa.`,
+      },
+      {
+        titulo: "Para qué usamos sus datos",
+        cuerpo: `Los datos que nos deja por el formulario se usan para:
+- Responder su solicitud y hacerle las preguntas técnicas necesarias para entenderla.
+- Preparar y enviarle la cotización o la propuesta del servicio por el que preguntó.
+- Dar seguimiento a esa solicitud y conservar el histórico de la conversación con su empresa.
+- Llevar el registro interno de las solicitudes que llegan por el sitio.
+
+Los datos del personal se usan para administrar la relación laboral, liquidar las horas trabajadas y cumplir las obligaciones laborales, contables y tributarias que la ley nos impone.
+
+No usamos sus datos para publicidad masiva, ni los vendemos, alquilamos o cedemos a terceros con fines comerciales. Si algún día quisiéramos enviarle comunicaciones comerciales distintas de la respuesta a su solicitud, se lo pediríamos aparte.`,
+      },
+      {
+        titulo: "Con qué autorización los tratamos",
+        cuerpo: `La base del tratamiento es su autorización previa, expresa e informada, que usted otorga al marcar la casilla que aparece en el formulario antes de enviarlo. Si esa casilla no está marcada, el formulario no se envía y no guardamos nada.
+
+De cada autorización dejamos constancia de la fecha y la hora en que se otorgó y de la versión de esta política que estaba publicada en ese momento, para poder demostrar qué texto fue el que usted aceptó.
+
+En el caso del personal, además de su autorización, el tratamiento se apoya en la relación laboral y en las obligaciones legales que se derivan de ella.
+
+Usted puede revocar su autorización en cualquier momento y pedir que eliminemos sus datos, salvo cuando exista un deber legal o contractual que nos obligue a conservarlos.`,
+      },
+      {
+        titulo: "Cuánto tiempo los conservamos",
+        cuerpo: `Los mensajes recibidos por el formulario se conservan mientras la solicitud siga viva y, después, hasta dos años contados desde el último contacto, que es el tiempo en el que una consulta comercial todavía puede retomarse. Cumplido ese plazo, o antes si usted lo solicita, el mensaje se elimina.
+
+Los datos del personal se conservan mientras dure el vínculo laboral y, terminado este, por el tiempo que exigen las normas laborales, contables y tributarias.
+
+Nuestras bases de datos permanecen vigentes mientras PIYC desarrolle su objeto social y sean necesarias para las finalidades descritas en esta política. El criterio es siempre el mismo: ningún dato se guarda más allá de lo que hace falta para la finalidad que lo justificó.`,
+      },
+      {
+        titulo: "Con quién se comparten",
+        cuerpo: `Sus datos no se entregan a terceros para que los usen por su cuenta. Solo intervienen los proveedores que nos prestan la infraestructura del sitio, que actúan como encargados del tratamiento y siguen nuestras instrucciones:
+- El proveedor de alojamiento del sitio web, que sirve las páginas y mantiene los registros técnicos de acceso.
+- El proveedor de la base de datos y del almacenamiento, donde queda guardado el mensaje del formulario y la información del portal del equipo.
+- WhatsApp, únicamente si usted decide continuar la conversación por ese medio: en ese caso el mensaje viaja por esa aplicación.
+
+Los servidores de esos proveedores están fuera de Colombia. Al autorizar el tratamiento usted autoriza también esa transmisión internacional, que se hace con proveedores que aplican estándares de seguridad equiparables a los que exige la normativa colombiana.
+
+También podemos entregar información cuando la solicite una autoridad judicial o administrativa competente en ejercicio de sus funciones.`,
+      },
+      {
+        titulo: "Cookies y medición",
+        cuerpo: `Este sitio no usa cookies de publicidad, de analítica ni de redes sociales, y no tiene rastreadores de terceros. Por eso no verá un aviso de cookies: no hay nada que consentir.
+
+Las únicas cookies propias que se instalan son las de sesión del portal del equipo y del panel de administración. Se crean cuando alguien inicia sesión, sirven para mantener esa sesión abierta y se eliminan al cerrarla. Son técnicamente necesarias y no siguen su navegación. Si usted solo visita el sitio público, no se instala ninguna.
+
+La página de contacto incluye un mapa de Google incrustado para mostrar dónde quedamos. Ese recuadro lo sirve Google y, al cargarse, ese proveedor recibe su dirección IP y aplica sus propias condiciones. En nuestras comprobaciones ese mapa no instala cookies en su navegador, pero es contenido de un tercero y su comportamiento no depende de nosotros. La dirección también está escrita en el texto de la página, por si prefiere no cargar el mapa.`,
+      },
+      {
+        titulo: "Datos de niñas, niños y adolescentes",
+        cuerpo: `El sitio y los servicios de PIYC se dirigen a empresas y a personas mayores de edad. No recogemos de manera deliberada datos de menores de edad, y el formulario no los solicita.
+
+Si llegáramos a recibir datos de un menor sin autorización de su representante legal, los eliminaremos tan pronto lo advirtamos. Si usted cree que eso ocurrió, escríbanos a {correo}.`,
+      },
+      {
+        titulo: "Sus derechos como titular",
+        cuerpo: `Como titular de sus datos personales usted puede:
+- Conocer qué datos suyos tenemos y cómo los estamos usando.
+- Actualizarlos cuando hayan cambiado.
+- Rectificarlos cuando estén incompletos, sean inexactos o induzcan a error.
+- Solicitar su supresión cuando ya no se necesiten para la finalidad autorizada o cuando considere que el tratamiento no respeta la ley.
+- Revocar la autorización que nos dio.
+- Ser informado, cuando lo pida, sobre el uso que le hemos dado a sus datos.
+- Presentar quejas ante la Superintendencia de Industria y Comercio, que es la autoridad de protección de datos en Colombia, una vez haya agotado el trámite de consulta o reclamo ante nosotros.
+
+Estos derechos los ejerce el titular, sus causahabientes, su representante o apoderado, o quien actúe por estipulación a favor de otro. Para atender la solicitud necesitamos poder verificar quién la presenta.`,
+      },
+      {
+        titulo: "Cómo ejercer sus derechos y en cuánto respondemos",
+        cuerpo: `Escríbanos a {correo} con el asunto «Protección de datos» e indíquenos su nombre, un dato de contacto, qué solicita y, si lo recuerda, la fecha aproximada en que nos escribió. También puede comunicarse al {telefono} y le indicamos cómo formalizar la solicitud; siempre la dejamos por escrito para poder darle trazabilidad. Atendemos en el horario {horario}.
+
+Los plazos son los que fija la ley:
+- Consultas, para saber qué datos tenemos y cómo los usamos: respondemos en un término máximo de diez (10) días hábiles contados desde que recibimos la solicitud. Si no nos fuera posible, se lo informamos con los motivos y la fecha en que la atenderemos, que no superará los cinco (5) días hábiles siguientes al vencimiento del primer término.
+- Reclamos, para corregir, actualizar o suprimir datos o para revocar la autorización: respondemos en un término máximo de quince (15) días hábiles contados desde el día siguiente a la fecha en que lo recibimos. Si no nos fuera posible, se lo informamos con los motivos y la fecha en que lo atenderemos, que no superará los ocho (8) días hábiles siguientes al vencimiento del primer término.
+
+Si el reclamo llega incompleto, dentro de los cinco (5) días siguientes le pediremos que lo complete; si pasan dos meses sin que recibamos respuesta, entenderemos que desistió. Si el reclamo debe atenderlo otra persona o entidad, se lo trasladamos dentro de los dos (2) días hábiles siguientes y se lo informamos.
+
+Presentar una consulta o un reclamo no tiene ningún costo para usted.`,
+      },
+      {
+        titulo: "Cómo protegemos la información",
+        cuerpo: `Aplicamos medidas razonables para que sus datos no se pierdan ni queden al alcance de quien no debe: acceso con usuario y contraseña, permisos por rol, reglas de acceso en la propia base de datos y conexión cifrada en todo el sitio. Solo el personal de PIYC que necesita la información para su trabajo puede consultarla.
+
+Ningún sistema es infalible. Si llegara a ocurrir un incidente que afecte sus datos, actuaremos para contenerlo y daremos los avisos que la ley exija.`,
+      },
+      {
+        titulo: "Cambios en esta política",
+        cuerpo: `Podemos actualizar esta política cuando cambien nuestros servicios, nuestras herramientas o la normativa aplicable. La versión vigente es siempre la publicada en esta misma página, con su número de versión y su fecha de entrada en vigencia al comienzo.
+
+Si el cambio afecta de forma sustancial la finalidad del tratamiento, se lo comunicaremos antes de aplicarlo y, cuando la ley lo exija, le pediremos una autorización nueva.`,
+      },
+    ],
+  };
+}
+
+/* ===================================================================== */
 /* paginas — cabeceras, introducciones y FAQ                              */
 /* ===================================================================== */
 
@@ -471,7 +634,11 @@ export const paginasEstatico: AjustesPaginas = {
     introFormulario:
       "Al enviar, se abre WhatsApp con el mensaje ya escrito para que solo tenga que darle enviar. No enviamos correos automáticos.",
     notaFormulario:
-      "Los datos que escriba aquí se usan únicamente para responder su solicitud. No compartimos su información con terceros ni lo suscribimos a ningún boletín.",
+      // No dice «no compartimos su información con terceros» a secas, como
+      // antes: la política reconoce que hay proveedores de infraestructura y
+      // que WhatsApp interviene si el visitante sigue por ahí. La nota del
+      // formulario y la política tienen que decir lo mismo.
+      "Los datos que escriba aquí se usan únicamente para responder su solicitud. No los vendemos ni los cedemos con fines comerciales, y no lo suscribimos a ningún boletín.",
     // FAQ redactada por el equipo de la web. Sin tiempos de respuesta, precios
     // ni garantías: nada de eso lo ha confirmado PIYC.
     faq: [
@@ -512,6 +679,7 @@ export const paginasEstatico: AjustesPaginas = {
     title: "Esta página no existe",
     body: "El enlace puede estar mal escrito o la página pudo haber cambiado de dirección. Desde aquí puede volver al inicio o ir directo al portafolio de servicios.",
   },
+  tratamientoDatos: politicaDatosEstatica(),
 };
 
 /* ===================================================================== */

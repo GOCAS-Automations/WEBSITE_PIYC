@@ -19,6 +19,7 @@ import {
   guardarFaqPagina,
   guardarPaginaNoEncontrada,
   guardarPlantillasDeFicha,
+  guardarPoliticaDatos,
   guardarTextosFormulario,
 } from "../actions";
 import type { CabeceraPagina, CierrePagina, PreguntaFrecuente } from "@/lib/content-types";
@@ -373,6 +374,127 @@ export default async function PaginasPage() {
                   placeholder="Otros servicios"
                 />
               </div>
+            </div>
+          </FormularioAdmin>
+        </Tarjeta>
+
+        {/* POLÍTICA DE TRATAMIENTO DE DATOS PERSONALES
+            Es la página legal del sitio (Ley 1581 de 2012). Se edita aquí
+            porque es texto de página, como el resto de esta pantalla. */}
+        <Tarjeta>
+          <TituloTarjeta
+            title="Política de tratamiento de datos personales"
+            description="La página /tratamiento-de-datos, enlazada desde el pie, desde el formulario de contacto y desde el portal del equipo."
+          />
+          <AyudaSeccion className="mb-5">
+            Es un texto legal: PIYC es la responsable de lo que diga. No
+            escribas aquí la dirección, el teléfono ni el correo — usa los
+            marcadores <code>{"{razonSocial}"}</code>, <code>{"{nit}"}</code>,{" "}
+            <code>{"{direccion}"}</code>, <code>{"{ciudad}"}</code>,{" "}
+            <code>{"{correo}"}</code>, <code>{"{telefono}"}</code>,{" "}
+            <code>{"{horario}"}</code> y <code>{"{sitio}"}</code>, que el sitio
+            reemplaza con lo que haya en Ajustes → Datos de contacto. Así, si
+            PIYC cambia de sede o de correo, la política se actualiza sola.
+            Dentro de cada sección, una línea en blanco separa párrafos y una
+            línea que empieza por «- » se pinta como viñeta.
+          </AyudaSeccion>
+          <FormularioAdmin action={guardarPoliticaDatos}>
+            <div className="space-y-4">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Campo
+                  label="Línea pequeña de arriba"
+                  name="eyebrow"
+                  scope="politica"
+                  defaultValue={paginas.tratamientoDatos?.eyebrow}
+                  placeholder="Datos personales"
+                />
+                <Campo
+                  label="Título"
+                  name="title"
+                  scope="politica"
+                  defaultValue={paginas.tratamientoDatos?.title}
+                  placeholder="Política de tratamiento de datos personales"
+                />
+              </div>
+              <AreaTexto
+                label="Frase de apoyo"
+                name="subtitle"
+                scope="politica"
+                rows={2}
+                defaultValue={paginas.tratamientoDatos?.subtitle}
+              />
+              <AreaTexto
+                label="Párrafo de entrada"
+                name="intro"
+                scope="politica"
+                rows={3}
+                defaultValue={paginas.tratamientoDatos?.intro}
+                hint="Va sobre la primera sección, dentro del cuerpo de la política."
+              />
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Campo
+                  label="Entra en vigencia el"
+                  name="vigente_desde"
+                  scope="politica"
+                  defaultValue={paginas.tratamientoDatos?.vigenteDesde}
+                  placeholder="2026-09-29"
+                  hint="En formato AAAA-MM-DD. La ley exige publicar esta fecha."
+                />
+                <Campo
+                  label="Versión"
+                  name="version"
+                  scope="politica"
+                  maxLength={40}
+                  defaultValue={paginas.tratamientoDatos?.version}
+                  placeholder="1.0"
+                  hint="Súbela cada vez que cambies el texto: es lo que queda guardado junto a cada autorización, y sirve para probar qué aceptó quien escribió."
+                />
+              </div>
+
+              <CampoParejas
+                label="Secciones de la política"
+                nameA="seccion_titulo"
+                nameB="seccion_cuerpo"
+                etiquetaA="Título de la sección"
+                etiquetaB="Texto"
+                filasB={8}
+                placeholderA="Cuánto tiempo los conservamos"
+                placeholderB="Los mensajes recibidos por el formulario se conservan…"
+                textoAgregar="Agregar sección"
+                defaultValue={(paginas.tratamientoDatos?.secciones ?? []).map((seccion) => ({
+                  a: seccion.titulo,
+                  b: seccion.cuerpo,
+                }))}
+                hint="El orden es el que se ve en la página y en el índice lateral. No borres las secciones de derechos, plazos y finalidades: son las que exige la ley."
+              />
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <AreaTexto
+                  label="Texto de la casilla del formulario"
+                  name="etiqueta_casilla"
+                  scope="politica"
+                  rows={2}
+                  defaultValue={paginas.tratamientoDatos?.etiquetaCasilla}
+                  placeholder="Autorizo el tratamiento de mis datos personales conforme a la"
+                  hint="Aparece junto a la casilla obligatoria de /contacto."
+                />
+                <Campo
+                  label="Texto del enlace a la política"
+                  name="enlace_casilla"
+                  scope="politica"
+                  defaultValue={paginas.tratamientoDatos?.enlaceCasilla}
+                  placeholder="política de tratamiento de datos de PIYC"
+                  hint="Va debajo de la casilla y lleva a esta página."
+                />
+              </div>
+              <AreaTexto
+                label="Aviso del portal del equipo"
+                name="aviso_portal"
+                scope="politica"
+                rows={2}
+                defaultValue={paginas.tratamientoDatos?.avisoPortal}
+                hint="Lo ve el personal en /mi-cuenta, bajo sus jornadas. Déjalo vacío si no quieres el aviso."
+              />
             </div>
           </FormularioAdmin>
         </Tarjeta>

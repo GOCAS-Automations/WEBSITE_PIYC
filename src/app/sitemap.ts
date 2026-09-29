@@ -10,6 +10,7 @@
 
 import type { MetadataRoute } from "next";
 import { getProyectos, getServicios } from "@/lib/content";
+import { RUTA_POLITICA_DATOS } from "@/lib/content-types";
 import { urlAbsoluta } from "@/lib/seo";
 
 export const revalidate = 300;
@@ -55,6 +56,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
     { url: urlAbsoluta("/nosotros"), lastModified: ahora, changeFrequency: "yearly", priority: 0.6 },
     { url: urlAbsoluta("/contacto"), lastModified: ahora, changeFrequency: "yearly", priority: 0.7 },
+    // Página legal: se indexa (un cliente corporativo la busca), pero pesa
+    // poco en el sitio.
+    {
+      url: urlAbsoluta(RUTA_POLITICA_DATOS),
+      lastModified: ahora,
+      changeFrequency: "yearly",
+      priority: 0.3,
+    },
   ];
 
   return [

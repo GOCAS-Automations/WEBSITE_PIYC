@@ -32,7 +32,7 @@ No hay un enlace de «recuperar contraseña» automático. Pídele a tu coordina
 Hay solo tres roles. Cada cuenta tiene exactamente uno.
 
 - **Administrador.** Puede hacer todo: editar el sitio, administrar el equipo (incluyendo crear y eliminar otros administradores) y revisar las jornadas.
-- **Coordinador.** Puede hacer lo mismo que un administrador, **menos** crear o eliminar cuentas de administrador. Sí puede crear, editar y desactivar cuentas de empleados y de otros coordinadores.
+- **Coordinador.** Puede hacer lo mismo que un administrador en el sitio y en las jornadas, pero en **Equipo solo maneja cuentas de empleado**: las crea, las edita, las desactiva, las elimina y les restablece la contraseña. Las cuentas de administrador y las de otro coordinador las ve en solo lectura y nada más —restablecer una contraseña es poder entrar como esa persona, así que eso lo hace únicamente un administrador—. Tampoco puede crear cuentas de coordinador ni ascender a nadie a ese rol.
 - **Empleado.** Solo ve su propio portal: registra su jornada, consulta su historial y cambia su contraseña. No entra al panel.
 
 Un administrador o un coordinador que abre su propia ficha en Equipo puede cambiar sus datos personales, pero no su propio rol ni su propio estado (activo/inactivo): eso lo tiene que hacer otra persona con acceso. Es a propósito, para que el sistema nunca se quede sin nadie que pueda entrar.
@@ -93,6 +93,7 @@ Todo lo que no es una ficha de servicio ni de proyecto, agrupado por página:
 - **Preguntas frecuentes** de Servicios y de Contacto: se agregan y se borran una por una. Se pintan como acordeón al final de la página y Google las puede mostrar en los resultados, así que no prometas plazos, precios ni garantías que PIYC no haya confirmado. Si borras todas, el bloque desaparece.
 - **Textos del formulario** de Contacto: el párrafo que va encima (qué pasa al enviar), la nota de abajo (qué se hace con los datos) y los **títulos de los tres bloques** de esa página: el del bloque de datos, el del formulario y el del mapa.
 - **Textos que se repiten en todas las fichas**: la frase que aparece bajo los datos de un caso con servicios asociados, los cierres de la ficha de un caso y de la de un servicio, y **los títulos que encabezan cada parte**: el del cuerpo y el de la galería de un caso, y los de alcance, «Qué incluye», galería, casos relacionados y «Otros servicios» de un servicio. No son de una ficha concreta —salen igual en todas—, por eso se editan aquí y no dentro de cada una.
+- **Política de tratamiento de datos personales**: la página legal del sitio. Tiene su propio apartado más abajo (ver el punto 6), porque no es un texto de adorno: es el que responde por PIYC ante la ley.
 - **Página «no encontrada»**: lo que ve alguien que entra a un enlace que ya no existe.
 
 ### Datos de contacto y buscadores
@@ -144,7 +145,52 @@ Muchas personas cierran WhatsApp sin pulsar enviar — por eso existe esta panta
 
 Esta pantalla es de **solo lectura**: los mensajes no se editan ni se borran. El botón **Responder por WhatsApp** abre una conversación con un saludo ya armado; revísalo antes de enviarlo. (En el Dashboard, donde salen los últimos cinco mensajes, ese mismo botón se llama solo **Responder**.) Si nadie ha escrito, la pantalla dice «Todavía no ha escrito nadie».
 
-## 6. Equipo
+## 6. Datos personales y política de tratamiento
+
+### Qué es esta página y por qué existe
+
+El sitio tiene una página pública en **piycsas.com/tratamiento-de-datos**, enlazada desde el pie de página, desde la casilla del formulario de contacto y desde el portal del equipo. Es la **política de tratamiento de datos personales** que exige la **Ley 1581 de 2012** (habeas data) y el **Decreto 1074 de 2015** a cualquier empresa colombiana que recoja datos de personas — y PIYC los recoge: por el formulario del sitio (nombre, empresa, teléfono, correo, mensaje) y por el portal del equipo (cédula, cargo, teléfono y las jornadas de cada persona).
+
+**La responsable del tratamiento es PIYC**, no quien desarrolló el sitio. Eso significa que PIYC responde por lo que la política diga y por atender a quien escriba reclamando por sus datos. La autoridad que vigila esto es la **Superintendencia de Industria y Comercio (SIC)**.
+
+### La casilla del formulario
+
+Desde ahora, quien escribe por el formulario de contacto tiene que **marcar una casilla** autorizando el tratamiento de sus datos. Sin esa casilla, el formulario no se envía y no se guarda nada — la ley exige una autorización previa, expresa e informada, y también exige poder **probarla**. Por eso, junto a cada mensaje de la bandeja, el sistema guarda la fecha y la hora en que se marcó la casilla y la **versión de la política** que estaba publicada ese día.
+
+De ahí viene una regla práctica: **cada vez que cambies el texto de la política, súbele el número de versión** (de `1.0` a `1.1`, por ejemplo). Si no lo haces, las autorizaciones nuevas quedarán ligadas a una versión que ya no dice lo mismo.
+
+### Obligaciones que quedan del lado de PIYC
+
+1. **Atender las solicitudes de los titulares**, que llegan al correo de contacto publicado en el sitio. Los plazos son de ley y no son negociables:
+   - **Consultas** (alguien quiere saber qué datos suyos tienen): **10 días hábiles**. Si no alcanzas, hay que avisarle con el motivo y la nueva fecha, que no puede pasar de **5 días hábiles más**.
+   - **Reclamos** (corregir, actualizar, eliminar datos o revocar la autorización): **15 días hábiles** desde el día siguiente al que llegó. Si no alcanzas, se avisa igual, con un máximo de **8 días hábiles más**.
+   - Un reclamo incompleto se le devuelve al interesado dentro de los 5 días siguientes para que lo complete. Si el asunto le corresponde a otra entidad, se traslada en 2 días hábiles.
+   - La solicitud **no puede cobrarse**.
+2. **Cumplir lo que la política promete.** Hoy dice que los mensajes del formulario se conservan hasta dos años desde el último contacto; si PIYC prefiere otro plazo, se cambia el texto y se cumple el nuevo.
+3. **Confirmar con la contadora si hay que registrar las bases de datos ante la SIC.** Ese registro (RNBD) solo obliga a las sociedades con activos totales superiores a **100.000 UVT**; a una empresa del tamaño de PIYC normalmente no le aplica, pero conviene dejarlo verificado por escrito. La política y la casilla sí aplican siempre, sin importar el tamaño.
+
+### Cómo editar el texto desde el panel
+
+Panel → **Contenido del sitio** → **Textos de las páginas** → tarjeta **Política de tratamiento de datos personales**. Ahí hay:
+
+- **Cabecera** (línea pequeña, título, frase de apoyo) y **párrafo de entrada**.
+- **Entra en vigencia el** y **Versión**: la fecha va en formato `AAAA-MM-DD` y la versión es la que queda guardada con cada autorización.
+- **Secciones**: el cuerpo de la política, una tarjeta por sección, en el orden en que se leen. El índice lateral de la página se arma solo con esos títulos. No borres las secciones de **finalidades**, **derechos del titular** y **plazos de respuesta**: son contenido mínimo exigido por la ley.
+- **Texto de la casilla** y **texto del enlace**, que son los que se ven en el formulario de contacto.
+- **Aviso del portal del equipo**, la línea que el personal ve en «Mi cuenta».
+
+Dos detalles del formato:
+
+- Dentro de una sección, **una línea en blanco separa párrafos** y **una línea que empieza por `- ` se pinta como viñeta**. No hay nada más: ni negritas ni títulos dentro de la sección.
+- **Nunca escribas ahí la dirección, el teléfono, el correo, el NIT ni la razón social.** Se escriben como marcadores y el sitio los reemplaza con lo que haya en *Datos de contacto*: `{razonSocial}`, `{nombreComercial}`, `{nit}`, `{direccion}`, `{ciudad}`, `{correo}`, `{telefono}`, `{horario}` y `{sitio}`. Así, si PIYC se muda o cambia de correo, la política se actualiza sola y no queda un dato viejo escondido en un texto legal.
+
+### Cookies
+
+El sitio **no usa cookies de publicidad, de analítica ni de redes sociales**, y por eso no tiene el típico banner de cookies: no habría nada que consentir. Las únicas cookies propias son las de sesión del panel y del portal, que se crean al iniciar sesión y se borran al cerrarla. El único elemento de terceros es el **mapa de Google** de la página de contacto, y la política lo dice. Si algún día se agrega analítica o un píxel de publicidad, hay que volver a mirar esto: ahí sí haría falta pedir consentimiento.
+
+<!-- captura: página pública de tratamiento de datos -->
+
+## 7. Equipo
 
 Solo administradores y coordinadores ven esta sección.
 
@@ -161,7 +207,7 @@ Solo administradores y coordinadores ven esta sección.
 
 - **Desactivar** es el interruptor **¿La cuenta está activa?** dentro de la ficha de la persona. Deja a la persona sin poder entrar desde ese momento, pero conserva su ficha y su historial de jornadas. Es lo correcto cuando alguien sale de la empresa.
 - **Eliminar** borra la cuenta y también sus jornadas registradas, de forma permanente. Se usa solo para cuentas de prueba o creadas por error. Lleva **doble confirmación**: primero hay que escribir el usuario exacto de la persona en el campo «Escribe `<usuario>` para confirmar» (el botón **Eliminar definitivamente** sigue deshabilitado hasta que coincida), y después aceptar el aviso del navegador.
-- En el listado, cada fila trae **Abrir ficha** y **Desactivar** / **Reactivar**. Para un coordinador, las filas de administradores dicen «Solo un administrador puede editarla».
+- En el listado, cada fila trae **Abrir ficha** y **Desactivar** / **Reactivar**. Para un coordinador, las filas de administradores y de otros coordinadores no traen esos botones: dicen «Solo un administrador la gestiona» y solo ofrecen **Ver ficha**, que abre la ficha en solo lectura con el motivo en una línea.
 
 Cada persona debe tener su propia cuenta: compartir una entre varios hace que las jornadas dejen de decir quién trabajó realmente.
 
@@ -174,7 +220,7 @@ Si abres tu **propia** ficha, puedes cambiar tus datos pero no tu rol ni tu esta
 3. Confirma el aviso del navegador: la contraseña anterior deja de funcionar de inmediato.
 4. El sistema muestra la nueva contraseña una sola vez, en el recuadro «Contraseña restablecida»; entrégasela para que pueda volver a entrar.
 
-## 7. Jornadas para el empleado
+## 8. Jornadas para el empleado
 
 Desde tu portal (`/mi-cuenta`) puedes registrar tus horas trabajadas, pensado para hacerse desde el celular en obra.
 
@@ -197,7 +243,7 @@ Los tres estados posibles son:
 - **Aprobada**: revisada y aceptada. Su desglose de horas quedó congelado y ya no cambia.
 - **Rechazada**: devuelta con una nota para corregirla. **No está eliminada**: el registro se conserva, y la nota de tu coordinador aparece junto a la jornada en tu historial. Regístrala de nuevo con la corrección.
 
-## 8. Jornadas para quien aprueba (coordinador/administrador)
+## 9. Jornadas para quien aprueba (coordinador/administrador)
 
 La sección **Jornadas** del panel muestra el registro de horas de todo el equipo.
 
@@ -240,7 +286,7 @@ Para quien no la registra desde su celular:
 3. Completa el resto del formulario igual que en el portal.
 4. Al guardar, la jornada queda **pendiente** a nombre de esa persona, visible en su portal, y hay que aprobarla después igual que cualquier otra.
 
-## 9. Horarios mensuales
+## 10. Horarios mensuales
 
 El horario mensual es el calendario laboral de cada mes: qué días son hábiles, cuáles son festivos y cuál es la jornada esperada cada día. **Sin el horario del mes cargado, el sistema no tiene con qué comparar** para saber qué parte de un turno es hora extra — así que es indispensable mantenerlo al día.
 
@@ -272,7 +318,7 @@ Estas son las reglas que aplica el sistema, las mismas que usa GPI. Todas son **
 8. **Duración máxima.** 24 horas. Dos jornadas de la misma persona no se pueden solapar; si ese día ya había otra, el sistema avisa pero no bloquea.
 9. **Qué puede editar cada quien.** La persona edita o elimina su jornada **solo mientras esté pendiente**. La orden de trabajo es opcional, la descripción de la labor es obligatoria, y no hay límite de días hacia atrás para registrar.
 
-## 10. Exportar a Excel
+## 11. Exportar a Excel
 
 Desde **Jornadas**, con los filtros que quieras aplicar, pulsa **Exportar a CSV**; el botón muestra entre paréntesis cuántas jornadas va a exportar. El archivo descargado se llama `jornadas-piyc-` seguido de la fecha, y contiene exactamente las jornadas que estabas viendo en pantalla en ese momento.
 
@@ -291,7 +337,7 @@ Desde **Jornadas**, con los filtros que quieras aplicar, pulsa **Exportar a CSV*
 
 Al final del archivo hay una **fila de totales** con la suma de todas las jornadas exportadas.
 
-## 11. Preguntas frecuentes
+## 12. Preguntas frecuentes
 
 **Guardé un cambio en el sitio y no lo veo todavía.**
 Recarga la página del sitio: lo normal es que ya esté. Si no, espera unos minutos (el sitio se regenera como máximo cada cinco) y revisa que hayas pulsado «Guardar» en el bloque correcto: cada tarjeta tiene su propio botón y guarda solo lo suyo.

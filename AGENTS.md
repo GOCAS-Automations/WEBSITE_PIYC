@@ -22,7 +22,7 @@ Plan de arranque completo (histórico): `docs/PLAN_INICIAL_PIYC.md`. Bitácora d
 
 ## Estructura del sitio y del panel
 
-Sitio público, estático + ISR (`revalidate = 300`), nunca dinámico: `/`, `/nosotros`, `/servicios`, `/servicios/[slug]`, `/proyectos`, `/proyectos/[slug]`, `/contacto`.
+Sitio público, estático + ISR (`revalidate = 300`), nunca dinámico: `/`, `/nosotros`, `/servicios`, `/servicios/[slug]`, `/proyectos`, `/proyectos/[slug]`, `/contacto`, `/tratamiento-de-datos`.
 
 Panel `/admin` — cuatro entradas, no más: Dashboard · Contenido del sitio (inicio, nosotros, servicios, proyectos, valores, páginas, ajustes) · Equipo (cuentas, roles, horarios) · Jornadas (registro, aprobación, exportación).
 
@@ -58,12 +58,13 @@ Uso: el azul domina y el verde se dosifica (nunca fondo de sección ni de bloque
 
 ## Backend / Supabase
 
-Cuatro migraciones, no más (detalle y motivo en `docs/PLAN_INICIAL_PIYC.md` §7):
+Cinco migraciones, no más (detalle y motivo en `docs/PLAN_INICIAL_PIYC.md` §7):
 
 - `0001_contenido.sql` — `profiles`, `site_services`, `site_projects`, `site_values`, `site_settings`. RLS: `SELECT` público solo de lo `published`; escritura solo con `is_content_editor()`. Storage: bucket público `site-images` (`inicio/`, `nosotros/`, `servicios/`, `proyectos/`, `cabeceras/`).
 - `0002_jornadas.sql` — `jornadas`, `horarios_mensuales`. `desglose` + `contexto_calculo` + `calculado_at` desde el día uno; se congelan al aprobar. RLS: el empleado ve e inserta solo lo suyo mientras está `pendiente`; el manager ve, aprueba, rechaza y elimina todo.
 - `0003_mensajes.sql` — `site_mensajes`. Una sola política: `SELECT` para `is_manager()`. Nunca `INSERT` para `anon` — se inserta desde el servidor con la clave service-role.
 - `0004_jornadas_revision.sql` — cierra los dos hallazgos de QA sobre `jornadas`: el trigger `jornadas_proteger_revision` impide en la base que una sesión cambie el estado, el revisor o el desglose de su propia jornada (nadie se revisa a sí mismo, ni un admin; la service-role sigue libre), y la política `jornadas_insert_manager` deja que un manager registre jornadas de otra cuenta **activa** con su propia sesión, siempre `pendiente` y sin desglose — así el panel ya no necesita la clave de servicio para eso.
+- `0005_consentimiento.sql` — añade a `site_mensajes` las columnas anulables `autorizacion_at` y `autorizacion_version`: la constancia de la autorización de tratamiento de datos que exige la Ley 1581 de 2012 (cuándo se marcó la casilla y qué versión de la política estaba publicada). RLS sin cambios. **Mientras no se aplique**, `POST /api/contacto` reintenta la inserción sin esas columnas y deja el aviso en el log: el lead nunca se pierde por eso.
 
 Variables de entorno en Vercel: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` (solo servidor), `NEXT_PUBLIC_SITE_URL`, `CONTACT_IP_SALT` (sal del hash de IP del formulario) y, para el aviso por correo del formulario, `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `CONTACT_FROM`, `CONTACT_TO` (detalle y qué pedirle al proveedor en `docs/DESPLIEGUE.md` §4). `SUPABASE_ACCESS_TOKEN` es personal, solo local (CLI / Management API) — nunca en Vercel ni en el repo.
 
@@ -75,7 +76,7 @@ Variables de entorno en Vercel: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABAS
 2. La navegación del panel necesita tres piezas juntas: `src/app/admin/loading.tsx`, el componente `PuntoDeCarga` y `prefetch={false}` en todos los `<Link>` de `/admin` (rutas `force-dynamic`). Sin las tres, el panel se siente trabado.
 3. RLS de `profiles` solo deja a cada quien leer su propia fila. Cualquier pantalla que muestre compañeros necesita completar con la clave de servicio, y **solo** nombre, apodo y cargo.
 4. Un valor exportado desde un módulo `"use client"` no se puede leer en el servidor. Las constantes compartidas viven en `src/lib/*-types.ts`.
-5. **El formulario de contacto abre WhatsApp; el correo es un aviso, no el canal.** El servidor registra el lead en `site_mensajes` (service-role), devuelve el enlace de `wa.me` y **después** —dentro de `after()`— manda un aviso por SMTP si están las variables; si faltan o el envío falla, el visitante ni se entera. El número destino y el correo destino salen SIEMPRE de los ajustes o del entorno, **nunca del payload**: tomarlos del formulario convierte el sitio en un relay abierto.
+5. **El formulario de contacto abre WhatsApp; el correo es un aviso, no el canal.** El servidor registra el lead en `site_mensajes` (service-role), devuelve el enlace de `wa.me` y **después** —dentro de `after()`— manda un aviso por SMTP si están las variables; si faltan o el envío falla, el visitante ni se entera. El número destino y el correo destino salen SIEMPRE de los ajustes o del entorno, **nunca del payload**: tomarlos del formulario convierte el sitio en un relay abierto. Y **sin `autorizacion: true` no pasa nada**: el servidor rechaza el envío con 400 (Ley 1581 de 2012), y la versión de la política que se guarda como constancia sale de los ajustes, nunca del payload. La política vive en `site_settings.paginas.tratamientoDatos` y se pinta en `/tratamiento-de-datos`; ahí **no se escriben datos de contacto**, se escriben marcadores que `src/lib/politica-datos.ts` sustituye con `site_settings.contact`.
 6. Rechazar ≠ eliminar, y **en el panel las jornadas ya no se eliminan** (PIYC, 23-sep-2026): la acción se quitó de la interfaz, aunque la RLS lo siga permitiendo. Lo que se corrige, se corrige; lo que no sirve, se rechaza con nota.
 7. Anti-spam sin terceros: honeypot + 3 segundos mínimos (contra el reloj del visitante, nunca el del servidor) + longitudes máximas + tope por IP. Sin captcha.
 8. Nunca exponer una función service-role a `anon`. La clave anónima es pública.

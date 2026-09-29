@@ -5,7 +5,13 @@
  * Tres roles, igual que el CHECK de `profiles.role` (0001_contenido.sql):
  *
  *   admin        → todo.
- *   coordinador  → todo menos crear, modificar o eliminar administradores.
+ *   coordinador  → el contenido del sitio y las jornadas de todos, pero en
+ *                  Equipo solo las cuentas de EMPLEADO: sobre un administrador
+ *                  o sobre otro coordinador no puede editar, desactivar,
+ *                  eliminar ni restablecer la contraseña. Restablecer una
+ *                  contraseña es poder entrar como esa persona; si un
+ *                  coordinador pudiera hacerlo con un par o con un
+ *                  administrador, podría suplantarlo.
  *   empleado     → solo su portal de jornadas (/mi-cuenta).
  *
  * Estas funciones deciden qué se MUESTRA; quien decide qué se PUEDE es la RLS
@@ -44,13 +50,40 @@ export function isEmployeeRole(role: UserRole): boolean {
 }
 
 /**
- * ¿Puede `actor` crear, editar o eliminar una cuenta con rol `objetivo`?
- * Un coordinador gestiona coordinadores y empleados, nunca administradores.
- * La server action que usa la Auth Admin API DEBE llamarla: la service-role no
- * pasa por la guardia de la base.
+ * Los roles cuyas cuentas puede administrar `actor` en /admin/equipo.
+ *
+ * ÚNICO CRITERIO de esa pantalla: de aquí salen el listado, la ficha, las
+ * opciones del selector de rol y todas las server actions.
  */
-export function puedeGestionarRol(actor: UserRole, objetivo: UserRole): boolean {
-  if (actor === "admin") return true;
-  if (actor === "coordinador") return objetivo !== "admin";
-  return false;
+export function rolesAdministrables(actor: UserRole): readonly UserRole[] {
+  if (actor === "admin") return ROLES;
+  if (actor === "coordinador") return ["empleado"];
+  return [];
+}
+
+/**
+ * ¿Puede `actor` editar, desactivar, eliminar o restablecerle la contraseña a
+ * una cuenta AJENA con rol `objetivo`?
+ *
+ * La server action que usa la Auth Admin API DEBE llamarla: la service-role no
+ * pasa por la guardia de la base. La cuenta propia es caso aparte —cada quien
+ * edita sus datos— y la resuelve quien llama, junto con las reglas de «nadie se
+ * degrada ni se desactiva a sí mismo».
+ */
+export function puedeGestionarCuenta(actor: UserRole, objetivo: UserRole): boolean {
+  return rolesAdministrables(actor).includes(objetivo);
+}
+
+/** ¿Puede `actor` asignar el rol `objetivo` al crear o al editar una cuenta? */
+export function puedeAsignarRol(actor: UserRole, objetivo: UserRole): boolean {
+  return puedeGestionarCuenta(actor, objetivo);
+}
+
+/** Por qué no, en una línea. La usan la interfaz y el error del servidor. */
+export function motivoSinPermiso(actor: UserRole, objetivo: UserRole): string {
+  if (actor === "coordinador")
+    return `Un coordinador solo gestiona cuentas de empleado. Para una cuenta de ${ETIQUETA_ROL[
+      objetivo
+    ].toLowerCase()} hace falta un administrador.`;
+  return "Tu cuenta no tiene permisos para gestionar el equipo.";
 }

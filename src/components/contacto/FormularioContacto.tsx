@@ -20,12 +20,21 @@
  *    legítimos.
  *  - Longitudes máximas con `maxLength`, iguales a las del servidor.
  *
+ * AUTORIZACIÓN DE DATOS PERSONALES
+ * --------------------------------
+ * La casilla es obligatoria y nace sin marcar. El `required` del navegador
+ * solo evita el viaje inútil: quien decide es el servidor, que rechaza el
+ * envío sin `autorizacion: true` y guarda la fecha y la versión de la política
+ * aceptada junto al lead (Ley 1581 de 2012). Sus textos vienen del panel.
+ *
  * Client Component: no importa nada de `components/admin/*` (regla 1).
  */
 
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import {
   LIMITES_CONTACTO,
+  RUTA_POLITICA_DATOS,
   type RespuestaContacto,
 } from "@/lib/content-types";
 import { IconoWhatsApp } from "@/components/ui/iconos";
@@ -49,10 +58,17 @@ const CLASES_ETIQUETA = "block pl-1 text-[13px] font-medium text-acero-600";
 export function FormularioContacto({
   servicios,
   nota,
+  casilla,
 }: {
   /** Opciones del select «servicio de interés». */
   servicios: readonly { slug: string; titulo: string }[];
   nota?: string;
+  /**
+   * Textos de la casilla de autorización, editables desde el panel. El
+   * componente NO los escribe en código: llegan desde
+   * `site_settings.paginas.tratamientoDatos`.
+   */
+  casilla: { etiqueta: string; enlace: string };
 }) {
   const [estado, setEstado] = useState<Estado>({ fase: "inicial" });
   const montadoEn = useRef<number>(0);
@@ -89,6 +105,10 @@ export function FormularioContacto({
           email: datos.get("email"),
           servicio: datos.get("servicio"),
           mensaje: datos.get("mensaje"),
+          // Un checkbox desmarcado no viaja en el `FormData`: se manda
+          // explícitamente `true`/`false` para que el servidor no tenga que
+          // interpretar la ausencia del campo.
+          autorizacion: datos.get("autorizacion") === "si",
           sitioWeb: datos.get("sitioWeb"),
           transcurridoMs: Date.now() - montadoEn.current,
         }),
@@ -231,6 +251,56 @@ export function FormularioContacto({
           />
         </div>
 
+        {/* AUTORIZACIÓN DE TRATAMIENTO DE DATOS (Ley 1581 de 2012, art. 9).
+            Obligatoria, SIN marcar por defecto y validada también en el
+            servidor: el `required` del navegador es comodidad, no garantía.
+            El enlace se abre en la misma pestaña —es una página del sitio— y
+            queda fuera del `<label>` para que el clic sobre él no marque la
+            casilla. */}
+        <div className="sm:col-span-2">
+          <div className="flex items-start gap-3 rounded-campo bg-acero-50 p-4 ring-1 ring-separador">
+            <input
+              id="contacto-autorizacion"
+              name="autorizacion"
+              type="checkbox"
+              value="si"
+              required
+              // El nombre accesible es la frase COMPLETA, con el nombre de la
+              // política incluido: `aria-labelledby` gana sobre el `<label>`,
+              // que solo envuelve la primera parte para que el enlace se
+              // pueda pulsar sin marcar la casilla.
+              aria-labelledby="contacto-autorizacion-texto"
+              aria-invalid={errores.autorizacion ? true : undefined}
+              aria-describedby={errores.autorizacion ? "error-autorizacion" : undefined}
+              className={`mt-0.5 size-5 shrink-0 cursor-pointer rounded-chip accent-azul-700 ${
+                errores.autorizacion ? "outline outline-2 outline-offset-2 outline-error-500" : ""
+              }`}
+            />
+            {/* La frase se lee de corrido —«…conforme a la política de
+                tratamiento de datos de PIYC»—, pero el enlace queda FUERA del
+                `<label>`: dentro, pulsarlo marcaría la casilla en vez de
+                abrir la página. */}
+            <p id="contacto-autorizacion-texto" className="text-[15px] leading-relaxed text-azul-950">
+              <label htmlFor="contacto-autorizacion" className="cursor-pointer">
+                {casilla.etiqueta}
+              </label>{" "}
+              <Link
+                href={RUTA_POLITICA_DATOS}
+                prefetch={false}
+                className="font-medium text-azul-700 underline underline-offset-2"
+              >
+                {casilla.enlace}
+              </Link>
+              . <span aria-hidden="true">*</span>
+            </p>
+          </div>
+          {errores.autorizacion ? (
+            <p id="error-autorizacion" className="mt-1.5 pl-1 text-[13px] font-medium text-error-500">
+              {errores.autorizacion}
+            </p>
+          ) : null}
+        </div>
+
         {/* `pb-16 sm:pb-0`: el flotante de WhatsApp ahora se ve siempre, y en
             móvil se sentaba justo encima de este botón. */}
         <div className="flex flex-col gap-4 pb-16 sm:col-span-2 sm:flex-row sm:items-center sm:pb-0">
@@ -245,8 +315,8 @@ export function FormularioContacto({
             {enviando ? "Enviando…" : "Enviar y abrir WhatsApp"}
           </button>
           <p className="text-[13px] leading-snug text-acero-600">
-            <span aria-hidden="true">*</span> Campos obligatorios: nombre, empresa, teléfono y
-            mensaje.
+            <span aria-hidden="true">*</span> Campos obligatorios: nombre, empresa, teléfono,
+            mensaje y la autorización de tratamiento de datos.
           </p>
         </div>
       </form>

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { requireManager } from "@/lib/supabase/auth";
 import { listPerfiles } from "@/lib/admin/lecturas";
-import { ETIQUETA_ROL, puedeGestionarRol } from "@/lib/supabase/roles";
+import { ETIQUETA_ROL, puedeGestionarCuenta } from "@/lib/supabase/roles";
 import { isServiceRoleConfigured } from "@/lib/supabase/admin";
 import { leerPagina, paginar } from "@/lib/paginacion";
 import {
@@ -84,8 +84,9 @@ export default async function EquipoPage({
             <strong>Administrador.</strong> Todo: contenido, cuentas y jornadas.
           </li>
           <li>
-            <strong>Coordinador.</strong> Lo mismo, menos tocar cuentas de
-            administrador.
+            <strong>Coordinador.</strong> Contenido y jornadas de todos, pero en
+            Equipo solo las cuentas de empleado: las de administrador y las de
+            otro coordinador las ve, no las toca.
           </li>
           <li>
             <strong>Empleado.</strong> Solo su portal: sus jornadas y su
@@ -111,8 +112,11 @@ export default async function EquipoPage({
         <>
           <ul id="lista-cuentas" className="scroll-mt-8 space-y-3">
             {pagina.visibles.map((cuenta) => {
-              const gestionable = puedeGestionarRol(profile.role, cuenta.role);
               const esUnoMismo = cuenta.id === profile.id;
+              // La propia cuenta siempre se abre (cada quien edita sus datos);
+              // las ajenas, solo si el rol de quien mira las administra.
+              const gestionable =
+                esUnoMismo || puedeGestionarCuenta(profile.role, cuenta.role);
               return (
                 <li
                   key={cuenta.id}
@@ -186,9 +190,18 @@ export default async function EquipoPage({
                         Abrir ficha
                       </Link>
                     ) : (
-                      <span className="text-xs text-acero-600">
-                        Solo un administrador puede editarla
-                      </span>
+                      <>
+                        <span className="text-xs text-acero-600">
+                          Solo un administrador la gestiona
+                        </span>
+                        <Link
+                          prefetch={false}
+                          href={`/admin/equipo/${cuenta.id}`}
+                          className={`${botonSecundario} ${botonChico}`}
+                        >
+                          Ver ficha
+                        </Link>
+                      </>
                     )}
                   </div>
                 </li>

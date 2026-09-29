@@ -34,6 +34,7 @@ import {
   usuarioInstagram,
 } from "@/lib/contacto";
 import { enlaceWhatsApp } from "@/lib/whatsapp";
+import { textosDeCasilla } from "@/lib/politica-datos";
 import { jsonLdFaq, jsonLdMigas, metadataDePagina, metadatosPagina, type Miga } from "@/lib/seo";
 import { CabeceraInterna } from "@/components/sections/CabeceraInterna";
 import { Faq } from "@/components/sections/Faq";
@@ -254,6 +255,7 @@ export default async function Contacto() {
                     titulo: servicio.navTitle,
                   }))}
                   nota={ajustes?.notaFormulario}
+                  casilla={textosDeCasilla(paginas.tratamientoDatos)}
                 />
               </div>
             </div>

@@ -6,6 +6,8 @@ import { getSessionProfile, type SessionProfile } from "@/lib/supabase/auth";
 import { isContentEditorRole, ETIQUETA_ROL } from "@/lib/supabase/roles";
 import { signOutAction } from "@/lib/session-actions";
 import { getContextoJornadas, listMisJornadas } from "@/lib/jornadas-lecturas";
+import { getPaginas } from "@/lib/content";
+import { RUTA_POLITICA_DATOS } from "@/lib/content-types";
 import { hoyEnColombia } from "@/lib/jornada";
 import { FormularioJornada } from "@/components/jornadas/FormularioJornada";
 import { MisJornadas } from "@/components/jornadas/MisJornadas";
@@ -181,11 +183,13 @@ async function Portal({ profile }: { profile: SessionProfile }) {
   /* Todo lo que necesita el módulo de jornadas, de una sola vez. La RLS de la
      migración 0002 ya limita `listMisJornadas` a lo propio; el filtro por
      `employee_id` se repite igualmente en la consulta. */
-  const [{ config, horarios }, propias] = await Promise.all([
+  const [{ config, horarios }, propias, paginas] = await Promise.all([
     getContextoJornadas(),
     listMisJornadas(profile.id),
+    getPaginas(),
   ]);
   const jornadas = { config, horarios, propias, hoy: hoyEnColombia() };
+  const avisoDatos = paginas.tratamientoDatos?.avisoPortal?.trim() ?? "";
 
   return (
     <main id="contenido" className="fondo-plano min-h-dvh px-4 py-8 sm:py-12">
@@ -309,6 +313,24 @@ async function Portal({ profile }: { profile: SessionProfile }) {
           </div>
           <FormularioClave action={cambiarMiPassword} />
         </section>
+
+        {/* Aviso de tratamiento de datos personales (Ley 1581 de 2012). El
+            portal guarda cédula, cargo, teléfono y el detalle de cada jornada:
+            quien los entrega tiene derecho a saber bajo qué política se
+            tratan. El texto se edita desde el panel; vacío = no se pinta. */}
+        {avisoDatos ? (
+          <p className="px-1 pb-2 text-xs leading-relaxed text-acero-600">
+            {avisoDatos}{" "}
+            <Link
+              href={RUTA_POLITICA_DATOS}
+              prefetch={false}
+              className="font-semibold text-azul-700 underline underline-offset-2"
+            >
+              Leer la política
+            </Link>
+            .
+          </p>
+        ) : null}
       </div>
     </main>
   );

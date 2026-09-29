@@ -999,6 +999,59 @@ export async function guardarPlantillasDeFicha(
   return estado;
 }
 
+/**
+ * POLÍTICA DE TRATAMIENTO DE DATOS PERSONALES (`/tratamiento-de-datos`).
+ *
+ * Es texto legal, así que aquí no se «arregla» nada por cuenta propia: se
+ * guarda lo que PIYC escriba. Lo único que se valida es la forma de la fecha
+ * de vigencia —el Decreto 1074 de 2015 la exige y una fecha ilegible no
+ * cumple— y el largo de la versión, que tiene que caber en la columna
+ * `site_mensajes.autorizacion_version` (40 caracteres).
+ *
+ * Una lista de secciones vacía se respeta: la página queda con la cabecera y
+ * la ficha del responsable, y nada más. Es visible de inmediato, así que
+ * nadie la deja así sin darse cuenta.
+ */
+export async function guardarPoliticaDatos(
+  _prev: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  const vigenteDesde = text(formData, "vigente_desde");
+  if (vigenteDesde !== "" && !/^\d{4}-\d{2}-\d{2}$/.test(vigenteDesde)) {
+    return fail("La fecha de entrada en vigencia tiene que ir en formato AAAA-MM-DD (2026-09-29).");
+  }
+
+  const version = text(formData, "version");
+  if (version.length > 40) {
+    return fail("La versión de la política no puede pasar de 40 caracteres.");
+  }
+
+  const secciones = paresDeListas(formData, "seccion_titulo", "seccion_cuerpo").map(
+    ({ a, b }) => ({ titulo: a, cuerpo: b }),
+  );
+
+  const estado = await actualizarAjuste<AjustesPaginas>("paginas", (p) => ({
+    ...p,
+    tratamientoDatos: {
+      ...(p.tratamientoDatos ?? {}),
+      eyebrow: text(formData, "eyebrow"),
+      title: text(formData, "title"),
+      subtitle: text(formData, "subtitle"),
+      intro: text(formData, "intro"),
+      vigenteDesde,
+      version,
+      etiquetaCasilla: text(formData, "etiqueta_casilla"),
+      enlaceCasilla: text(formData, "enlace_casilla"),
+      avisoPortal: text(formData, "aviso_portal"),
+      secciones,
+    },
+  }));
+
+  // `/contacto` también: de ahí salen los textos de la casilla.
+  if (estado.status === "success") revalidarSitio("/tratamiento-de-datos", "/contacto");
+  return estado;
+}
+
 export async function guardarPaginaNoEncontrada(
   _prev: ActionState,
   formData: FormData,

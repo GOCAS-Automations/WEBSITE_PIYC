@@ -7,16 +7,21 @@ import {
   TituloTarjeta,
 } from "@/components/admin/ui";
 import { AYUDA_USUARIO, USUARIO_MAX } from "@/lib/usuarios";
-import { ETIQUETA_ROL, ROLES, puedeGestionarRol, type UserRole } from "@/lib/supabase/roles";
+import {
+  ETIQUETA_ROL,
+  ROLES,
+  puedeAsignarRol,
+  type UserRole,
+} from "@/lib/supabase/roles";
 import { PASSWORD_MINIMO, type PerfilRow } from "@/lib/admin-types";
 
 /**
  * CAMPOS DE UNA CUENTA — Server Component.
  * Lo envuelve `FormularioCuenta`, que es el de cliente.
  *
- * Los roles que se ofrecen dependen de QUIÉN está editando: un coordinador no
- * ve «Administrador» en la lista. Eso es comodidad, no seguridad — la barrera
- * real está en la server action (`puedeGestionarRol`) y en el trigger
+ * Los roles que se ofrecen dependen de QUIÉN está editando: un coordinador solo
+ * ve «Empleado» en la lista. Eso es comodidad, no seguridad — la barrera real
+ * está en la server action (`puedeAsignarRol`) y en el trigger
  * `profiles_proteger` de la base.
  */
 export function CamposCuenta({
@@ -29,9 +34,14 @@ export function CamposCuenta({
   actor: UserRole;
   esUnoMismo?: boolean;
 }) {
-  const opcionesRol = ROLES.filter((rol) => puedeGestionarRol(actor, rol)).map(
-    (rol) => ({ value: rol, label: ETIQUETA_ROL[rol] }),
-  );
+  // El rol que la cuenta ya tiene va siempre en la lista aunque quien edita no
+  // pueda asignarlo (su propia ficha, por ejemplo): un `<select>` sin su propio
+  // valor se pintaría con otro rol y confundiría.
+  const asignables = ROLES.filter((rol) => puedeAsignarRol(actor, rol));
+  const actual: UserRole = cuenta?.role ?? "empleado";
+  const opcionesRol = (
+    asignables.includes(actual) ? asignables : [actual, ...asignables]
+  ).map((rol) => ({ value: rol, label: ETIQUETA_ROL[rol] }));
 
   return (
     <>
@@ -112,10 +122,15 @@ export function CamposCuenta({
             />
           )}
 
+          {/* Un `<select disabled>` no envía nada: sin este oculto, guardar la
+              propia ficha mandaría el rol vacío y el servidor lo leería como
+              «Empleado». */}
+          {esUnoMismo && <input type="hidden" name="role" value={actual} />}
+
           <Selector
             label="Rol"
             name="role"
-            defaultValue={cuenta?.role ?? "empleado"}
+            defaultValue={actual}
             options={opcionesRol}
             disabled={esUnoMismo}
             hint={
@@ -162,9 +177,11 @@ export function CamposCuenta({
               (incluidas las de otros administradores) y jornadas.
             </li>
             <li>
-              <strong>Coordinador.</strong> Lo mismo, menos tocar cuentas de
-              administrador: no puede crearlas, editarlas, restablecerles la
-              contraseña ni eliminarlas.
+              <strong>Coordinador.</strong> Lo mismo en contenido y jornadas,
+              pero en Equipo solo cuentas de <strong>empleado</strong>: las de
+              administrador y las de otro coordinador las ve, y nada más —no las
+              crea, no las edita, no las desactiva, no las elimina y no les
+              restablece la contraseña.
             </li>
             <li>
               <strong>Empleado.</strong> Solo su portal: registrar sus jornadas,

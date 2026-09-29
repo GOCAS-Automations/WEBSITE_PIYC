@@ -30,14 +30,30 @@
  * `x-forwarded-for` es falsificable, así que el tope por IP es un freno al
  * ruido automatizado, no una barrera de seguridad. Por eso no hay nada
  * sensible detrás de este endpoint.
+ *
+ * AUTORIZACIÓN DE TRATAMIENTO DE DATOS (Ley 1581 de 2012, art. 9)
+ * ---------------------------------------------------------------
+ * **Sin `autorizacion: true` no pasa nada**: no se registra el lead, no se
+ * arma el enlace de WhatsApp y se responde 400 con un mensaje claro. La
+ * casilla del formulario es comodidad; la barrera está aquí, porque una
+ * casilla que solo vive en el navegador no prueba ni impide nada.
+ *
+ * De la autorización se guardan dos cosas junto al lead: **cuándo** se dio
+ * (`autorizacion_at`, la hora del servidor) y **qué texto** se aceptó
+ * (`autorizacion_version`, la versión o la fecha de vigencia de la política
+ * publicada en ese momento, leída de los ajustes — nunca del payload). Esas
+ * dos columnas las crea `supabase/migrations/0005_consentimiento.sql`; si la
+ * migración todavía no se aplicó, el guardado se reintenta sin ellas y queda
+ * el aviso en el log. El lead nunca se pierde por eso.
  */
 
 import { createHash } from "node:crypto";
 import { headers } from "next/headers";
 import { after, NextResponse } from "next/server";
 import { getServiceRoleSupabase } from "@/lib/supabase/admin";
-import { getContacto } from "@/lib/content";
+import { getContacto, getPaginas } from "@/lib/content";
 import { correoPrincipal, whatsappFormulario } from "@/lib/contacto";
+import { versionDePolitica } from "@/lib/politica-datos";
 import { correoConfigurado, enviarAvisoDeLead } from "./correo";
 import { enlaceWhatsApp } from "@/lib/whatsapp";
 import {
@@ -96,6 +112,21 @@ async function hashDeIp(): Promise<string | null> {
   const ip = reenviada || cabeceras.get("x-real-ip")?.trim();
   if (!ip) return null;
   return createHash("sha256").update(`${salDeIp()}:${ip}`).digest("hex").slice(0, 64);
+}
+
+/**
+ * ¿El error es «esa columna no existe»?
+ *
+ * PostgREST responde `PGRST204` cuando la columna no está en su caché de
+ * esquema, y Postgres `42703` cuando la consulta llega igual. Se mira también
+ * el texto porque el código no siempre viaja. Cualquier otro error se propaga:
+ * solo este caso merece un reintento.
+ */
+function esColumnaDesconocida(error: unknown): boolean {
+  if (!error || typeof error !== "object") return false;
+  const { code, message } = error as { code?: unknown; message?: unknown };
+  if (code === "PGRST204" || code === "42703") return true;
+  return typeof message === "string" && /column|schema cache/i.test(message);
 }
 
 /** Mensaje que el visitante verá ya escrito en WhatsApp. */
@@ -185,8 +216,27 @@ export async function POST(request: Request) {
   }
   if (mensaje.length < 10) campos.mensaje = "Cuéntenos un poco más sobre lo que necesita.";
 
+  /* --- Autorización de tratamiento de datos -------------------------- */
+  // Se exige `true` literal: un `"on"`, un `1` o un campo ausente NO son una
+  // autorización. La ley pide que sea previa, expresa e informada, y lo
+  // expreso se comprueba aquí, no en el navegador.
+  const autorizado = payload.autorizacion === true;
+  if (!autorizado) {
+    campos.autorizacion = "Marque la casilla para autorizar el tratamiento de sus datos.";
+  }
+
   if (Object.keys(campos).length > 0) {
-    return respuesta({ ok: false, error: "Revise los datos marcados.", campos }, 400);
+    const soloFaltaLaAutorizacion = !autorizado && Object.keys(campos).length === 1;
+    return respuesta(
+      {
+        ok: false,
+        error: soloFaltaLaAutorizacion
+          ? "Para enviar el mensaje necesitamos su autorización para tratar sus datos personales. Marque la casilla y vuelva a intentarlo."
+          : "Revise los datos marcados.",
+        campos,
+      },
+      400,
+    );
   }
 
   /* --- Destino: SIEMPRE de los ajustes, nunca del payload ------------ */
@@ -237,7 +287,7 @@ export async function POST(request: Request) {
         }
       }
 
-      const { error } = await supabase.from("site_mensajes").insert({
+      const fila = {
         nombre,
         empresa,
         telefono,
@@ -247,7 +297,31 @@ export async function POST(request: Request) {
         canal: "whatsapp",
         destino,
         ip_hash: ipHash,
-      });
+      };
+
+      // La constancia de la autorización: cuándo se dio y qué texto se aceptó.
+      // La versión sale de los AJUSTES, no del payload: si la pusiera el
+      // cliente, el registro no probaría nada.
+      const paginas = await getPaginas();
+      const version = versionDePolitica(paginas.tratamientoDatos);
+      const conConsentimiento = {
+        ...fila,
+        autorizacion_at: new Date().toISOString(),
+        ...(version ? { autorizacion_version: version } : {}),
+      };
+
+      let { error } = await supabase.from("site_mensajes").insert(conConsentimiento);
+
+      // La migración 0005 todavía no se aplicó: se reintenta sin las columnas
+      // nuevas. Perder el lead por una columna que falta sería peor que
+      // guardarlo sin la constancia, y el aviso queda en el log para que
+      // alguien la aplique.
+      if (error && esColumnaDesconocida(error)) {
+        console.warn(
+          "[contacto] la base no tiene las columnas de consentimiento: aplica supabase/migrations/0005_consentimiento.sql. El lead se guarda sin la constancia.",
+        );
+        ({ error } = await supabase.from("site_mensajes").insert(fila));
+      }
 
       if (error) throw error;
       guardado = true;
