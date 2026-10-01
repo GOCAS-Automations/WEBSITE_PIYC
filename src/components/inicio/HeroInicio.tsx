@@ -134,7 +134,14 @@ export function HeroInicio({
           className={`absolute inset-0 -z-10 ${imagenDeFondo ? "velo-cabecera" : ""}`}
         />
 
-        <Contenedor className="flex min-h-[30rem] flex-col pb-14 pt-[calc(var(--alto-nav)+2rem)] sm:min-h-[34rem] lg:min-h-[40rem] lg:pb-20 lg:pt-[calc(var(--alto-nav)+3rem)]">
+        {/* El hero llena la ventana: con un alto fijo (40rem) una pantalla de
+            escritorio dejaba asomar una franja de la sección siguiente, que es
+            justo lo que se ve mal. `svh` y no `vh` porque en móvil `vh` cuenta
+            la barra del navegador y el bloque salta al hacer scroll. Es un
+            MÍNIMO: si el texto no cabe —móvil apaisado, tipografía grande—, la
+            sección crece en vez de recortarse. El texto va anclado abajo (`mt-auto`), así que en una
+            pantalla muy alta no queda nadando en el centro. */}
+        <Contenedor className="flex min-h-[100svh] flex-col pb-14 pt-[calc(var(--alto-nav)+2rem)] lg:pb-20 lg:pt-[calc(var(--alto-nav)+3rem)]">
           <div className="animate-aparecer mt-auto max-w-[56rem]">
             {hero?.eyebrow ? <Rotulo tono="oscuro">{hero.eyebrow}</Rotulo> : null}
 

@@ -184,3 +184,28 @@ Valores para Vercel:
 
 - Cualquier cambio de contenido se hace desde el panel; se ve en el sitio en ≤ 5 minutos (ISR).
 - Si el sitio público muestra textos viejos tras un cambio de variables, falta el *Redeploy*.
+
+## 6. Latido de Supabase (no dejar que el proyecto se pause)
+
+El plan gratuito de Supabase **pausa** un proyecto tras siete días sin actividad
+en la base. Pausado no se pierde nada, pero el panel, el portal y el formulario
+dejan de funcionar hasta reanudarlo a mano desde el tablero de Supabase.
+
+Ya queda resuelto en el repositorio:
+
+- `vercel.json` programa un cron **diario** (13:00 UTC, 8:00 a. m. en Cali) a
+  `/api/latido`.
+- `src/app/api/latido/route.ts` hace una consulta mínima a `site_settings` con
+  la clave anónima. Eso es lo que cuenta como actividad: pedirle la portada al
+  sitio no sirve, porque con ISR responde la caché.
+- `CRON_SECRET` (ya creada en Vercel, variable sensible) autoriza la llamada:
+  Vercel la manda como `Authorization: Bearer …` y la ruta rechaza con 401 a
+  cualquier otro.
+
+**Comprobar que funciona**: en Vercel, *Project → Settings → Cron Jobs* debe
+listar `/api/latido` como activo, y *Logs* muestra la ejecución diaria. En
+Hobby los crons corren una vez al día y Vercel puede moverlos hasta una hora.
+
+**Si alguna vez el proyecto aparece pausado**: se reanuda desde el tablero de
+Supabase (*Project → Resume*), y conviene revisar por qué dejó de correr el
+cron antes de darlo por resuelto.
