@@ -58,13 +58,14 @@ Uso: el azul domina y el verde se dosifica (nunca fondo de sección ni de bloque
 
 ## Backend / Supabase
 
-Cinco migraciones, no más (detalle y motivo en `docs/PLAN_INICIAL_PIYC.md` §7):
+Seis migraciones, no más (detalle y motivo en `docs/PLAN_INICIAL_PIYC.md` §7):
 
 - `0001_contenido.sql` — `profiles`, `site_services`, `site_projects`, `site_values`, `site_settings`. RLS: `SELECT` público solo de lo `published`; escritura solo con `is_content_editor()`. Storage: bucket público `site-images` (`inicio/`, `nosotros/`, `servicios/`, `proyectos/`, `cabeceras/`).
 - `0002_jornadas.sql` — `jornadas`, `horarios_mensuales`. `desglose` + `contexto_calculo` + `calculado_at` desde el día uno; se congelan al aprobar. RLS: el empleado ve e inserta solo lo suyo mientras está `pendiente`; el manager ve, aprueba, rechaza y elimina todo.
 - `0003_mensajes.sql` — `site_mensajes`. Una sola política: `SELECT` para `is_manager()`. Nunca `INSERT` para `anon` — se inserta desde el servidor con la clave service-role.
 - `0004_jornadas_revision.sql` — cierra los dos hallazgos de QA sobre `jornadas`: el trigger `jornadas_proteger_revision` impide en la base que una sesión cambie el estado, el revisor o el desglose de su propia jornada (nadie se revisa a sí mismo, ni un admin; la service-role sigue libre), y la política `jornadas_insert_manager` deja que un manager registre jornadas de otra cuenta **activa** con su propia sesión, siempre `pendiente` y sin desglose — así el panel ya no necesita la clave de servicio para eso.
 - `0005_consentimiento.sql` — añade a `site_mensajes` las columnas anulables `autorizacion_at` y `autorizacion_version`: la constancia de la autorización de tratamiento de datos que exige la Ley 1581 de 2012 (cuándo se marcó la casilla y qué versión de la política estaba publicada). RLS sin cambios. **Mientras no se aplique**, `POST /api/contacto` reintenta la inserción sin esas columnas y deja el aviso en el log: el lead nunca se pierde por eso.
+- `0006_gastos_jornada.sql` — añade a `jornadas` cuatro columnas anulables para los **gastos reembolsables** de una jornada en campo: `gasto_alimentacion`, `gasto_transporte`, `gasto_otros` (pesos `integer`, con tope de 5.000.000 por campo, igual al `TOPE_GASTO` de `src/lib/jornada-types.ts`: se tocan juntos) y `gasto_otros_nota`. Son **datos, no cálculo**: no entran en el desglose ni en ningún recargo, y por eso no se congelan al aprobar. RLS y el trigger de la 0004, sin cambios: los edita quien puede editar la jornada —el empleado mientras está `pendiente`, el manager al corregir—. `null` ≠ `0` (regla 9): vacío es `null` y no se pinta. **Mientras no se aplique**, las dos acciones de guardado reintentan sin esas columnas (`src/lib/jornadas-escritura.ts`) y dejan el aviso en el log: la jornada nunca se pierde por eso.
 
 Variables de entorno en Vercel: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` (solo servidor), `NEXT_PUBLIC_SITE_URL`, `CONTACT_IP_SALT` (sal del hash de IP del formulario) y, para el aviso por correo del formulario, `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `CONTACT_FROM`, `CONTACT_TO` (detalle y qué pedirle al proveedor en `docs/DESPLIEGUE.md` §4). `CRON_SECRET` autoriza el cron diario del latido. `SUPABASE_ACCESS_TOKEN` es personal, solo local (CLI / Management API) — nunca en Vercel ni en el repo.
 
@@ -92,7 +93,7 @@ Variables de entorno en Vercel: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABAS
 
 ## Fuera de alcance
 
-Nómina, volante de pago en PDF, calendario de programación, métricas con Recharts. Existen en GPI; aquí no entran. Si PIYC los pide, se cotizan aparte.
+Nómina, volante de pago en PDF, calendario de programación, métricas con Recharts. Existen en GPI; aquí no entran. Si PIYC los pide, se cotizan aparte. **Anotar los gastos reembolsables de una jornada no es nómina**: es el soporte de un reembolso de lo que alguien ya pagó de su bolsillo, se guarda tal cual y no se liquida ni se multiplica por nada.
 
 ## Flujo de trabajo con agentes
 

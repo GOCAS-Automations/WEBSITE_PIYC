@@ -14,7 +14,7 @@ import {
   obtenerDesglose,
   rangoHorario,
 } from "@/lib/jornada";
-import { EXPLICACION_ESTADO } from "@/lib/jornada-types";
+import { EXPLICACION_ESTADO, hayGastos, totalGastos } from "@/lib/jornada-types";
 import {
   AyudaSeccion,
   CabeceraPanel,
@@ -22,7 +22,11 @@ import {
   Tarjeta,
   TituloTarjeta,
 } from "@/components/admin/ui";
-import { ChipEstado, Desglose } from "@/components/jornadas/Desglose";
+import {
+  ChipEstado,
+  Desglose,
+  GastosJornadaDetalle,
+} from "@/components/jornadas/Desglose";
 import { AccionesRevision } from "@/components/jornadas/AccionesRevision";
 import { FormularioJornada } from "@/components/jornadas/FormularioJornada";
 import {
@@ -173,6 +177,20 @@ export default async function JornadaDetallePage({
             </p>
           </Tarjeta>
 
+          {/* ---------------- Gastos reembolsables ----------------
+              Solo si hay alguno (regla 9). Va arriba, antes del desglose: es
+              dinero que la empresa va a devolver, así que quien aprueba tiene
+              que verlo antes de decidir. No entra en ningún cálculo de horas. */}
+          {hayGastos(jornada) && (
+            <Tarjeta>
+              <TituloTarjeta
+                title="Gastos de su bolsillo"
+                description="Lo que la persona pagó durante esta jornada y la empresa le reembolsa. Es un dato declarado por quien trabajó: no afecta las horas ni los recargos."
+              />
+              <GastosJornadaDetalle gastos={jornada} />
+            </Tarjeta>
+          )}
+
           {/* ---------------- Nota de revisión ---------------- */}
           {jornada.review_note && (
             <AyudaSeccion
@@ -275,6 +293,7 @@ export default async function JornadaDetallePage({
               aprobar={aprobarJornada}
               rechazar={rechazarJornada}
               reabrir={reabrirJornada}
+              gastos={totalGastos(jornada)}
             />
           </Tarjeta>
         </aside>

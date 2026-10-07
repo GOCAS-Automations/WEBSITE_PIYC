@@ -22,7 +22,17 @@ import {
   instanteColombia,
   MAX_MINUTOS_TURNO,
 } from "@/lib/jornada";
-import { LIMITES_JORNADA } from "@/lib/jornada-types";
+import { LIMITES_JORNADA, hayGastos, leerGastos } from "@/lib/jornada-types";
+import { escribirJornadaConGastos } from "@/lib/jornadas-escritura";
+import type { Database } from "@/lib/supabase/database.types";
+
+/**
+ * La forma que acepta un `update` de `jornadas`, según los tipos generados. La
+ * edición se arma dos veces —con los gastos y sin ellos, por si la 0006 no
+ * está aplicada todavía— y las dos pasan por este tipo, que es lo que impide
+ * colar una columna mal escrita.
+ */
+type ActualizacionJornada = Database["public"]["Tables"]["jornadas"]["Update"];
 
 const SIN_SESION: ActionState = {
   status: "error",
@@ -78,6 +88,9 @@ export async function cambiarMiPassword(
  *     venga en el `FormData`: la RLS de la 0002 lo exige, pero la acción no
  *     depende de que la base la salve.
  *   · Solo se edita o elimina lo propio y mientras siga en `pendiente`.
+ *   · Los gastos reembolsables (0006) se validan aquí y se guardan tal cual:
+ *     no entran en ninguna fórmula de horas. Si la base todavía no tiene esas
+ *     columnas, la jornada se guarda sin ellos (`escribirJornadaConGastos`).
  *   · Al terminar, `revalidatePath` de las dos pantallas afectadas.
  *   · Nunca lanzan: devuelven un `ActionState` y el formulario pinta el mensaje.
  */
@@ -126,6 +139,14 @@ export async function guardarJornada(
     return fail(
       `La descripción es demasiado larga (máximo ${LIMITES_JORNADA.descripcion} caracteres).`,
     );
+
+  /* --- Gastos reembolsables (opcionales) ---
+     Son DATOS, no cálculo: no tocan ni una hora del desglose. Se validan en el
+     servidor —no negativos, tope por campo, nada de letras— y un campo vacío
+     queda en `null`, nunca en `0` (regla 9). */
+  const gastosLeidos = leerGastos(formData);
+  if ("error" in gastosLeidos) return fail(gastosLeidos.error);
+  const gastos = gastosLeidos.gastos;
 
   // El turno cruza la medianoche si lo marcaron o si la hora de fin es menor o
   // igual a la de inicio (22:00 → 02:00).
@@ -195,13 +216,21 @@ export async function guardarJornada(
 
   if (id) {
     // Editar: solo lo propio y mientras siga pendiente (doble filtro + RLS).
-    const { data, error } = await session.supabase
-      .from("jornadas")
-      .update(payload)
-      .eq("id", id)
-      .eq("employee_id", session.profile.id)
-      .eq("status", "pendiente")
-      .select("id");
+    // Los gastos viajan SIEMPRE, también cuando quedaron en `null`: así se
+    // pueden borrar los que se habían anotado por error.
+    const editar = (datos: ActualizacionJornada) =>
+      session.supabase
+        .from("jornadas")
+        .update(datos)
+        .eq("id", id)
+        .eq("employee_id", session.profile.id)
+        .eq("status", "pendiente")
+        .select("id");
+
+    const { data, error } = await escribirJornadaConGastos(
+      () => editar({ ...payload, ...gastos }),
+      () => editar(payload),
+    );
 
     if (error) return fail(error.message);
     if (!data || data.length === 0)
@@ -211,9 +240,16 @@ export async function guardarJornada(
     return ok(`Los cambios de tu jornada quedaron guardados.${avisoMismoDia}`);
   }
 
-  const { error } = await session.supabase
-    .from("jornadas")
-    .insert({ ...payload, status: "pendiente" });
+  // Al insertar, los gastos solo se mandan si hay alguno: así una jornada sin
+  // gastos no necesita ni el reintento mientras la 0006 no esté aplicada.
+  const nueva = { ...payload, status: "pendiente" as const };
+  const { error } = await escribirJornadaConGastos(
+    () =>
+      session.supabase
+        .from("jornadas")
+        .insert(hayGastos(gastos) ? { ...nueva, ...gastos } : nueva),
+    () => session.supabase.from("jornadas").insert(nueva),
+  );
 
   if (error) return fail(error.message);
 

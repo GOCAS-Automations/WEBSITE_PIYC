@@ -11,8 +11,9 @@
  * módulos. Así el código fuente se queda idiomático —importando con `@/`, como
  * el resto del proyecto— y las pruebas no necesitan compilación ni empaquetador.
  *
- * QUÉ SE PRUEBA: solo los dos módulos puros (`jornada.ts`, `horarios.ts`,
- * `jornada-festivos.ts`). Nada que toque React, Next o Supabase.
+ * QUÉ SE PRUEBA: solo los módulos puros (`jornada.ts`, `horarios.ts`,
+ * `jornada-festivos.ts` y, al final, los gastos reembolsables de
+ * `jornada-types.ts`). Nada que toque React, Next o Supabase.
  */
 
 import test from "node:test";
@@ -428,4 +429,156 @@ test("los totales del periodo son la suma exacta de cada categoría", () => {
     total.extraDominicalDiurna +
     total.extraDominicalNocturna;
   assert.equal(porCategoria, total.minutosTrabajados);
+});
+
+/* ------------------------------------------------------------------ */
+/* Gastos reembolsables (migración 0006)                               */
+/* ------------------------------------------------------------------ */
+/*
+ * Son DATOS, no cálculo: no aparecen en ningún desglose. Lo que se prueba aquí
+ * es la lectura y la validación del monto, que es lo que de verdad puede
+ * fallar —un dedo gordo en el celular— y lo único que el servidor no puede
+ * delegarle al navegador.
+ */
+
+const {
+  TOPE_GASTO,
+  agruparMiles,
+  formatearPesos,
+  interpretarMonto,
+  leerGastos,
+  sumarGastos,
+  totalGastos,
+  valorCampoGasto,
+} = await import("./jornada-types.ts");
+
+test("los miles se agrupan con punto, como se lee un precio en Colombia", () => {
+  assert.equal(agruparMiles(48000), "48.000");
+  assert.equal(agruparMiles(1250000), "1.250.000");
+  assert.equal(agruparMiles(900), "900");
+  assert.equal(formatearPesos(48000), "$ 48.000");
+});
+
+test("un monto se lee con o sin puntos, con o sin $ y con espacios", () => {
+  for (const crudo of ["48000", "48.000", "$48.000", " $ 48.000 ", "48 000"]) {
+    assert.deepEqual(interpretarMonto(crudo, "Transporte"), { valor: 48000 });
+  }
+});
+
+test("un campo vacío y un cero escrito a mano quedan en null, no en 0", () => {
+  // Regla 9: un `0` afirmaría que alguien declaró no haber gastado nada.
+  assert.deepEqual(interpretarMonto("", "Transporte"), { valor: null });
+  assert.deepEqual(interpretarMonto("   ", "Transporte"), { valor: null });
+  assert.deepEqual(interpretarMonto("0", "Transporte"), { valor: null });
+  assert.equal(valorCampoGasto(null), "");
+  assert.equal(valorCampoGasto(0), "");
+  assert.equal(valorCampoGasto(48000), "48.000");
+});
+
+test("un monto con letras, con signo o con centavos se rechaza con mensaje", () => {
+  for (const crudo of ["48mil", "-5000", "48,50", "1e5"]) {
+    const leido = interpretarMonto(crudo, "Alimentación y viáticos");
+    assert.ok(leido.error, `debía rechazar «${crudo}»`);
+    assert.match(leido.error, /Alimentación y viáticos/);
+  }
+});
+
+test("el tope por campo son 5.000.000 y el mensaje lo dice", () => {
+  assert.deepEqual(interpretarMonto(String(TOPE_GASTO), "Otros gastos"), {
+    valor: TOPE_GASTO,
+  });
+  const pasado = interpretarMonto(String(TOPE_GASTO + 1), "Otros gastos");
+  assert.ok(pasado.error);
+  assert.match(pasado.error, /5\.000\.000/);
+});
+
+test("los tres montos se suman y el total de un periodo también", () => {
+  const jornada = {
+    gasto_alimentacion: 25000,
+    gasto_transporte: 12000,
+    gasto_otros: 8000,
+    gasto_otros_nota: "parqueadero",
+  };
+  assert.equal(totalGastos(jornada), 45000);
+  assert.equal(totalGastos(null), 0);
+  assert.equal(totalGastos({ gasto_alimentacion: null }), 0);
+  assert.equal(sumarGastos([jornada, { gasto_transporte: 5000 }, null]), 50000);
+});
+
+test("leerGastos devuelve null en lo que no se anotó", () => {
+  const form = new FormData();
+  form.set("gasto_alimentacion", "25.000");
+  form.set("gasto_transporte", "");
+  form.set("gasto_otros", "");
+  const leido = leerGastos(form);
+  assert.deepEqual(leido.gastos, {
+    gasto_alimentacion: 25000,
+    gasto_transporte: null,
+    gasto_otros: null,
+    gasto_otros_nota: null,
+  });
+});
+
+test("una nota de otros gastos sin monto no se descarta en silencio", () => {
+  const form = new FormData();
+  form.set("gasto_otros_nota", "un repuesto");
+  const leido = leerGastos(form);
+  assert.ok(leido.error);
+  assert.match(leido.error, /monto/i);
+});
+
+test("la nota de otros gastos se guarda recortada y con su tope", () => {
+  const form = new FormData();
+  form.set("gasto_otros", "8.000");
+  form.set("gasto_otros_nota", "  parqueadero de la camioneta  ");
+  assert.equal(leerGastos(form).gastos.gasto_otros_nota, "parqueadero de la camioneta");
+
+  form.set("gasto_otros_nota", "x".repeat(161));
+  assert.match(leerGastos(form).error, /demasiado larga/);
+});
+
+/* ------------------------------------------------------------------ */
+/* El reintento cuando la base no tiene las columnas de gastos         */
+/* ------------------------------------------------------------------ */
+
+const { escribirJornadaConGastos } = await import("./jornadas-escritura.ts");
+
+test("si la escritura con gastos funciona, no se reintenta sin ellos", async () => {
+  let sinGastos = 0;
+  const r = await escribirJornadaConGastos(
+    async () => ({ error: null, data: [{ id: "1" }] }),
+    async () => {
+      sinGastos += 1;
+      return { error: null };
+    },
+  );
+  assert.equal(sinGastos, 0);
+  assert.deepEqual(r.data, [{ id: "1" }]);
+});
+
+test("si faltan las columnas, se repite la escritura sin los gastos", async () => {
+  // El aviso del log es parte del comportamiento; aquí solo estorba la salida.
+  const warn = console.warn;
+  console.warn = () => {};
+  // Es lo que contesta PostgREST mientras la 0006 no esté aplicada.
+  const r = await escribirJornadaConGastos(
+    async () => ({ error: { code: "PGRST204", message: "column gasto_transporte does not exist" } }),
+    async () => ({ error: null, data: [{ id: "2" }] }),
+  );
+  console.warn = warn;
+  assert.equal(r.error, null);
+  assert.deepEqual(r.data, [{ id: "2" }]);
+});
+
+test("cualquier otro error llega a la pantalla, no se disfraza de columna ausente", async () => {
+  let sinGastos = 0;
+  const r = await escribirJornadaConGastos(
+    async () => ({ error: { code: "42501", message: "new row violates row-level security policy" } }),
+    async () => {
+      sinGastos += 1;
+      return { error: null };
+    },
+  );
+  assert.equal(sinGastos, 0);
+  assert.equal(r.error.code, "42501");
 });

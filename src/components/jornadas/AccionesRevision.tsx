@@ -24,7 +24,11 @@
 
 import { useActionState, useState } from "react";
 import { idleState, type ActionState } from "@/lib/admin-types";
-import { LIMITES_JORNADA, type EstadoJornada } from "@/lib/jornada-types";
+import {
+  LIMITES_JORNADA,
+  formatearPesos,
+  type EstadoJornada,
+} from "@/lib/jornada-types";
 import {
   banner,
   botonOscuro,
@@ -56,12 +60,19 @@ export function AccionesRevision({
   aprobar,
   rechazar,
   reabrir,
+  gastos = 0,
 }: {
   id: string;
   estado: EstadoJornada;
   aprobar: Accion;
   rechazar: Accion;
   reabrir: Accion;
+  /**
+   * Total de gastos reembolsables de esta jornada, en pesos. Se avisa aquí
+   * —junto al botón— porque aprobar la jornada es también aprobar ese
+   * reembolso. `0` no se pinta (regla 9).
+   */
+  gastos?: number;
 }) {
   const [estadoAprobar, accionAprobar, aprobando] = useActionState(aprobar, idleState);
   const [estadoRechazar, accionRechazar, rechazando] = useActionState(rechazar, idleState);
@@ -82,6 +93,16 @@ export function AccionesRevision({
       <Mensaje state={estadoAprobar} />
       <Mensaje state={estadoRechazar} />
       <Mensaje state={estadoReabrir} />
+
+      {/* Aviso de gastos: lo primero del bloque, antes de cualquier botón. */}
+      {gastos > 0 && (
+        <p className="rounded-control bg-azul-50 px-4 py-3 text-sm leading-relaxed text-azul-900">
+          Esta jornada trae{" "}
+          <strong className="tabular-nums">{formatearPesos(gastos)}</strong> en
+          gastos que la persona puso de su bolsillo. Revísalos arriba antes de
+          decidir: aprobar la jornada es también dar por bueno ese reembolso.
+        </p>
+      )}
 
       {/* ---------------- Pendiente: aprobar o rechazar ---------------- */}
       {pendiente && (

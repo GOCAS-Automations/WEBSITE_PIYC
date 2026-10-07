@@ -54,6 +54,7 @@ import { getServiceRoleSupabase } from "@/lib/supabase/admin";
 import { getContacto, getPaginas } from "@/lib/content";
 import { correoPrincipal, whatsappFormulario } from "@/lib/contacto";
 import { versionDePolitica } from "@/lib/politica-datos";
+import { esColumnaDesconocida } from "@/lib/supabase/columnas";
 import { correoConfigurado, enviarAvisoDeLead } from "./correo";
 import { enlaceWhatsApp } from "@/lib/whatsapp";
 import {
@@ -114,20 +115,11 @@ async function hashDeIp(): Promise<string | null> {
   return createHash("sha256").update(`${salDeIp()}:${ip}`).digest("hex").slice(0, 64);
 }
 
-/**
- * ¿El error es «esa columna no existe»?
- *
- * PostgREST responde `PGRST204` cuando la columna no está en su caché de
- * esquema, y Postgres `42703` cuando la consulta llega igual. Se mira también
- * el texto porque el código no siempre viaja. Cualquier otro error se propaga:
- * solo este caso merece un reintento.
+/*
+ * AQUÍ VIVÍA `esColumnaDesconocida`. Se mudó a `@/lib/supabase/columnas` en
+ * oct-2026, cuando la 0006 (gastos de una jornada) necesitó el mismo
+ * reintento: el mismo error hay que reconocerlo igual en las dos pantallas.
  */
-function esColumnaDesconocida(error: unknown): boolean {
-  if (!error || typeof error !== "object") return false;
-  const { code, message } = error as { code?: unknown; message?: unknown };
-  if (code === "PGRST204" || code === "42703") return true;
-  return typeof message === "string" && /column|schema cache/i.test(message);
-}
 
 /** Mensaje que el visitante verá ya escrito en WhatsApp. */
 function mensajeWhatsApp(datos: {

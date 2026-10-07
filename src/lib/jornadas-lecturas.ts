@@ -54,6 +54,20 @@ function textoOrNull(valor: unknown): string | null {
   return v === "" ? null : v;
 }
 
+/**
+ * Un entero de la base, o `null`. Lo usan los gastos reembolsables
+ * (migración 0006): `null` si la columna no existe todavía, si está vacía o si
+ * trae un `0` —que no es un dato (regla 9)—. PostgREST entrega los enteros
+ * como número JSON, pero se acepta también la cadena por si acaso: lo que
+ * nunca pasa es que un valor raro quede como `NaN` dentro de una suma.
+ */
+function entero(valor: unknown): number | null {
+  const n = typeof valor === "number" ? valor : typeof valor === "string" ? Number(valor) : NaN;
+  if (!Number.isFinite(n)) return null;
+  const truncado = Math.trunc(n);
+  return truncado > 0 ? truncado : null;
+}
+
 function filaAJornada(row: Record<string, unknown>): JornadaRecord {
   return {
     id: String(row.id),
@@ -73,6 +87,13 @@ function filaAJornada(row: Record<string, unknown>): JornadaRecord {
     calculado_at: textoOrNull(row.calculado_at),
     created_at: texto(row.created_at),
     updated_at: texto(row.updated_at),
+    // Gastos reembolsables (0006). Si la migración no está aplicada, estas
+    // claves no vienen en la fila y quedan en `null`: las pantallas no pintan
+    // nada y el módulo sigue funcionando igual.
+    gasto_alimentacion: entero(row.gasto_alimentacion),
+    gasto_transporte: entero(row.gasto_transporte),
+    gasto_otros: entero(row.gasto_otros),
+    gasto_otros_nota: textoOrNull(row.gasto_otros_nota),
   };
 }
 

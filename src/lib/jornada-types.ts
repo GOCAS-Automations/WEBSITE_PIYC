@@ -7,7 +7,8 @@
  * `"use client"` no se puede leer en el servidor. Todo lo que comparten las
  * páginas de servidor, las server actions y los formularios de cliente
  * (estados, etiquetas, opciones de filtro, forma de una fila, longitudes
- * máximas) vive aquí y solo aquí.
+ * máximas, lectura y validación de los gastos reembolsables) vive aquí y solo
+ * aquí.
  */
 
 /* ===================================================================== */
@@ -81,6 +82,15 @@ export interface JornadaRecord {
   calculado_at: string | null;
   created_at: string;
   updated_at: string;
+  /**
+   * Gastos de bolsillo que la empresa reembolsa (migración 0006). Pesos
+   * enteros o `null`; NUNCA entran en el cálculo de horas. Mientras la
+   * migración no esté aplicada llegan en `null` desde la base.
+   */
+  gasto_alimentacion: number | null;
+  gasto_transporte: number | null;
+  gasto_otros: number | null;
+  gasto_otros_nota: string | null;
 }
 
 /** Una jornada con el nombre de quien la registró, ya resuelto (regla 3). */
@@ -106,6 +116,8 @@ export const LIMITES_JORNADA = {
   descripcion: 600,
   observaciones: 600,
   notaRevision: 600,
+  /** La nota de «otros gastos» es una línea, no un relato. Igual al CHECK de la 0006. */
+  notaGasto: 160,
 } as const;
 
 /* ===================================================================== */
@@ -250,3 +262,183 @@ export interface FiltrosPortal {
 }
 
 export const FILTROS_PORTAL_VACIOS: FiltrosPortal = { mes: "", estado: "" };
+
+/* ===================================================================== */
+/* 7. Gastos reembolsables de una jornada                                 */
+/* ===================================================================== */
+
+/**
+ * SON DATOS, NO CÁLCULO (migración 0006)
+ * --------------------------------------
+ * Lo que la persona puso de su bolsillo en una jornada de campo y la empresa
+ * le reembolsa aparte: alimentación, transporte y «otros» con su nota. Se
+ * guardan tal cual, se suman tal cual y se exportan tal cual. **No entran en
+ * ninguna fórmula de recargos** ni en el desglose congelado: la nómina sigue
+ * fuera de alcance (`AGENTS.md`), esto es un reembolso.
+ *
+ * `null` ≠ `0`. `null` es «no gastó o no anotó» y no se pinta (regla 9); un `0`
+ * afirmaría que alguien declaró cero, que es otra cosa. Por eso un campo vacío
+ * —y también un `0` escrito a mano— se guardan como `null`.
+ */
+
+/** Pesos colombianos, enteros. Nadie anota centavos en un gasto de obra. */
+export interface GastosJornada {
+  gasto_alimentacion: number | null;
+  gasto_transporte: number | null;
+  gasto_otros: number | null;
+  gasto_otros_nota: string | null;
+}
+
+export const GASTOS_VACIOS: GastosJornada = {
+  gasto_alimentacion: null,
+  gasto_transporte: null,
+  gasto_otros: null,
+  gasto_otros_nota: null,
+};
+
+/**
+ * Tope por campo: **5.000.000 COP**. No es una regla contable, es un cinturón
+ * contra el dedo gordo en el celular (sobra un cero y entran 480.000 en vez de
+ * 48.000). Está también en el CHECK de `supabase/migrations/0006_gastos_jornada.sql`:
+ * los dos se tocan juntos.
+ */
+export const TOPE_GASTO = 5_000_000;
+
+/**
+ * Los tres montos, con el texto que lee la gente. El orden es el del
+ * formulario, de la ficha y del CSV: una sola lista para que las tres
+ * pantallas no se desincronicen.
+ */
+export const CAMPOS_GASTO = [
+  {
+    campo: "gasto_alimentacion",
+    etiqueta: "Alimentación y viáticos",
+    ayuda: "Lo que pagaste de comida o refrigerio durante el turno.",
+  },
+  {
+    campo: "gasto_transporte",
+    etiqueta: "Transporte",
+    ayuda: "Buses, taxis, peajes o gasolina que pusiste tú.",
+  },
+  {
+    campo: "gasto_otros",
+    etiqueta: "Otros gastos",
+    ayuda: "Materiales, parqueadero, una herramienta de urgencia…",
+  },
+] as const;
+
+export type CampoGasto = (typeof CAMPOS_GASTO)[number]["campo"];
+
+/** El `name` del campo de la nota en el formulario. */
+export const CAMPO_NOTA_GASTO = "gasto_otros_nota";
+
+/** Lo que gastó en total esta jornada. `0` = no hay nada anotado. */
+export function totalGastos(gastos: Partial<GastosJornada> | null | undefined): number {
+  if (!gastos) return 0;
+  return CAMPOS_GASTO.reduce((suma, { campo }) => {
+    const valor = gastos[campo];
+    return suma + (typeof valor === "number" && Number.isFinite(valor) ? valor : 0);
+  }, 0);
+}
+
+/** true si hay al menos un monto anotado. Es la condición para pintar algo. */
+export function hayGastos(gastos: Partial<GastosJornada> | null | undefined): boolean {
+  return totalGastos(gastos) > 0;
+}
+
+/** El total de gastos de un conjunto de jornadas (el periodo, el filtro). */
+export function sumarGastos(
+  jornadas: readonly (Partial<GastosJornada> | null | undefined)[],
+): number {
+  return jornadas.reduce((suma, j) => suma + totalGastos(j), 0);
+}
+
+/** `48000` → `"48.000"`. El punto es el separador de miles en Colombia. */
+export function agruparMiles(n: number): string {
+  return String(Math.trunc(Math.abs(n))).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+}
+
+/** `48000` → `"$ 48.000"`. Lo que se pinta en pantalla. */
+export function formatearPesos(n: number): string {
+  return `$ ${agruparMiles(n)}`;
+}
+
+/** Lo que va dentro del campo del formulario: los miles agrupados, sin `$`. */
+export function valorCampoGasto(n: number | null | undefined): string {
+  return typeof n === "number" && Number.isFinite(n) && n > 0 ? agruparMiles(n) : "";
+}
+
+/**
+ * Lo que la persona escribió, convertido a pesos enteros.
+ *
+ * Acepta lo que de verdad se teclea en un celular: `48000`, `48.000`, `$48.000`
+ * y con espacios. Los puntos son separadores de miles, no decimales. Un `0` o
+ * un campo vacío devuelven `null` (ver la nota de arriba: `null` ≠ `0`).
+ */
+export function interpretarMonto(
+  crudo: string,
+  etiqueta: string,
+): { valor: number | null } | { error: string } {
+  const limpio = crudo
+    .trim()
+    .replace(/^\$/, "")
+    .replace(/[\s .]/g, "");
+
+  if (limpio === "") return { valor: null };
+
+  if (!/^\d+$/.test(limpio))
+    return {
+      error: `Revisa el monto de «${etiqueta}»: anótalo en pesos enteros, sin centavos ni letras (por ejemplo 48.000).`,
+    };
+
+  const valor = Number(limpio);
+  if (!Number.isFinite(valor))
+    return { error: `Revisa el monto de «${etiqueta}»: no pudimos leer esa cifra.` };
+  if (valor > TOPE_GASTO)
+    return {
+      error: `El monto de «${etiqueta}» no puede pasar de ${formatearPesos(
+        TOPE_GASTO,
+      )}. Revisa si sobró un cero; si de verdad fue más, divídelo y cuéntalo en la nota.`,
+    };
+
+  return { valor: valor === 0 ? null : valor };
+}
+
+/**
+ * Lee los tres montos y la nota del `FormData` de una jornada.
+ *
+ * Es la MISMA validación para el portal y para el panel: los dos la llaman
+ * desde su server action, nunca confían en lo que validó el navegador.
+ * Devuelve `error` con el mensaje ya escrito en español, listo para `fail()`.
+ */
+export function leerGastos(
+  formData: FormData,
+): { gastos: GastosJornada } | { error: string } {
+  const gastos: GastosJornada = { ...GASTOS_VACIOS };
+
+  for (const { campo, etiqueta } of CAMPOS_GASTO) {
+    const bruto = formData.get(campo);
+    const leido = interpretarMonto(typeof bruto === "string" ? bruto : "", etiqueta);
+    if ("error" in leido) return { error: leido.error };
+    gastos[campo] = leido.valor;
+  }
+
+  const notaBruta = formData.get(CAMPO_NOTA_GASTO);
+  const nota = typeof notaBruta === "string" ? notaBruta.trim() : "";
+
+  if (nota.length > LIMITES_JORNADA.notaGasto)
+    return {
+      error: `La nota de los otros gastos es demasiado larga (máximo ${LIMITES_JORNADA.notaGasto} caracteres).`,
+    };
+
+  // Una nota sin monto no explica nada y se perdería al guardar: mejor decirlo
+  // que descartarla en silencio.
+  if (nota !== "" && gastos.gasto_otros === null)
+    return {
+      error:
+        "Escribiste de qué fueron los otros gastos pero no su monto. Anota el monto en «Otros gastos» o borra la nota.",
+    };
+
+  gastos.gasto_otros_nota = nota === "" ? null : nota;
+  return { gastos };
+}

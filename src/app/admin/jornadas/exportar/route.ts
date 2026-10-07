@@ -49,6 +49,11 @@
  * El BOM tiene que ser el primer carácter del cuerpo, sin nada delante: si lo
  * precediera cualquier otra cosa, Excel tampoco lo reconocería.
  *
+ * LOS GASTOS REEMBOLSABLES VAN COMO NÚMERO, no como texto: pesos enteros sin
+ * `$` y sin separador de miles, para que Excel los sume sin convertir nada. Un
+ * campo sin monto sale VACÍO, nunca «0» (regla 9). Y son plata, no tiempo: las
+ * columnas de horas siguen siendo horas, estas no entran en ningún cálculo.
+ *
  * INYECCIÓN DE FÓRMULAS: una celda que empiece por `=`, `+`, `-` o `@` la
  * ejecuta Excel al abrir el archivo. Como el texto lo escribe cualquiera desde
  * el portal (una descripción que empiece por «=» basta), esas celdas se
@@ -72,7 +77,14 @@ import {
   horasDecimales,
   hoyEnColombia,
 } from "@/lib/jornada";
-import { ETIQUETA_ESTADO, leerFiltros } from "@/lib/jornada-types";
+import {
+  CAMPOS_GASTO,
+  ETIQUETA_ESTADO,
+  leerFiltros,
+  sumarGastos,
+  totalGastos,
+  type CampoGasto,
+} from "@/lib/jornada-types";
 
 export const dynamic = "force-dynamic";
 
@@ -98,6 +110,19 @@ function celdaHoras(minutos: number): string {
 /** Una celda numérica cualquiera, con coma decimal. */
 function celdaNumero(n: number): string {
   return String(Math.round(n * 100) / 100).replace(".", ",");
+}
+
+/**
+ * Un monto en pesos: **número pelado, sin `$` ni separador de miles**, para que
+ * Excel lo sume sin que nadie tenga que convertir la columna. Son enteros, así
+ * que no llevan parte decimal.
+ *
+ * `null` o `0` salen como celda VACÍA, no como «0» (regla 9): un cero en la
+ * columna afirmaría que la persona declaró no haber gastado nada, y además
+ * ensuciaría cualquier promedio que alguien saque en la hoja.
+ */
+function celdaMonto(n: number | null | undefined): string {
+  return typeof n === "number" && Number.isFinite(n) && n > 0 ? String(Math.trunc(n)) : "";
 }
 
 function fila(celdas: readonly string[]): string {
@@ -147,6 +172,12 @@ export async function GET(request: Request): Promise<Response> {
     "Cálculo",
     "Revisada por",
     "Fecha de revisión",
+    // Gastos reembolsables (0006). Van en pesos ENTEROS y como número, no como
+    // texto: la gracia de la columna es que se pueda sumar en la hoja. No son
+    // horas ni salen de ningún cálculo, y el encabezado lo dice.
+    ...CAMPOS_GASTO.map((g) => `${g.etiqueta} (COP)`),
+    "Total gastos (COP)",
+    "Nota de otros gastos",
     "Labor realizada",
     "Observaciones",
     "Nota de revisión",
@@ -185,6 +216,9 @@ export async function GET(request: Request): Promise<Response> {
         celda(resuelto.congelado ? "Congelado al aprobar" : "En vivo"),
         celda(j.revisorNombre),
         celda(j.reviewed_at ? formatearFechaNumerica(fechaColombia(j.reviewed_at)) : ""),
+        ...CAMPOS_GASTO.map((g) => celdaMonto(j[g.campo])),
+        celdaMonto(totalGastos(j)),
+        celda(j.gasto_otros_nota),
         celda(j.description),
         celda(j.observations),
         celda(j.review_note),
@@ -195,6 +229,8 @@ export async function GET(request: Request): Promise<Response> {
   /* ---------------- Fila de totales ---------------- */
   if (totales.jornadas > 0) {
     const vacias = (n: number) => Array.from({ length: n }, () => celda(""));
+    const sumaDeGasto = (campo: CampoGasto) =>
+      jornadas.reduce((suma, j) => suma + (j[campo] ?? 0), 0);
     lineas.push(
       fila([
         celda(`TOTALES (${totales.jornadas})`),
@@ -208,7 +244,12 @@ export async function GET(request: Request): Promise<Response> {
         celdaHoras(totales.minutosNocturnos),
         celdaHoras(totales.minutosDominicales),
         celdaNumero(totales.horasEquivalentes),
-        ...vacias(7), // Festivos … Nota de revisión
+        ...vacias(4), // Festivos del turno … Fecha de revisión
+        // Los gastos también suman en la fila de totales: es el reembolso del
+        // periodo exportado, el número que alguien va a llevar a la caja.
+        ...CAMPOS_GASTO.map((g) => celdaMonto(sumaDeGasto(g.campo))),
+        celdaMonto(sumarGastos(jornadas)),
+        ...vacias(4), // Nota de otros gastos … Nota de revisión
       ]),
     );
   }

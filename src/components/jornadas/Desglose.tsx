@@ -23,7 +23,15 @@ import {
   type DesgloseJornada,
   type TotalesJornadas,
 } from "@/lib/jornada";
-import { ETIQUETA_ESTADO, type EstadoJornada } from "@/lib/jornada-types";
+import {
+  CAMPOS_GASTO,
+  ETIQUETA_ESTADO,
+  formatearPesos,
+  hayGastos,
+  totalGastos,
+  type EstadoJornada,
+  type GastosJornada,
+} from "@/lib/jornada-types";
 import { Insignia } from "@/components/admin/ui-base";
 import {
   CHIP_AZUL,
@@ -232,6 +240,85 @@ export function Desglose({
 }
 
 /* ------------------------------------------------------------------ */
+/* Gastos reembolsables de una jornada                                 */
+/* ------------------------------------------------------------------ */
+
+/**
+ * LO QUE LA PERSONA PUSO DE SU BOLSILLO (migración 0006).
+ *
+ * La misma pieza la usan la ficha de `/admin/jornadas/[id]` y el historial del
+ * portal, por el mismo motivo que `Desglose`: si cada pantalla lo pintara a su
+ * manera, acabarían discrepando.
+ *
+ * **NO SON HORAS NI SE CALCULAN**: son el soporte de un reembolso que PIYC
+ * paga aparte y que no toca el desglose congelado.
+ *
+ * REGLA 9: sin ningún monto anotado no se pinta nada —ni la tarjeta, ni un
+ * total en cero—, y cada línea aparece solo si tiene valor.
+ */
+export function GastosJornadaDetalle({ gastos }: { gastos: GastosJornada }) {
+  if (!hayGastos(gastos)) return null;
+
+  const filas = CAMPOS_GASTO.filter(({ campo }) => (gastos[campo] ?? 0) > 0);
+  const total = totalGastos(gastos);
+
+  return (
+    <div className="space-y-3">
+      <div className="overflow-hidden rounded-control ring-1 ring-separador">
+        <table className="w-full border-collapse text-sm">
+          <caption className="sr-only">
+            Gastos que la persona puso de su bolsillo en esta jornada.
+          </caption>
+          <tbody>
+            {filas.map(({ campo, etiqueta }) => (
+              <tr key={campo} className="border-b border-separador last:border-0">
+                <th
+                  scope="row"
+                  className="px-3.5 py-2 text-left font-normal text-acero-700"
+                >
+                  {etiqueta}
+                </th>
+                <td className="px-3.5 py-2 text-right font-semibold tabular-nums text-azul-950">
+                  {formatearPesos(gastos[campo] ?? 0)}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+          <tfoot>
+            <tr className="border-t border-separador bg-lienzo-alto">
+              <th
+                scope="row"
+                className="px-3.5 py-2 text-left font-semibold text-azul-950"
+              >
+                Total por reembolsar
+              </th>
+              <td className="px-3.5 py-2 text-right font-semibold tabular-nums text-azul-950">
+                {formatearPesos(total)}
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      {gastos.gasto_otros_nota && (
+        <p className="text-sm leading-relaxed text-acero-700">
+          <span className="font-semibold text-azul-950">Otros gastos:</span>{" "}
+          {gastos.gasto_otros_nota}
+        </p>
+      )}
+      {gastos.gasto_otros !== null &&
+        gastos.gasto_otros > 0 &&
+        !gastos.gasto_otros_nota && (
+          <p className="text-sm leading-relaxed text-acero-600">
+            Los «otros gastos» se registraron sin nota: si no se sabe de qué
+            fueron, conviene preguntarlo antes de aprobar.
+          </p>
+        )}
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
 /* Totales de un conjunto de jornadas                                  */
 /* ------------------------------------------------------------------ */
 
@@ -243,10 +330,17 @@ export function TotalesDesglose({
   totales,
   titulo = "Totales del filtro",
   descripcion,
+  gastos = 0,
 }: {
   totales: TotalesJornadas;
   titulo?: string;
   descripcion?: string;
+  /**
+   * Gastos reembolsables del mismo conjunto, en pesos. Va aparte de las horas
+   * —y se dice en pantalla— porque no es tiempo ni sale de ningún cálculo.
+   * `0` no se pinta (regla 9).
+   */
+  gastos?: number;
 }) {
   if (totales.jornadas === 0) return null;
 
@@ -287,6 +381,16 @@ export function TotalesDesglose({
             </div>
           ))}
         </dl>
+      )}
+
+      {gastos > 0 && (
+        <p className="mt-4 border-t border-separador pt-3 text-sm text-acero-700">
+          <span className="font-semibold text-azul-950">
+            Gastos reembolsables: {formatearPesos(gastos)}
+          </span>{" "}
+          — lo que el equipo puso de su bolsillo en estas jornadas. No es tiempo
+          ni entra en el cálculo de horas: se reembolsa aparte.
+        </p>
       )}
     </section>
   );

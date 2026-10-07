@@ -11,9 +11,12 @@ import {
 import {
   OPCIONES_ESTADO_FILTRO,
   PARAM_FILTRO,
+  formatearPesos,
   hayFiltros,
   hrefConFiltros,
   leerFiltros,
+  sumarGastos,
+  totalGastos,
 } from "@/lib/jornada-types";
 import { formatearDuracion, formatearFechaCorta, rangoHorario } from "@/lib/jornada";
 import {
@@ -76,6 +79,9 @@ export default async function JornadasPage({
   const base = hrefConFiltros("/admin/jornadas", filtros);
 
   const pendientes = jornadas.filter((j) => j.status === "pendiente").length;
+  // Gastos reembolsables del periodo filtrado. Es plata, no tiempo: se suma
+  // aparte de las horas y, si nadie anotó nada, no se pinta (regla 9).
+  const gastosDelFiltro = sumarGastos(jornadas);
 
   return (
     <>
@@ -180,6 +186,7 @@ export default async function JornadasPage({
       <div className="mb-5">
         <TotalesDesglose
           totales={totales}
+          gastos={gastosDelFiltro}
           titulo={conFiltros ? "Totales del filtro" : "Totales de todo el histórico"}
           descripcion={`${totales.jornadas} ${
             totales.jornadas === 1 ? "jornada" : "jornadas"
@@ -214,6 +221,7 @@ export default async function JornadasPage({
           <ul id="lista-jornadas" className="scroll-mt-8 space-y-3">
             {pagina.visibles.map((j) => {
               const resuelto = desgloses.get(j.id);
+              const gastos = totalGastos(j);
               return (
                 <li
                   key={j.id}
@@ -256,6 +264,17 @@ export default async function JornadasPage({
                     <p className="mt-1 line-clamp-2 text-sm leading-relaxed text-acero-600">
                       {j.description}
                     </p>
+
+                    {/* Gastos: solo si hay (regla 9). Van en su propia línea
+                        para que no se confundan con las horas. */}
+                    {gastos > 0 && (
+                      <p className="mt-1.5 text-sm text-acero-700">
+                        <span className="font-semibold tabular-nums text-azul-950">
+                          {formatearPesos(gastos)}
+                        </span>{" "}
+                        en gastos por reembolsar
+                      </p>
+                    )}
                   </div>
 
                   <Link

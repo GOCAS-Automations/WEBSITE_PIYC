@@ -30,7 +30,17 @@ import {
   type JornadaConfig,
 } from "@/lib/jornada";
 import type { MapaHorarios } from "@/lib/horarios";
-import { LIMITES_JORNADA, type JornadaRecord } from "@/lib/jornada-types";
+import {
+  CAMPOS_GASTO,
+  CAMPO_NOTA_GASTO,
+  LIMITES_JORNADA,
+  TOPE_GASTO,
+  agruparMiles,
+  formatearPesos,
+  valorCampoGasto,
+  type CampoGasto,
+  type JornadaRecord,
+} from "@/lib/jornada-types";
 import {
   ayudaCampo,
   banner,
@@ -313,6 +323,9 @@ export function FormularioJornada({
         />
       </div>
 
+      {/* Gastos de bolsillo — opcionales y aparte del cálculo de horas */}
+      <CamposGastos jornada={jornada} />
+
       {/* Vista previa del cálculo */}
       {previa && (
         <div className="rounded-tarjeta bg-azul-50 p-4">
@@ -364,5 +377,137 @@ export function FormularioJornada({
         )}
       </div>
     </form>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Gastos de bolsillo (opcionales)                                     */
+/* ------------------------------------------------------------------ */
+
+/**
+ * LO QUE LA PERSONA PUSO DE SU BOLSILLO Y LA EMPRESA LE REEMBOLSA.
+ *
+ * Tres montos y una nota, **todos opcionales**: muchas jornadas de PIYC son en
+ * campo y el almuerzo, el bus o un repuesto de urgencia los paga quien va.
+ *
+ * SON DATOS, NO CÁLCULO: no entran en el desglose ni en ningún recargo, y por
+ * eso este bloque vive fuera de la vista previa de horas. Si no se anota nada,
+ * no cambia nada.
+ *
+ * PENSADO PARA EL CELULAR EN OBRA:
+ *   · `inputMode="numeric"` abre el teclado de números —no `type="number"`,
+ *     que no admite el punto de los miles y en Android regala una ruedita que
+ *     cambia la cifra al rozarla—.
+ *   · Los miles se agrupan MIENTRAS SE ESCRIBE: «48000» se ve «48.000» en el
+ *     momento, que es como se lee un precio en Colombia y es la única forma de
+ *     notar al vuelo que sobró un cero.
+ *   · El `$` lo pinta el campo; nadie tiene que escribirlo.
+ *   · La nota aparece sola cuando hay un monto en «Otros gastos»: es ahí donde
+ *     hace falta, y así no estorba el resto del tiempo.
+ */
+function CamposGastos({ jornada }: { jornada?: JornadaRecord }) {
+  const [montos, setMontos] = useState<Record<CampoGasto, string>>(() => ({
+    gasto_alimentacion: valorCampoGasto(jornada?.gasto_alimentacion),
+    gasto_transporte: valorCampoGasto(jornada?.gasto_transporte),
+    gasto_otros: valorCampoGasto(jornada?.gasto_otros),
+  }));
+
+  const cambiar = (campo: CampoGasto, bruto: string) => {
+    // Se queda solo con los dígitos: el punto que se ve lo pone el formateo, y
+    // así da igual si alguien lo teclea, lo pega con «$» o lo copia de una
+    // factura.
+    const digitos = bruto.replace(/\D/g, "").replace(/^0+(?=\d)/, "").slice(0, 9);
+    const valor =
+      digitos === "" ? "" : agruparMiles(Math.min(Number(digitos), TOPE_GASTO));
+    setMontos((prev) => ({ ...prev, [campo]: valor }));
+  };
+
+  const total = CAMPOS_GASTO.reduce(
+    (suma, { campo }) => suma + Number(montos[campo].replace(/\./g, "") || 0),
+    0,
+  );
+
+  return (
+    <div className="rounded-control bg-lienzo-alto p-4 ring-1 ring-separador">
+      <p className="text-sm font-semibold text-azul-950">
+        ¿Gastaste algo de tu bolsillo?{" "}
+        <span className="font-normal text-acero-600">(opcional)</span>
+      </p>
+      <p className="mt-1 text-xs leading-relaxed text-acero-600">
+        Anota lo que pagaste tú y la empresa te reembolsa. Si no gastaste nada,
+        deja los campos vacíos: <strong>no afecta el cálculo de tus horas</strong>.
+      </p>
+
+      <div className="mt-4 grid gap-4 sm:grid-cols-3">
+        {CAMPOS_GASTO.map(({ campo, etiqueta, ayuda }) => (
+          <div key={campo}>
+            <label htmlFor={`jornada-${campo}`} className={etiquetaCampo}>
+              {etiqueta}
+            </label>
+            <div className="relative">
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-semibold text-acero-500"
+              >
+                $
+              </span>
+              <input
+                id={`jornada-${campo}`}
+                type="text"
+                name={campo}
+                value={montos[campo]}
+                onChange={(e) => cambiar(campo, e.target.value)}
+                inputMode="numeric"
+                autoComplete="off"
+                // Sin `placeholder="0"`: un cero en gris se lee como un dato y
+                // aquí vacío significa «no gastó nada» (regla 9). El `$` de la
+                // izquierda ya dice que el campo es plata.
+                aria-describedby={`jornada-${campo}-ayuda`}
+                className={`${inputClass} pl-8 tabular-nums`}
+              />
+            </div>
+            <span id={`jornada-${campo}-ayuda`} className={ayudaCampo}>
+              {ayuda}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      {/* La nota solo tiene sentido si hay un «otro» gasto que explicar. */}
+      {montos.gasto_otros !== "" && (
+        <div className="mt-4">
+          <label htmlFor={`jornada-${CAMPO_NOTA_GASTO}`} className={etiquetaCampo}>
+            ¿De qué fueron esos otros gastos?
+          </label>
+          <input
+            id={`jornada-${CAMPO_NOTA_GASTO}`}
+            type="text"
+            name={CAMPO_NOTA_GASTO}
+            maxLength={LIMITES_JORNADA.notaGasto}
+            defaultValue={jornada?.gasto_otros_nota ?? ""}
+            placeholder="Ej.: parqueadero de la camioneta en la planta."
+            className={inputClass}
+          />
+          <span className={ayudaCampo}>
+            En una línea. Un monto sin explicación le deja dudas a quien aprueba.
+          </span>
+        </div>
+      )}
+
+      {/* Regla 9: si no hay nada anotado, no se pinta ningún total. */}
+      {total > 0 && (
+        <p
+          aria-live="polite"
+          className="mt-4 border-t border-separador pt-3 text-sm text-azul-950"
+        >
+          Total que anotaste:{" "}
+          <strong className="tabular-nums">{formatearPesos(total)}</strong>
+          <span className="block text-xs leading-relaxed text-acero-600">
+            Queda registrado junto a la jornada para que lo revise tu
+            coordinador. Máximo {formatearPesos(TOPE_GASTO)} por campo.
+          </span>
+        </p>
+      )}
+    </div>
   );
 }

@@ -40,8 +40,9 @@ import {
   instanteColombia,
   MAX_MINUTOS_TURNO,
 } from "@/lib/jornada";
-import { LIMITES_JORNADA } from "@/lib/jornada-types";
-import type { Json } from "@/lib/supabase/database.types";
+import { LIMITES_JORNADA, hayGastos, leerGastos } from "@/lib/jornada-types";
+import { escribirJornadaConGastos } from "@/lib/jornadas-escritura";
+import type { Database, Json } from "@/lib/supabase/database.types";
 import { fail, ok, text, textOrNull, SIN_PERMISO } from "@/lib/admin/formulario";
 import type { ActionState } from "@/lib/admin-types";
 
@@ -52,6 +53,15 @@ import type { ActionState } from "@/lib/admin-types";
  * dice explícitamente en un solo sitio, en vez de repartir `as` por el archivo.
  */
 const comoJson = (valor: unknown): Json => valor as Json;
+
+/**
+ * La forma que acepta un `update` de `jornadas`, según los tipos generados.
+ * Se nombra porque la edición se arma dos veces —con los gastos y sin ellos,
+ * por si la 0006 no está aplicada— y las dos tienen que pasar por el mismo
+ * tipo: con un `Record<string, unknown>` el cliente de Supabase rechaza
+ * cualquier clave y se pierde la comprobación de nombres de columna.
+ */
+type ActualizacionJornada = Database["public"]["Tables"]["jornadas"]["Update"];
 
 /** Todo lo que cambia cuando una jornada deja de estar aprobada. */
 const SIN_CONGELADO = {
@@ -335,6 +345,14 @@ export async function guardarJornadaComoManager(
       `La descripción es demasiado larga (máximo ${LIMITES_JORNADA.descripcion} caracteres).`,
     );
 
+  /* --- Gastos reembolsables (opcionales) ---
+     La misma validación que en el portal, con la misma función: no negativos,
+     tope por campo y un campo vacío en `null`, nunca en `0` (regla 9). Son
+     datos: ni el desglose ni los recargos los miran. */
+  const gastosLeidos = leerGastos(formData);
+  if ("error" in gastosLeidos) return fail(gastosLeidos.error);
+  const gastos = gastosLeidos.gastos;
+
   // La cuenta tiene que existir y estar activa: registrarle horas a una cuenta
   // desactivada casi siempre es un error de selección.
   const { data: persona } = await session.supabase
@@ -385,19 +403,25 @@ export async function guardarJornadaComoManager(
 
   if (id) {
     // Editar invalida el cálculo congelado: las horas cambiaron, así que la
-    // jornada vuelve a quedar pendiente de revisión.
-    const { data, error } = await session.supabase
-      .from("jornadas")
-      .update({
-        ...payload,
-        status: "pendiente",
-        review_note: null,
-        reviewed_by: null,
-        reviewed_at: null,
-        ...SIN_CONGELADO,
-      })
-      .eq("id", id)
-      .select("id");
+    // jornada vuelve a quedar pendiente de revisión. Es también el motivo por
+    // el que una jornada APROBADA no cambia de gastos sin volver a revisarse.
+    const revision = {
+      status: "pendiente" as const,
+      review_note: null,
+      reviewed_by: null,
+      reviewed_at: null,
+      ...SIN_CONGELADO,
+    };
+
+    // Los gastos viajan siempre, también en `null`: es lo que permite borrar
+    // un monto anotado por error.
+    const editar = (datos: ActualizacionJornada) =>
+      session.supabase.from("jornadas").update(datos).eq("id", id).select("id");
+
+    const { data, error } = await escribirJornadaConGastos(
+      () => editar({ ...payload, ...revision, ...gastos }),
+      () => editar({ ...payload, ...revision }),
+    );
 
     if (error) return fail(error.message);
     if (!data || data.length === 0)
@@ -415,9 +439,14 @@ export async function guardarJornadaComoManager(
      base lo que ya se validó arriba (rol de manager, cuenta destino activa,
      estado 'pendiente' y sin desglose). Las comprobaciones de este archivo se
      quedan porque dan el mensaje en español; la RLS es la red de abajo. */
-  const { error } = await session.supabase
-    .from("jornadas")
-    .insert({ ...payload, status: "pendiente" });
+  const nueva = { ...payload, status: "pendiente" as const };
+  const { error } = await escribirJornadaConGastos(
+    () =>
+      session.supabase
+        .from("jornadas")
+        .insert(hayGastos(gastos) ? { ...nueva, ...gastos } : nueva),
+    () => session.supabase.from("jornadas").insert(nueva),
+  );
 
   if (error) return fail(error.message);
 

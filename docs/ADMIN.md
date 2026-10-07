@@ -228,14 +228,29 @@ Desde tu portal (`/mi-cuenta`) puedes registrar tus horas trabajadas, pensado pa
 2. En **Registrar jornada**, llena **Fecha del día laboral** —el día en que **empezaste** el turno—, **Hora de inicio** y **Hora de finalización**.
 3. Si el turno pasó de la medianoche (por ejemplo, empezaste a las 10:00 p. m. y terminaste a las 2:00 a. m.), marca la casilla **Terminé al día siguiente**. Si no la marcas pero la hora de fin es menor que la de inicio, el sistema entiende igual que cruzó la medianoche y te lo avisa en pantalla.
 4. Escribe la orden de trabajo si la tuviste (opcional), la descripción de la labor y, si quieres, observaciones.
-5. Revisa el recuadro **Así quedarían estas horas**: se recalcula solo mientras escribes. No es definitivo — las cifras finales las fija tu coordinador al aprobar.
-6. Pulsa **Registrar jornada**.
+5. Si pusiste algo de tu bolsillo durante el turno, llena el recuadro **¿Gastaste algo de tu bolsillo?** — ver más abajo. Es **opcional**: si no gastaste nada, déjalo vacío.
+6. Revisa el recuadro **Así quedarían estas horas**: se recalcula solo mientras escribes. No es definitivo — las cifras finales las fija tu coordinador al aprobar.
+7. Pulsa **Registrar jornada**.
 
 <!-- captura: portal del empleado, formulario de registrar jornada con la vista previa -->
 
+### Gastos de tu bolsillo (opcional)
+
+Muchas jornadas son en campo y la comida, el bus o un repuesto de urgencia los paga quien va. Para que la empresa te los reembolse, anótalos en la jornada del día en que los gastaste:
+
+- **Alimentación y viáticos** — lo que pagaste de comida o refrigerio durante el turno.
+- **Transporte** — buses, taxis, peajes o gasolina que pusiste tú.
+- **Otros gastos** — materiales, parqueadero, una herramienta de urgencia… Al escribir un monto aquí aparece el campo **¿De qué fueron esos otros gastos?**: explícalo en una línea, porque un monto suelto no le dice nada a quien aprueba.
+
+Se anotan en **pesos, sin centavos**: escribe solo los números y el campo va poniendo los puntos de los miles («48000» se ve «48.000»). No hace falta escribir el signo de pesos. Debajo aparece el **total que anotaste**. El máximo por campo son 5.000.000 de pesos; si de verdad gastaste más, divídelo y cuéntalo en la nota.
+
+**Los gastos no cambian el cálculo de tus horas.** Son un reembolso aparte: el sistema no liquida nómina ni paga nada, solo deja el dato registrado junto a la jornada para que tu coordinador lo vea al revisarla. Un campo vacío queda vacío, no en cero.
+
+Mientras la jornada esté **pendiente** puedes corregir los gastos igual que el resto: **Editar** en tu historial. Una vez aprobada ya no se cambian.
+
 ### Tu historial
 
-En **Mis jornadas** ves todas tus jornadas con su estado, y puedes filtrar por **Mes** (desplegable) y por **Estado** (control segmentado: Todas · Pendiente · Aprobada · Rechazada). Cada jornada trae el desplegable **Ver el desglose de horas**. Mientras una jornada está **pendiente**, puedes **editarla** o **eliminarla** (con confirmación) desde ahí mismo. Una vez que se revisó, cualquier corrección la hace tu coordinador.
+En **Mis jornadas** ves todas tus jornadas con su estado, y puedes filtrar por **Mes** (desplegable) y por **Estado** (control segmentado: Todas · Pendiente · Aprobada · Rechazada). Cada jornada trae el desplegable **Ver el desglose de horas** y, si anotaste gastos, el bloque **Gastos de tu bolsillo** con su detalle y su total; arriba, el recuadro azul del periodo suma también lo que anotaste para que te reembolsen. Mientras una jornada está **pendiente**, puedes **editarla** o **eliminarla** (con confirmación) desde ahí mismo. Una vez que se revisó, cualquier corrección la hace tu coordinador.
 
 Los tres estados posibles son:
 
@@ -256,6 +271,8 @@ Bloque **Filtrar**: Persona («Todo el equipo»), Estado («Todos los estados»,
 ### Revisar una jornada
 
 Abre la ficha de una jornada pendiente («Revisar») para ver el detalle completo: persona, día, horario, orden de trabajo, labor realizada, observaciones y el desglose de horas.
+
+Si la persona anotó **gastos de su bolsillo**, aparece la tarjeta **Gastos de su bolsillo** —con cada monto, el total por reembolsar y la nota de los «otros»— encima del desglose, y un aviso junto al botón de aprobar: aprobar la jornada es también dar por bueno ese reembolso. Si no anotó nada, no se pinta nada. En el **listado**, cada jornada con gastos muestra su total debajo de la descripción, y la tarjeta de totales suma los **gastos reembolsables del filtro**. Esas cifras son **plata, no horas**: no entran en el cálculo de recargos ni en el desglose congelado, y el sistema no liquida nómina.
 
 1. **Aprobar jornada**: acepta el registro tal como está. Al aprobarla, su desglose de horas queda **congelado**: aunque después se corrija el horario del mes, esta jornada ya no cambia.
 
@@ -333,6 +350,7 @@ Desde **Jornadas**, con los filtros que quieras aplicar, pulsa **Exportar a CSV*
 - **Horas** (todas las columnas de horas son eso — **horas trabajadas, no dinero**; el sistema no calcula pagos ni nómina): presencia total, almuerzo, horas trabajadas, y el desglose completo por tipo — ordinaria diurna, ordinaria nocturna, extra diurna, extra nocturna, dominical/festiva diurna, dominical/festiva nocturna, extra dominical/festiva diurna y extra dominical/festiva nocturna —, además de los totales de ordinarias, extras, nocturnas y dominicales/festivas, y las horas equivalentes con recargo.
 - **Contexto del cálculo**: qué festivos tocó el turno y si el cálculo quedó «Congelado al aprobar» o sigue «En vivo» (se recalcula con el horario vigente).
 - **Revisión**: quién la revisó y cuándo.
+- **Gastos reembolsables**: alimentación y viáticos, transporte, otros gastos, el total de los tres y la nota de los «otros». Van en **pesos enteros y como número** (sin signo de pesos ni puntos de miles), así que se pueden sumar en la hoja sin convertir nada; una jornada sin gastos deja esas celdas **vacías**, no en cero. Son dinero, no horas: no entran en ninguna de las columnas de tiempo.
 - **Texto**: la labor realizada, las observaciones y la nota de revisión, si la hubo.
 
 Al final del archivo hay una **fila de totales** con la suma de todas las jornadas exportadas.

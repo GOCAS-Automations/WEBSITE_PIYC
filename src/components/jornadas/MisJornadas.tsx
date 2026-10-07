@@ -30,6 +30,10 @@ import { etiquetaMes, type MapaHorarios } from "@/lib/horarios";
 import {
   ETIQUETA_ESTADO,
   ESTADOS_JORNADA,
+  formatearPesos,
+  hayGastos,
+  sumarGastos,
+  totalGastos,
   type EstadoJornada,
   type JornadaRecord,
 } from "@/lib/jornada-types";
@@ -47,7 +51,7 @@ import {
   usePaginaLocal,
 } from "@/components/admin/ui-base";
 import { IconoLapiz, IconoPapelera } from "@/components/admin/iconos";
-import { ChipEstado, Desglose } from "./Desglose";
+import { ChipEstado, Desglose, GastosJornadaDetalle } from "./Desglose";
 import { FormularioJornada } from "./FormularioJornada";
 
 export function MisJornadas({
@@ -111,6 +115,10 @@ export function MisJornadas({
       ),
     [filtradas, desgloses],
   );
+
+  // Gastos del periodo filtrado: plata, no horas, y por eso va aparte de
+  // `sumarDesgloses`. Si no hay nada anotado, no se pinta (regla 9).
+  const gastosDelPeriodo = useMemo(() => sumarGastos(filtradas), [filtradas]);
 
   const pagina = usePaginaLocal(filtradas, `${mes}|${estado}`);
 
@@ -191,6 +199,14 @@ export function MisJornadas({
               </>
             )}
           </p>
+          {gastosDelPeriodo > 0 && (
+            <p className="mt-2 border-t border-azul-600 pt-2 text-sm text-azul-100">
+              <strong className="tabular-nums text-blanco">
+                {formatearPesos(gastosDelPeriodo)}
+              </strong>{" "}
+              en gastos que anotaste para que te reembolsen
+            </p>
+          )}
         </div>
       )}
 
@@ -255,6 +271,21 @@ export function MisJornadas({
                       <span className="font-semibold text-azul-950">Observaciones:</span>{" "}
                       {j.observations}
                     </p>
+                  )}
+
+                  {/* Gastos anotados: solo si hay (regla 9). Se muestran para
+                      que cada quien compruebe que quedó lo que escribió; no
+                      afectan las horas de la jornada. */}
+                  {hayGastos(j) && (
+                    <div className="mt-3">
+                      <p className="mb-1.5 text-sm font-semibold text-azul-950">
+                        Gastos de tu bolsillo:{" "}
+                        <span className="tabular-nums">
+                          {formatearPesos(totalGastos(j))}
+                        </span>
+                      </p>
+                      <GastosJornadaDetalle gastos={j} />
+                    </div>
                   )}
 
                   {/* Nota de revisión: lo primero que hay que ver si la devolvieron. */}

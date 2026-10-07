@@ -53,6 +53,10 @@ export type Database = {
           desglose: Json | null
           employee_id: string
           end_at: string
+          gasto_alimentacion: number | null
+          gasto_otros: number | null
+          gasto_otros_nota: string | null
+          gasto_transporte: number | null
           id: string
           observations: string | null
           review_note: string | null
@@ -72,6 +76,10 @@ export type Database = {
           desglose?: Json | null
           employee_id: string
           end_at: string
+          gasto_alimentacion?: number | null
+          gasto_otros?: number | null
+          gasto_otros_nota?: string | null
+          gasto_transporte?: number | null
           id?: string
           observations?: string | null
           review_note?: string | null
@@ -91,6 +99,10 @@ export type Database = {
           desglose?: Json | null
           employee_id?: string
           end_at?: string
+          gasto_alimentacion?: number | null
+          gasto_otros?: number | null
+          gasto_otros_nota?: string | null
+          gasto_transporte?: number | null
           id?: string
           observations?: string | null
           review_note?: string | null
