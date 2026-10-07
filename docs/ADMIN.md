@@ -53,9 +53,11 @@ Al guardar, el sitio público se refresca solo: casi siempre el cambio se ve al 
 
 Se edita en bloques, en el mismo orden en que se ven en la portada:
 
-- **Primera pantalla**: línea pequeña, titular, frase de apoyo, el texto y el destino de los dos botones, y la **Imagen principal de la portada**.
+- **Primera pantalla**: línea pequeña, titular, frase de apoyo, el texto y el destino de los dos botones, y el **fondo de la portada**.
 
-  La **Imagen principal de la portada** es la foto grande del recuadro de la derecha, lo primero que se ve al abrir el sitio. Se llena como cualquier campo de foto: **Subir imagen** y después la **Descripción de la imagen (texto alternativo)**, obligatoria en cuanto hay foto. Si se deja vacía —botón **Quitar**—, la portada vuelve a mostrar el esquema eléctrico animado que trae de fábrica. La foto se recorta a 4:3: conviene una apaisada, con lo importante al centro.
+  El fondo ocupa **toda la primera pantalla**, con un velo azul encima para que el texto se lea. El campo **Qué se ve de fondo** decide si se muestra **Una imagen** o **Un video**; lo que no se elige queda guardado. La **Imagen de fondo de la portada** se llena como cualquier campo de foto (**Subir imagen** + **Descripción de la imagen**, obligatoria), y conviene apaisada y ancha, con lo importante hacia la derecha, porque el texto va encima a la izquierda. El **Video de fondo** **no se sube desde el panel**: se pega la dirección de un archivo `.mp4` o `.webm` que ya esté en el almacenamiento del sitio o en Cloudinary (un enlace de YouTube, Vimeo o Drive no sirve, y el panel lo avisa); corto, sin sonido y liviano, porque se reproduce solo, en bucle y sin controles. Si hay video, el **Póster del video** es obligatorio: es lo que se ve mientras carga y lo único que ven quienes pidieron menos movimiento. Sin imagen y sin video, la portada muestra el marcador azul de marca con la cápsula «Imagen pendiente».
+- **Líneas de servicio**: la franja de cuatro líneas de trabajo que va debajo de la primera pantalla; de cada una se edita el nombre y una frase corta.
+- **Clientes**: la franja de logos con la que cierra la portada. Cada fila tiene el nombre de la empresa, el logo (**Subir logo**, PNG con fondo transparente o WebP), su descripción —obligatoria— y **Dirección del caso**: el slug del proyecto al que lleva ese logo. Si se deja vacío, o si ese proyecto no está publicado, el logo se pinta **sin enlace**. Las flechas cambian el orden y **Quitar** saca el logo; si se quitan todos, la franja desaparece del sitio. Arriba van la línea pequeña, el título y el párrafo de entrada de la franja.
 - **Qué hace PIYC**: línea pequeña, título, texto, foto y el texto del enlace que lleva a Nosotros.
 - **Franja de servicios** y **Franja de casos de éxito**: la línea pequeña, el título, el párrafo de entrada y el texto del enlace «ver todos» de cada una. El enlace siempre lleva a Servicios o a Proyectos; lo que se cambia aquí es cómo se llama. Si lo dejas vacío, el enlace no aparece.
 - **Cómo trabajamos**: la franja del proceso, con sus pasos.
@@ -140,6 +142,8 @@ El formulario de contacto del sitio **no manda correos**. Cuando alguien lo llen
 2. Se abre WhatsApp en el navegador de la persona, con el mensaje ya escrito, listo para que solo tenga que pulsar enviar.
 
 Muchas personas cierran WhatsApp sin pulsar enviar — por eso existe esta pantalla: el contacto queda registrado igual, con su teléfono, aunque el WhatsApp nunca haya llegado.
+
+Hay una tercera cosa, opcional y apagada hasta que PIYC entregue las credenciales de correo: si el servidor tiene configurado el envío, manda además un **aviso por correo** a quien atiende los mensajes. Es solo un aviso y se manda **después** de responderle al visitante: si falla, el lead ya quedó guardado y nadie se entera. **El canal sigue siendo WhatsApp y esta bandeja**, nunca el correo.
 
 <!-- captura: bandeja de Mensajes de contacto -->
 

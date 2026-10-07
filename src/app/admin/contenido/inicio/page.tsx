@@ -274,7 +274,7 @@ export default async function InicioPage() {
                 folder="inicio"
                 defaultValue={home.clientes?.logos}
                 slugsDisponibles={proyectos.map((p) => p.slug)}
-                hint="Sube el logo en PNG con fondo transparente o en WebP. En la portada se ven en gris y recuperan el color al pasar el puntero. Con las flechas cambias el orden; si quitas todos, la franja desaparece del sitio."
+                hint="Sube el logo en PNG con fondo transparente o en WebP. En la portada se ven a color y crecen un poco al pasar el puntero. Con las flechas cambias el orden; si quitas todos, la franja desaparece del sitio."
               />
             </div>
           </FormularioAdmin>
